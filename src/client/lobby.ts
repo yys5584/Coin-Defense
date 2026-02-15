@@ -44,47 +44,76 @@ export function renderLobby(container: HTMLElement) {
 function renderCurrentView(container: HTMLElement, state: ClientUserState) {
     container.innerHTML = '';
 
-    // 상단 바
+    // TopBar: profile + currencies(Soft/Shard7/Shard10) + settings
     const topBar = document.createElement('div');
     topBar.className = 'lobby-topbar';
+    const s7 = state.unlocks.license7Shards;
+    const s10 = state.unlocks.license10Shards;
     topBar.innerHTML = `
-        <div class="lobby-profile">
-            <span class="lobby-nickname">🎮 ${state.profile.nickname}</span>
-            <span class="lobby-uid">#${state.userId.slice(0, 8)}</span>
+        <div class="top-profile">
+            <div class="top-avatar">🎮</div>
+            <span class="top-name">${state.profile.nickname}</span>
         </div>
-        <div class="lobby-currency">
-            <span class="lobby-soft">💰 ${state.wallet.soft.toLocaleString()}</span>
+        <div class="top-currencies">
+            <div class="currency-pill">
+                <span class="c-icon">💰</span>
+                <span class="c-val">${state.wallet.soft.toLocaleString()}</span>
+            </div>
+            <div class="currency-pill shard7">
+                <span class="c-icon">🔑</span>
+                <span class="c-val">${s7}</span>
+            </div>
+            <div class="currency-pill shard10">
+                <span class="c-icon">⭐</span>
+                <span class="c-val">${s10}</span>
+            </div>
         </div>
+        <button class="top-settings" id="btn-settings">⚙️</button>
     `;
     container.appendChild(topBar);
 
-    // 본문
+    // Settings button
+    topBar.querySelector('#btn-settings')?.addEventListener('click', () => {
+        currentView = 'settings';
+        renderCurrentView(container, state);
+    });
+
+    // Body
     const body = document.createElement('div');
     body.className = 'lobby-body';
     container.appendChild(body);
 
-    switch (currentView) {
-        case 'home': renderHome(body, state); break;
-        case 'campaign': renderCampaign(body, state); break;
-        case 'stageDetail': renderStageDetail(body, state); break;
-        case 'missions': renderMissions(body, state); break;
-        case 'collection': renderCollection(body, state); break;
-        case 'license': renderLicense(body, state); break;
-        case 'shop': renderShop(body, state); break;
-        case 'settings': renderSettings(body, state); break;
+    if (currentView === 'home') {
+        // Home uses native 3-column grid
+        renderHome(body, state);
+    } else {
+        // Other views: wrap in scrollable full-width container
+        const scroll = document.createElement('div');
+        scroll.className = 'sub-page-scroll';
+        body.appendChild(scroll);
+
+        switch (currentView) {
+            case 'campaign': renderCampaign(scroll, state); break;
+            case 'stageDetail': renderStageDetail(scroll, state); break;
+            case 'missions': renderMissions(scroll, state); break;
+            case 'collection': renderCollection(scroll, state); break;
+            case 'license': renderLicense(scroll, state); break;
+            case 'shop': renderShop(scroll, state); break;
+            case 'settings': renderSettings(scroll, state); break;
+        }
     }
 
-    // 하단 네비게이션
+    // Bottom Tab Bar
     if (currentView !== 'stageDetail') {
         const nav = document.createElement('div');
         nav.className = 'lobby-nav';
         const navItems = [
-            { id: 'home', icon: '🏠', label: '홈' },
-            { id: 'campaign', icon: '⚔️', label: '캠페인' },
-            { id: 'missions', icon: '📋', label: '퀘스트' },
-            { id: 'collection', icon: '📖', label: '도감' },
-            { id: 'license', icon: '🔑', label: '라이선스' },
-            { id: 'shop', icon: '🛒', label: '상점' },
+            { id: 'home', icon: '🏠', label: 'Home' },
+            { id: 'campaign', icon: '⚔️', label: 'Campaign' },
+            { id: 'missions', icon: '📋', label: 'Quest' },
+            { id: 'collection', icon: '📖', label: 'Book' },
+            { id: 'shop', icon: '🛒', label: 'Shop' },
+            { id: 'license', icon: '🔑', label: 'License' },
         ];
 
         for (const item of navItems) {
@@ -101,89 +130,114 @@ function renderCurrentView(container: HTMLElement, state: ClientUserState) {
     }
 }
 
-// ── 홈 ──
+// Home
 function renderHome(body: HTMLElement, state: ClientUserState) {
     const nextUnlock = getNextUnlock(state);
     const bestRound = state.progress.bestRound;
     const currentStage = state.progress.unlockedStage;
+    const stageName = STAGE_INFO[currentStage]?.name ?? '';
 
-    body.innerHTML = `
-        <div class="lobby-home">
-            <!-- 3열 레이아웃: 왼쪽 사이드 / 중앙 / 오른쪽 사이드 -->
-            <div class="home-layout">
-                <!-- 왼쪽 사이드 메뉴 -->
-                <div class="side-menu side-left">
-                    <button class="side-btn" data-view="shop">
-                        <span class="side-icon">🛒</span>
-                        <span class="side-label">상점</span>
-                    </button>
-                    <button class="side-btn" data-view="collection">
-                        <span class="side-icon">📖</span>
-                        <span class="side-label">도감</span>
-                    </button>
-                    <button class="side-btn" data-view="license">
-                        <span class="side-icon">🔑</span>
-                        <span class="side-label">라이선스</span>
-                    </button>
-                </div>
+    // Left side menu
+    const leftPanel = document.createElement('div');
+    leftPanel.className = 'side-panel';
+    leftPanel.innerHTML = `
+        <button class="side-btn" data-view="shop">
+            <span class="side-icon">🛒</span>
+            <span class="side-label">Shop</span>
+        </button>
+        <button class="side-btn locked">
+            <span class="side-icon">👑</span>
+            <span class="side-label">VIP</span>
+            <span class="side-soon">SOON</span>
+        </button>
+        <button class="side-btn" data-view="collection">
+            <span class="side-icon">📢</span>
+            <span class="side-label">Notice</span>
+            <span class="side-badge">NEW</span>
+        </button>
+    `;
+    body.appendChild(leftPanel);
 
-                <!-- 중앙 게임 영역 -->
-                <div class="home-center">
-                    <!-- 최고 웨이브 표시 -->
-                    <div class="best-wave-display">
-                        <span class="best-wave-num">${bestRound}</span>
-                    </div>
-                    <div class="best-wave-label">최고 웨이브 <strong>${bestRound}</strong></div>
+    // Center hub
+    const center = document.createElement('div');
+    center.className = 'center-hub';
+    center.innerHTML = `
+        <div class="wave-display">
+            <div class="wave-big">${bestRound}</div>
+            <div class="wave-sub">Best Wave</div>
+        </div>
 
-                    <!-- 스테이지 정보 -->
-                    <div class="stage-info-bar">
-                        <span>🏰 S${currentStage}</span>
-                        <span>${STAGE_INFO[currentStage]?.name ?? ''}</span>
-                    </div>
-
-                    ${nextUnlock
-            ? `<div class="next-unlock-hint">🔓 다음: ${nextUnlock}</div>`
-            : '<div class="next-unlock-hint complete">✅ 모든 스테이지 해금!</div>'
-        }
-
-                    <!-- 큰 CTA 버튼 -->
-                    <button class="lobby-cta-main" id="cta-campaign">
-                        <span class="cta-text">빠른 시작!</span>
-                        <span class="cta-sub">⚡ 5</span>
-                    </button>
-                </div>
-
-                <!-- 오른쪽 사이드 메뉴 -->
-                <div class="side-menu side-right">
-                    <button class="side-btn" data-view="missions">
-                        <span class="side-icon">📋</span>
-                        <span class="side-label">퀘스트</span>
-                    </button>
-                    <button class="side-btn" data-view="campaign">
-                        <span class="side-icon">⚔️</span>
-                        <span class="side-label">캠페인</span>
-                    </button>
-                    <button class="side-btn side-locked">
-                        <span class="side-icon">🏆</span>
-                        <span class="side-label">랭크</span>
-                        <span class="side-soon">SOON</span>
-                    </button>
-                    <button class="side-btn" data-view="settings">
-                        <span class="side-icon">⚙️</span>
-                        <span class="side-label">설정</span>
-                    </button>
-                </div>
+        <div class="progress-card">
+            <div class="prog-row">
+                <span class="prog-label">Stage</span>
+                <span class="prog-value">S${currentStage} ${stageName}</span>
             </div>
+            <div class="prog-row">
+                <span class="prog-label">Best Round</span>
+                <span class="prog-value">R${bestRound}</span>
+            </div>
+            ${nextUnlock
+            ? `<div class="prog-next">🔓 Next: ${nextUnlock}</div>`
+            : '<div class="prog-next complete">✅ All Stages Unlocked!</div>'
+        }
+        </div>
+
+        <button class="cta-primary" id="cta-start">
+            <span>Campaign Start</span>
+            <span class="cta-sub-line">⚡ S${currentStage}</span>
+        </button>
+
+        <div class="secondary-actions">
+            <button class="btn-secondary" id="btn-difficulty">Difficulty</button>
+            <button class="btn-secondary disabled">Party (Soon)</button>
         </div>
     `;
+    body.appendChild(center);
 
-    body.querySelector('#cta-campaign')?.addEventListener('click', () => {
+    // Right side menu
+    const rightPanel = document.createElement('div');
+    rightPanel.className = 'side-panel';
+    rightPanel.innerHTML = `
+        <button class="side-btn" data-view="missions">
+            <span class="side-icon">📋</span>
+            <span class="side-label">Quest</span>
+            <span class="side-badge dot"></span>
+        </button>
+        <button class="side-btn" data-view="campaign">
+            <span class="side-icon">⚔️</span>
+            <span class="side-label">Stage</span>
+        </button>
+        <button class="side-btn locked">
+            <span class="side-icon">🎫</span>
+            <span class="side-label">Pass</span>
+            <span class="side-soon">SOON</span>
+        </button>
+        <button class="side-btn" data-view="license">
+            <span class="side-icon">🔑</span>
+            <span class="side-label">License</span>
+        </button>
+        <button class="side-btn locked">
+            <span class="side-icon">🏆</span>
+            <span class="side-label">Rank</span>
+            <span class="side-soon">SOON</span>
+        </button>
+    `;
+    body.appendChild(rightPanel);
+
+    // Event listeners
+    center.querySelector('#cta-start')?.addEventListener('click', () => {
         currentView = 'campaign';
         const container = body.parentElement!;
         renderCurrentView(container, state);
     });
 
-    body.querySelectorAll('.side-btn:not(.side-locked)').forEach(btn => {
+    center.querySelector('#btn-difficulty')?.addEventListener('click', () => {
+        currentView = 'campaign';
+        const container = body.parentElement!;
+        renderCurrentView(container, state);
+    });
+
+    body.querySelectorAll('.side-btn:not(.locked)').forEach(btn => {
         btn.addEventListener('click', () => {
             const view = (btn as HTMLElement).dataset.view as LobbyView;
             if (view) {
