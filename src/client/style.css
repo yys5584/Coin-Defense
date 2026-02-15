@@ -2,12 +2,37 @@
    CoinRandomDefense v3.5 - Premium UI
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+/* ── Monogram 픽셀 폰트 (로컬) ── */
+@font-face {
+    font-family: 'Monogram';
+    src: url('/fonts/monogram.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Monogram Extended';
+    src: url('/fonts/monogram-extended.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Monogram Extended';
+    src: url('/fonts/monogram-extended-italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
 }
 
 :root {
@@ -33,7 +58,7 @@
 }
 
 body {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Monogram Extended', 'Monogram', monospace;
     background: var(--bg);
     color: var(--text);
     height: 100vh;
@@ -55,7 +80,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Monogram Extended', 'Monogram', monospace;
 }
 
 .lobby-bg {
@@ -198,7 +223,7 @@ body {
     border-radius: 8px;
     color: #e8ecf4;
     font-size: 14px;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Monogram Extended', 'Monogram', monospace;
     outline: none;
     transition: border-color .2s;
 }
@@ -220,7 +245,7 @@ body {
     border-radius: 10px;
     cursor: pointer;
     text-align: center;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Monogram Extended', 'Monogram', monospace;
     transition: all .2s;
     position: relative;
 }
@@ -272,7 +297,7 @@ body {
     color: #0a0e17;
     font-size: 16px;
     font-weight: 800;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Monogram Extended', 'Monogram', monospace;
     cursor: pointer;
     transition: all .2s;
     box-shadow: 0 4px 20px rgba(240, 178, 50, .3);
@@ -1718,7 +1743,7 @@ body {
     text-shadow: 0 1px 3px rgba(0, 0, 0, .8), 0 0 6px rgba(250, 204, 21, .4);
     pointer-events: none;
     z-index: 20;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Monogram Extended', 'Monogram', monospace;
 }
 
 /* 크리티컬 숫자 — 더 크고 빨간색 */
@@ -1731,7 +1756,7 @@ body {
     text-shadow: 0 0 8px rgba(255, 68, 68, .8), 0 0 16px rgba(255, 200, 50, .5), 0 2px 4px rgba(0, 0, 0, .9);
     pointer-events: none;
     z-index: 21;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Monogram Extended', 'Monogram', monospace;
     letter-spacing: 1px;
 }
 
