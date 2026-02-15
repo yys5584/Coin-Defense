@@ -639,7 +639,7 @@ body {
     max-height: 480px;
     position: relative;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     /* Arena background */
     background: radial-gradient(ellipse at 50% 50%, rgba(25, 32, 55, 1) 0%, rgba(12, 16, 28, 1) 100%);
     border: 2px solid rgba(91, 157, 245, .15);
