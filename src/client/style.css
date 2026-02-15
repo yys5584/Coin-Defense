@@ -63,12 +63,17 @@ body {
 }
 
 body {
-    font-family: 'Monogram Extended', 'Monogram', monospace;
+    font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
     color: var(--text);
     height: 810px;
     overflow: hidden;
 }
+
+.num {
+    font-variant-numeric: tabular-nums;
+}
+
 
 .hidden {
     display: none !important;

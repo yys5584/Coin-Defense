@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1440, initial-scale=1, user-scalable=no">
   <title>CoinRandomDefense v3.5</title>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="/src/client/style.css">
   <link rel="stylesheet" href="/src/client/lobby-pro.css">
 </head>
@@ -35,21 +37,21 @@
           <div class="hud-left">
             <div class="hud-pill">
               <span class="hud-label">ROUND</span>
-              <span class="hud-value" id="hud-round">0</span>
+              <span class="hud-value num" id="hud-round">0</span>
             </div>
             <div class="hud-hp-bar">
               <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
-              <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
+              <span class="hud-hp-text">❤️ <span id="hud-hp" class="num">30</span></span>
             </div>
           </div>
           <div class="hud-right">
             <div class="hud-pill gold-pill">
               <span class="hud-gold-icon">💰</span>
-              <span class="hud-value" id="hud-gold">10</span>
+              <span class="hud-value num" id="hud-gold">10</span>
             </div>
             <div class="hud-pill">
               <span class="hud-label">DPS</span>
-              <span class="hud-value" id="hud-dps">0</span>
+              <span class="hud-value num" id="hud-dps">0</span>
             </div>
             <button id="btn-info" class="hud-icon-btn" title="유닛 정보">📋</button>
             <button id="btn-speed" class="hud-icon-btn speed-btn" title="게임 속도">▶ 1x</button>
@@ -79,13 +81,13 @@
           <div class="cb-left">
             <div class="cb-level">
               <span class="cb-level-label">Lv</span>
-              <span class="cb-level-value" id="hud-level">1</span>
+              <span class="cb-level-value num" id="hud-level">1</span>
             </div>
             <div class="cb-xp">
               <div class="cb-xp-bar">
                 <div class="cb-xp-fill" id="dock-xp-fill" style="width:0%"></div>
               </div>
-              <span class="cb-xp-text" id="hud-xp">0/2 XP</span>
+              <span class="cb-xp-text num" id="hud-xp">0/2 XP</span>
             </div>
             <button id="btn-buy-xp" class="cb-btn cb-btn-xp">
               📈 XP 구매 <span class="cb-cost">4G</span>
