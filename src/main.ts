@@ -1871,9 +1871,11 @@ function onCombatComplete(result: CombatResult): void {
     p.freeRerolls += 1;
     log('🎁 보스 처치! 무료 리롤 +1', 'gold');
     handleBossBox(state.round).then(() => {
-      // ★ 마지막 라운드 클리어 체크 (7-7 = R45)
-      if (getStage(state.round) >= 7 && getStageRound(state.round) === '7-7') {
-        log('🏆 모든 스테이지 클리어! 축하합니다!', 'gold');
+      // ★ 캔페인 클리어 체크 (stageId+1의 x-7 도달 시)
+      const targetStage = currentStageId + 1;
+      const targetLabel = `${targetStage}-7`;
+      if (getStage(state.round) >= targetStage && getStageRound(state.round) === targetLabel) {
+        log(`🏆 스테이지 ${targetStage} 클리어! 축하합니다!`, 'gold');
         showGameOver();
         return;
       }
@@ -1882,9 +1884,11 @@ function onCombatComplete(result: CombatResult): void {
     return; // chest popup handles the flow
   }
 
-  // ★ 마지막 라운드 클리어 체크 (보스가 아닌 경우에도)
-  if (getStage(state.round) >= 7 && getStageRound(state.round) === '7-7') {
-    log('🏆 모든 스테이지 클리어! 축하합니다!', 'gold');
+  // ★ 캔페인 클리어 체크 (보스가 아닌 경우에도)
+  const targetStage2 = currentStageId + 1;
+  const targetLabel2 = `${targetStage2}-7`;
+  if (getStage(state.round) >= targetStage2 && getStageRound(state.round) === targetLabel2) {
+    log(`🏆 스테이지 ${targetStage2} 클리어! 축하합니다!`, 'gold');
     showGameOver();
     return;
   }
