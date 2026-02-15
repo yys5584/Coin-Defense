@@ -104,31 +104,75 @@ function renderCurrentView(container: HTMLElement, state: ClientUserState) {
 // ── 홈 ──
 function renderHome(body: HTMLElement, state: ClientUserState) {
     const nextUnlock = getNextUnlock(state);
+    const bestRound = state.progress.bestRound;
+    const currentStage = state.progress.unlockedStage;
 
     body.innerHTML = `
         <div class="lobby-home">
-            <div class="lobby-progress-card">
-                <div class="progress-title">📊 캠페인 진행도</div>
-                <div class="progress-stage">현재 스테이지: <strong>S${state.progress.unlockedStage}</strong></div>
-                <div class="progress-best">최고 라운드: <strong>R${state.progress.bestRound}</strong></div>
-                ${nextUnlock ? `<div class="progress-next">🔓 다음 해금: <strong>${nextUnlock}</strong></div>` : '<div class="progress-complete">✅ 모든 스테이지 해금!</div>'}
-            </div>
+            <!-- 3열 레이아웃: 왼쪽 사이드 / 중앙 / 오른쪽 사이드 -->
+            <div class="home-layout">
+                <!-- 왼쪽 사이드 메뉴 -->
+                <div class="side-menu side-left">
+                    <button class="side-btn" data-view="shop">
+                        <span class="side-icon">🛒</span>
+                        <span class="side-label">상점</span>
+                    </button>
+                    <button class="side-btn" data-view="collection">
+                        <span class="side-icon">📖</span>
+                        <span class="side-label">도감</span>
+                    </button>
+                    <button class="side-btn" data-view="license">
+                        <span class="side-icon">🔑</span>
+                        <span class="side-label">라이선스</span>
+                    </button>
+                </div>
 
-            <button class="lobby-cta-main" id="cta-campaign">
-                <span class="cta-icon">⚔️</span>
-                <span class="cta-text">캠페인 시작</span>
-            </button>
+                <!-- 중앙 게임 영역 -->
+                <div class="home-center">
+                    <!-- 최고 웨이브 표시 -->
+                    <div class="best-wave-display">
+                        <span class="best-wave-num">${bestRound}</span>
+                    </div>
+                    <div class="best-wave-label">최고 웨이브 <strong>${bestRound}</strong></div>
 
-            <div class="lobby-daily-preview">
-                <div class="daily-title">📋 오늘의 퀘스트</div>
-                <div class="daily-empty">퀘스트 탭에서 확인하세요</div>
-            </div>
+                    <!-- 스테이지 정보 -->
+                    <div class="stage-info-bar">
+                        <span>🏰 S${currentStage}</span>
+                        <span>${STAGE_INFO[currentStage]?.name ?? ''}</span>
+                    </div>
 
-            <div class="lobby-menu-grid">
-                <button class="lobby-menu-btn" data-view="collection">📖 도감</button>
-                <button class="lobby-menu-btn" data-view="license">🔑 라이선스</button>
-                <button class="lobby-menu-btn" data-view="shop">🛒 상점</button>
-                <button class="lobby-locked" data-view="ranked">🏆 랭크 <span class="coming-soon">Coming Soon</span></button>
+                    ${nextUnlock
+            ? `<div class="next-unlock-hint">🔓 다음: ${nextUnlock}</div>`
+            : '<div class="next-unlock-hint complete">✅ 모든 스테이지 해금!</div>'
+        }
+
+                    <!-- 큰 CTA 버튼 -->
+                    <button class="lobby-cta-main" id="cta-campaign">
+                        <span class="cta-text">빠른 시작!</span>
+                        <span class="cta-sub">⚡ 5</span>
+                    </button>
+                </div>
+
+                <!-- 오른쪽 사이드 메뉴 -->
+                <div class="side-menu side-right">
+                    <button class="side-btn" data-view="missions">
+                        <span class="side-icon">📋</span>
+                        <span class="side-label">퀘스트</span>
+                    </button>
+                    <button class="side-btn" data-view="campaign">
+                        <span class="side-icon">⚔️</span>
+                        <span class="side-label">캠페인</span>
+                    </button>
+                    <button class="side-btn side-locked">
+                        <span class="side-icon">🏆</span>
+                        <span class="side-label">랭크</span>
+                        <span class="side-soon">SOON</span>
+                    </button>
+                    <button class="side-btn" data-view="settings">
+                        <span class="side-icon">⚙️</span>
+                        <span class="side-label">설정</span>
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -139,7 +183,7 @@ function renderHome(body: HTMLElement, state: ClientUserState) {
         renderCurrentView(container, state);
     });
 
-    body.querySelectorAll('.lobby-menu-btn:not(.lobby-locked)').forEach(btn => {
+    body.querySelectorAll('.side-btn:not(.side-locked)').forEach(btn => {
         btn.addEventListener('click', () => {
             const view = (btn as HTMLElement).dataset.view as LobbyView;
             if (view) {
@@ -283,38 +327,51 @@ function renderQuestsUI(body: HTMLElement, dailyData: any, weeklyData: any) {
     const weekly = weeklyData.weekly;
     const MILESTONES = [30, 60, 100];
 
+    // 완료 카운트 계산
+    const totalQuests = quests.length;
+    const doneCount = quests.filter((q: any) => q.status === 'CLAIMED' || q.status === 'COMPLETED').length;
+
     const questCards = quests.map((q: any) => {
         const claimed = q.status === 'CLAIMED';
         const completed = q.status === 'COMPLETED';
         const rewards = JSON.parse(q.rewards_json ?? '{}');
         const slotIdx = q.slot_index;
         const canReroll = _questTab === 'daily' && (slotIdx === 1 || slotIdx === 2) && !completed && !claimed;
-        const slotLabel = _questTab === 'daily' ? (['고정', '실력', '변주'][slotIdx] ?? '') : ('#' + (slotIdx + 1));
+
+        // 진행률 계산
+        const progress = Math.min(q.progress, q.target);
+        const pct = q.target > 0 ? Math.floor((progress / q.target) * 100) : 0;
+        const isDone = completed || claimed;
+
+        // 보상 표시
+        const rewardAmt = rewards.soft ?? 0;
 
         let actionHtml = '';
         if (completed) {
-            actionHtml = '<button class="mission-claim-btn" data-quest="' + q.id + '">수령</button>';
+            actionHtml = '<button class="q-claim-btn" data-quest="' + q.id + '">수령</button>';
         } else if (claimed) {
-            actionHtml = '<span class="mission-claimed-badge">✅</span>';
+            actionHtml = '<span class="q-done-dot">●</span>';
         } else if (canReroll) {
             const costLabel = reroll.nextCost > 0 ? reroll.nextCost + 'G' : '무료';
-            actionHtml = '<button class="mission-reroll-btn" data-slot="' + slotIdx + '">🔄 ' + costLabel + '</button>';
+            actionHtml = '<button class="q-reroll-btn" data-slot="' + slotIdx + '">🔄 ' + costLabel + '</button>';
         }
 
-        let rewardHtml = '<span>💰' + (rewards.soft ?? 0) + '</span>';
-        if (rewards.shards7) rewardHtml += ' <span>🔑' + rewards.shards7 + '</span>';
-        if (rewards.shards10) rewardHtml += ' <span>💎' + rewards.shards10 + '</span>';
-        if (rewards.weeklyPoints) rewardHtml += ' <span>⭐' + rewards.weeklyPoints + 'pt</span>';
-
-        return '<div class="mission-card ' + (completed ? 'complete' : '') + ' ' + (claimed ? 'claimed' : '') + '">' +
-            '<div class="mission-slot-badge">' + slotLabel + '</div>' +
-            '<div class="mission-info">' +
-            '<span class="mission-desc">' + (q.description ?? q.name) + '</span>' +
-            '<span class="mission-progress">' + q.progress + '/' + q.target + '</span>' +
-            '</div>' +
-            '<div class="mission-reward">' + rewardHtml + '</div>' +
-            '<div class="mission-actions">' + actionHtml + '</div>' +
-            '</div>';
+        return `<div class="q-card ${isDone ? 'q-done' : ''} ${completed ? 'q-claimable' : ''}">
+            <div class="q-left">
+                <div class="q-reward-icon">💰</div>
+                <div class="q-reward-amt">${rewardAmt}</div>
+            </div>
+            <div class="q-mid">
+                <div class="q-desc">${q.description ?? q.name}</div>
+                <div class="q-bar-wrap">
+                    <div class="q-bar" style="width:${pct}%"></div>
+                </div>
+            </div>
+            <div class="q-right">
+                <div class="q-frac">${progress}/${q.target > 999 ? Math.floor(q.target / 1000) + 'K' : q.target}</div>
+                ${actionHtml}
+            </div>
+        </div>`;
     }).join('');
 
     let milestoneHtml = '';
@@ -334,17 +391,28 @@ function renderQuestsUI(body: HTMLElement, dailyData: any, weeklyData: any) {
         milestoneHtml = '<div class="reroll-info">리롤: 1회 무료, 이후 점증 | ' + rerollInfo + '</div>';
     }
 
-    body.innerHTML = '<div class="missions-page">' +
-        '<div class="quest-tabs">' +
-        '<button class="quest-tab ' + (_questTab === 'daily' ? 'active' : '') + '" data-tab="daily">📋 데일리</button>' +
-        '<button class="quest-tab ' + (_questTab === 'weekly' ? 'active' : '') + '" data-tab="weekly">📅 위클리</button>' +
-        '</div>' +
-        '<div class="missions-list">' + questCards + '</div>' +
-        milestoneHtml +
-        '</div>';
+    body.innerHTML = `<div class="missions-page">
+        <!-- 탭 바 -->
+        <div class="q-tabs">
+            <button class="q-tab ${_questTab === 'daily' ? 'active' : ''}" data-tab="daily">일일</button>
+            <button class="q-tab ${_questTab === 'weekly' ? 'active' : ''}" data-tab="weekly">주간</button>
+        </div>
+
+        <!-- 완료 카운터 -->
+        <div class="q-counter-bar">
+            <span class="q-counter-icon">💰</span>
+            <span class="q-counter-num">${doneCount}</span>
+            <span class="q-counter-total">${doneCount}/${totalQuests}</span>
+        </div>
+
+        <!-- 미션 카드 리스트 -->
+        <div class="q-list">${questCards}</div>
+
+        ${milestoneHtml}
+    </div>`;
 
     // 탭 전환
-    body.querySelectorAll('.quest-tab').forEach(tab => {
+    body.querySelectorAll('.q-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             _questTab = (tab as HTMLElement).dataset.tab as 'daily' | 'weekly';
             renderQuestsUI(body, dailyData, weeklyData);
@@ -352,7 +420,7 @@ function renderQuestsUI(body: HTMLElement, dailyData: any, weeklyData: any) {
     });
 
     // 수령 버튼
-    body.querySelectorAll('.mission-claim-btn').forEach(btn => {
+    body.querySelectorAll('.q-claim-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const questId = (btn as HTMLElement).dataset.quest!;
             try {
@@ -370,7 +438,7 @@ function renderQuestsUI(body: HTMLElement, dailyData: any, weeklyData: any) {
     });
 
     // 리롤 버튼
-    body.querySelectorAll('.mission-reroll-btn').forEach(btn => {
+    body.querySelectorAll('.q-reroll-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const slot = parseInt((btn as HTMLElement).dataset.slot!);
             try {

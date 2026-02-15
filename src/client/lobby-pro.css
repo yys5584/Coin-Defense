@@ -1240,3 +1240,356 @@
 .sprite-emblem-gem {
     background-image: url('/images/ui/tile_r0_c7.png');
 }
+/* ═
+   HOME LAYOUT  3열 사이드 메뉴 + 중앙
+    */
+.lobby-home { height: 100%; }
+
+.home-layout {
+    display: grid;
+    grid-template-columns: 64px 1fr 64px;
+    gap: 6px;
+    height: 100%;
+    min-height: calc(100vh - 130px);
+    padding: 4px;
+}
+
+/* 사이드 메뉴 */
+.side-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 8px;
+}
+
+.side-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 3px solid var(--wood-border);
+    box-shadow: inset 0 1px 0 var(--wood-light), 0 2px 0 #0a0604;
+    color: var(--text-normal);
+    cursor: pointer;
+    transition: transform 0.08s;
+    position: relative;
+}
+
+.side-btn:hover { transform: scale(1.05); }
+.side-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #0a0604; }
+
+.side-icon { font-size: 24px; }
+.side-label { font-size: 16px; font-family: var(--font-main); }
+
+.side-locked { opacity: 0.35; cursor: not-allowed; }
+.side-soon {
+    position: absolute;
+    bottom: -2px; right: -2px;
+    font-size: 10px;
+    background: var(--red);
+    color: #fff;
+    padding: 1px 4px;
+    font-family: var(--font-title);
+}
+
+/* 중앙 게임 영역 */
+.home-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 8px;
+    background: linear-gradient(180deg, rgba(60,36,16,0.3), rgba(30,20,10,0.5));
+    border: 3px solid var(--wood-border);
+    position: relative;
+}
+
+.best-wave-display {
+    width: 96px; height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-mid));
+    border: 4px solid var(--gold-dark);
+    box-shadow: inset 0 2px 0 var(--wood-highlight), 0 4px 0 #0a0604, 0 0 16px rgba(255,215,0,0.15);
+}
+
+.best-wave-num {
+    font-family: var(--font-title);
+    font-size: 48px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000, 0 0 8px rgba(255,215,0,0.4);
+}
+
+.best-wave-label {
+    font-size: 20px;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+.best-wave-label strong {
+    color: var(--gold);
+    font-family: var(--font-title);
+    font-size: 22px;
+}
+
+.stage-info-bar {
+    display: flex;
+    gap: 12px;
+    font-size: 18px;
+    color: var(--amber);
+    background: rgba(0,0,0,0.3);
+    padding: 6px 16px;
+    border: 2px solid var(--wood-dark);
+}
+
+.next-unlock-hint {
+    font-size: 16px;
+    color: var(--text-dim);
+    text-align: center;
+}
+.next-unlock-hint.complete { color: var(--green); }
+
+/* CTA 재배치  중앙 하단 고정 */
+.home-center .lobby-cta-main {
+    width: 100%;
+    max-width: 280px;
+    margin-top: auto;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.cta-sub {
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.3);
+    padding: 2px 12px;
+    border-radius: 0;
+}
+
+/* 
+   QUEST CARDS  참고 이미지 스타일
+    */
+.missions-page { max-width: 560px; margin: 0 auto; }
+
+/* 탭 바 */
+.q-tabs {
+    display: flex;
+    border-bottom: 3px solid var(--wood-border);
+    margin-bottom: 10px;
+}
+
+.q-tab {
+    flex: 1;
+    padding: 10px;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 3px solid var(--wood-border);
+    border-bottom: none;
+    color: var(--text-dim);
+    font-family: var(--font-main);
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.q-tab.active {
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-mid));
+    color: var(--text-bright);
+    border-bottom: 3px solid var(--wood-light);
+    box-shadow: inset 0 2px 0 var(--wood-highlight);
+}
+
+/* 완료 카운터 */
+.q-counter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(0,0,0,0.2);
+    border: 2px solid var(--wood-dark);
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.q-counter-icon { font-size: 24px; }
+.q-counter-num { font-family: var(--font-title); color: var(--gold); font-size: 28px; }
+.q-counter-total { margin-left: auto; color: var(--text-dim); font-size: 20px; }
+
+/* 퀘스트 카드 리스트 */
+.q-list { display: flex; flex-direction: column; gap: 6px; }
+
+.q-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 3px solid var(--wood-border);
+    box-shadow: inset 0 1px 0 var(--wood-light), 0 2px 0 #0a0604;
+    transition: transform 0.08s;
+}
+
+.q-card.q-done {
+    background: linear-gradient(180deg, #e8c840, #d4a830);
+    border-color: #b8960c;
+}
+
+.q-card.q-claimable {
+    background: linear-gradient(180deg, #fff3a0, #ffd740);
+    border-color: #d4a800;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 0 #a08000, 0 0 8px rgba(255,215,0,0.3);
+}
+
+/* 왼쪽  보상 아이콘 */
+.q-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 48px;
+    gap: 2px;
+}
+
+.q-reward-icon { font-size: 24px; }
+.q-reward-amt {
+    font-family: var(--font-title);
+    font-size: 18px;
+    color: var(--gold);
+    text-shadow: 1px 1px 0 #000;
+}
+
+.q-done .q-reward-amt { color: #6b4420; text-shadow: none; }
+
+/* 중간  이름 + 바 */
+.q-mid { flex: 1; min-width: 0; }
+
+.q-desc {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--text-bright);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.q-done .q-desc { color: #3d2410; }
+
+.q-bar-wrap {
+    height: 8px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.q-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    transition: width 0.3s ease;
+}
+
+.q-done .q-bar-wrap { background: rgba(0,0,0,0.15); }
+.q-done .q-bar { background: linear-gradient(90deg, #3d8b3d, #2d6b2d); }
+
+/* 오른쪽  계수 + 액션 */
+.q-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 56px;
+    gap: 4px;
+}
+
+.q-frac {
+    font-family: var(--font-title);
+    font-size: 22px;
+    color: var(--text-bright);
+    text-shadow: 1px 1px 0 #000;
+}
+
+.q-done .q-frac { color: #3d2410; text-shadow: none; }
+
+.q-claim-btn {
+    padding: 4px 10px;
+    background: linear-gradient(180deg, #4ade80, #16a34a);
+    border: 2px solid #86efac;
+    box-shadow: 0 2px 0 #15803d;
+    color: #fff;
+    font-family: var(--font-main);
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.q-claim-btn:active { transform: translateY(2px); box-shadow: none; }
+
+.q-done-dot { color: #ef4444; font-size: 16px; }
+
+.q-reroll-btn {
+    padding: 4px 8px;
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-mid));
+    border: 2px solid var(--wood-border);
+    color: var(--text-normal);
+    font-family: var(--font-main);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.q-reroll-btn:active { transform: translateY(1px); }
+
+/* 마일스톤 / 리롤 정보 */
+.reroll-info {
+    padding: 8px 14px;
+    font-size: 16px;
+    color: var(--text-dim);
+    background: rgba(0,0,0,0.15);
+    border: 2px solid var(--wood-dark);
+    margin-top: 10px;
+    text-align: center;
+}
+
+.weekly-milestones {
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 3px solid var(--wood-border);
+    padding: 10px 14px;
+    margin-top: 10px;
+}
+
+.weekly-milestones h3 {
+    font-family: var(--font-title);
+    font-size: 18px;
+    color: var(--amber);
+    margin-bottom: 8px;
+}
+
+.milestone-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: space-around;
+}
+
+.milestone-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.2);
+    border: 2px solid var(--wood-dark);
+}
+
+.milestone-item.reached { border-color: var(--gold-dark); }
+.milestone-tier { font-family: var(--font-title); font-size: 16px; color: var(--amber); }
+
+.mission-slot-badge {
+    font-size: 14px;
+    color: var(--text-dim);
+    background: rgba(0,0,0,0.2);
+    padding: 2px 6px;
+}
+
