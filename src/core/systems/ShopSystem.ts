@@ -78,7 +78,7 @@ export class ShopSystem {
         const unitDef = UNIT_MAP[unitId];
         if (!unitDef) return false;
         if (player.gold < unitDef.cost) return false;
-        if (player.bench.length >= MAX_BENCH) {
+        if (player.bench.length >= (MAX_BENCH + (player.augments.includes('aug_bench_expand') ? 3 : 0))) {
             // 벤치 꽉 찼지만 합성 가능하면 구매 허용
             // 전투 중에는 벤치만 합성 대상
             const mergePool = state.phase === 'combat'
@@ -141,7 +141,9 @@ export class ShopSystem {
 
         // 판매 골드: ★1=cost, ★2=cost*3, ★3=cost*9
         const sellMultiplier = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
-        player.gold += unitDef.cost * sellMultiplier;
+        // 증강: 환매왕 — 판매 시 코스트 +1 추가 골드
+        const sellBonus = player.augments.includes('aug_sell_profit') ? 1 : 0;
+        player.gold += unitDef.cost * sellMultiplier + sellBonus;
 
         // 풀에 반환 (★2=3개, ★3=9개)
         const returnCount = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
@@ -158,7 +160,9 @@ export class ShopSystem {
     /** 리롤 */
     reroll(state: GameState, player: PlayerState): boolean {
         const isFree = player.freeRerolls > 0;
-        if (!isFree && player.gold < REROLL_COST) return false;
+        // 증강: 리롤 마스터 — 리롤 비용 2→1
+        const cost = player.augments.includes('aug_reroll_master') ? 1 : REROLL_COST;
+        if (!isFree && player.gold < cost) return false;
 
         // 현재 상점의 유닛을 풀에 반환
         player.shop.forEach(unitId => {
@@ -171,7 +175,7 @@ export class ShopSystem {
             player.freeRerolls--;
             this.events.emit('shop:freeReroll', { remaining: player.freeRerolls });
         } else {
-            player.gold -= REROLL_COST;
+            player.gold -= cost;
             this.events.emit('gold:changed', { gold: player.gold });
         }
 

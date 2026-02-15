@@ -90,7 +90,8 @@ export function countUnits(player: PlayerState, unitId: string, star: 1 | 2 | 3 
 
 /** 플레이어의 배치 가능 슬롯 수 */
 export function getMaxBoardSize(player: PlayerState): number {
-    return getLevelDef(player.level).slots;
+    const bonus = player.augments.includes('aug_extra_slot') ? 1 : 0;
+    return getLevelDef(player.level).slots + bonus;
 }
 
 /** 딥 복사 (상태 분기점 — 멀티에서 사용) */

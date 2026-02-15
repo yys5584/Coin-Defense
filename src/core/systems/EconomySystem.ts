@@ -16,11 +16,23 @@ export class EconomySystem {
     processIncome(state: GameState, player: PlayerState): number {
         const base = getBaseIncome(state.round);
         const isWarmup = getStage(state.round) === 1;
-        const interest = isWarmup ? 0 : getInterest(player.gold);
+        let interest = isWarmup ? 0 : getInterest(player.gold);
         const streak = isWarmup ? 0 : getStreakBonus(Math.max(player.winStreak, player.lossStreak));
 
-        const total = base + interest + streak;
+        // 증강: 이자왕 — 이자 상한 +3
+        if (player.augments.includes('aug_interest_king') && !isWarmup) {
+            interest = Math.min(interest + 3, 8);
+        }
+        // 증강: 골드 러시 — 라운드 기본 수입 +3
+        const goldRushBonus = player.augments.includes('aug_gold_rush') ? 3 : 0;
+
+        const total = base + interest + streak + goldRushBonus;
         player.gold += total;
+
+        // 증강: 재생의 오라 — 매 라운드 HP+5 (maxHP+20은 선택 시 1회)
+        if (player.augments.includes('aug_heal')) {
+            player.hp = Math.min(player.hp + 5, (player as any).maxHp ?? 100);
+        }
 
         this.events.emit('gold:changed', {
             gold: player.gold,
@@ -36,7 +48,9 @@ export class EconomySystem {
         if (player.level >= 10) return false;
 
         player.gold -= XP_BUY_COST;
-        this.addXp(player, XP_BUY_AMOUNT);
+        // 증강: 빠른 성장 — XP 구매 시 +3 추가 XP
+        const bonusXp = player.augments.includes('aug_xp_boost') ? 3 : 0;
+        this.addXp(player, XP_BUY_AMOUNT + bonusXp);
         this.events.emit('gold:changed', { gold: player.gold });
 
         return true;
@@ -46,7 +60,9 @@ export class EconomySystem {
     processRoundXp(player: PlayerState, round: number): void {
         if (player.level >= 10) return;
         if (round <= 1) return; // 1-1은 첫 라운드, XP 없음
-        this.addXp(player, getXpPerRound(round));
+        // 증강: 빠른 성장 — 라운드당 XP +2 추가
+        const bonusXp = player.augments.includes('aug_xp_boost') ? 2 : 0;
+        this.addXp(player, getXpPerRound(round) + bonusXp);
     }
 
     /** XP 추가 + 레벨업 체크 */

@@ -1600,8 +1600,31 @@ function showAugmentPick(round: number): void {
     card.onclick = () => {
       p.augments.push(aug.id);
       log(`🧬 증강 획득: ${aug.emoji} ${aug.name} — ${aug.effect}`, 'purple');
+
+      // ── 즉시 효과 ──
+      if (aug.id === 'aug_heal') {
+        // 재생의 오라: maxHP +20, 즉시 HP+5
+        (p as any).maxHp = ((p as any).maxHp ?? 100) + 20;
+        p.hp = Math.min(p.hp + 5, (p as any).maxHp);
+        log('💚 최대 HP +20, HP +5 회복!', 'green');
+      }
+      if (aug.id === 'aug_bench_expand') {
+        // 벤치 확장: 벤치 슬롯 +3
+        log('🪑 벤치 슬롯 +3!', 'green');
+      }
+      if (aug.id === 'aug_extra_slot') {
+        // 진격력: 보드 배치 슬롯 +1 (레벨 제한 완화)
+        log('📶 보드 슬롯 +1!', 'green');
+      }
+      if (aug.id === 'aug_reroll_master') {
+        // 리롤 마스터: 무료 리롤 1회 즉시 지급
+        p.freeRerolls += 1;
+        log('🎲 무료 리롤 +1!', 'green');
+      }
+
       overlay.remove();
       refreshUnlockPanel();
+      render();
     };
 
     container.appendChild(card);

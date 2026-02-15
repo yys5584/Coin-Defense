@@ -84,6 +84,7 @@ export class CombatSystem {
     private buffs: SynergyBuffs | null = null;
     private _paused = false;
     private _gameSpeed = 1;
+    private _augments: Set<string> = new Set();
 
     /** 게임 속도 (1x, 2x, 3x) */
     get gameSpeed(): number { return this._gameSpeed; }
@@ -200,6 +201,56 @@ export class CombatSystem {
         if (combatStartBuffs.teamAtkSpd > 0) {
             synergyBuffs.atkSpeedMultiplier *= (1 + combatStartBuffs.teamAtkSpd);
         }
+
+        // ── 증강 효과 적용 ──
+        const augs = new Set(player.augments);
+
+        // 🎯 크리 마스터: 크리확률+15%, 크리DMG+30%
+        if (augs.has('aug_crit_master')) {
+            synergyBuffs.critChance += 0.15;
+            synergyBuffs.critDmgMultiplier += 0.3;
+        }
+        // 💥 폭발의 손: 스플래시 25% 추가
+        if (augs.has('aug_splash_all')) {
+            synergyBuffs.splashDmg += 0.25;
+        }
+        // 🔥 광전사: 공속+20%, DMG+15%
+        if (augs.has('aug_berserker')) {
+            synergyBuffs.atkSpeedMultiplier *= 1.20;
+            synergyBuffs.dmgMultiplier *= 1.15;
+        }
+        // 🔱 관통탄: 방어무시 30%
+        if (augs.has('aug_armor_break')) {
+            synergyBuffs.armorIgnore = Math.min(1.0, (synergyBuffs.armorIgnore ?? 0) + 0.3);
+        }
+        // 👑 보스 슬레이어: 보스DMG ×2.5
+        if (augs.has('aug_boss_slayer')) {
+            synergyBuffs.bossDmgMultiplier *= 2.5;
+        }
+        // ⚡ 체인 라이트닝: 30% 확률로 인접 2명에게 50% DMG (doubleHitChance로 근사)
+        if (augs.has('aug_chain_light')) {
+            synergyBuffs.doubleHitChance += 0.30;
+        }
+        // 💰 이자왕: 경제 (main.ts에서 처리)
+        // 🎲 리롤 마스터: 경제 (main.ts에서 처리)
+        // 📈 빠른 성장: 경제 (main.ts에서 처리)
+        // 💚 재생의 오라: HP 회복 (main.ts에서 처리)
+        // 🏆 골드 러시: 킬 골드+1, 라운드 수입+3
+        if (augs.has('aug_gold_rush')) {
+            synergyBuffs.bonusKillGold += 1;
+            synergyBuffs.bonusRoundGold += 3;
+        }
+        // ⏳ 모래시계: 몬스터 이속 -20% (slowPercent에 합산)
+        if (augs.has('aug_monster_slow')) {
+            synergyBuffs.slowPercent = Math.min(0.8, (synergyBuffs.slowPercent ?? 0) + 0.20);
+        }
+        // 🔊 시너지 증폭기: 시너지 유닛 수+1 (SynergySystem에서 처리 필요 — 여기선 DMG 보너스로 근사)
+        if (augs.has('aug_synergy_amp')) {
+            synergyBuffs.dmgMultiplier *= 1.10;
+            synergyBuffs.atkSpeedMultiplier *= 1.05;
+        }
+        // 증강 적용한 후 몬스터 속도 재계산에 반영하기 위해 저장
+        this._augments = augs;
 
         this.events.emit('combat:start', { round });
 

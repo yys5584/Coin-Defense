@@ -548,7 +548,7 @@ export const LEVELS: LevelDef[] = [
     { level: 7, requiredXp: 48, naturalRound: 24, slots: 7, shopOdds: [20, 25, 30, 18, 7] },
     { level: 8, requiredXp: 72, naturalRound: 33, slots: 8, shopOdds: [15, 20, 25, 25, 15] },
     { level: 9, requiredXp: 80, naturalRound: 38, slots: 9, shopOdds: [10, 15, 25, 30, 20] },
-    { level: 10, requiredXp: 999, naturalRound: 45, slots: 10, shopOdds: [5, 10, 20, 30, 35] },
+    { level: 10, requiredXp: 150, naturalRound: 45, slots: 10, shopOdds: [5, 10, 20, 30, 35] },
 ];
 
 
