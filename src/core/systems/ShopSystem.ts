@@ -20,12 +20,15 @@ export class ShopSystem {
         const levelDef = getLevelDef(player.level);
         const odds = levelDef.shopOdds; // [1코%, 2코%, 3코%, 4코%, 5코%]
 
-        // 해금된 7/10코 유닛 목록 (풀에 남아있는 것만)
-        const unlockedHighCost = UNITS.filter(u =>
+        // ── 스테이지별 코스트 상한 ──
+        const maxCost = state.stageId === 1 ? 2 : state.stageId === 2 ? 3 : 5;
+
+        // 해금된 7/10코 유닛 목록 (풀에 남아있는 것만) — 코스트 제한 적용
+        const unlockedHighCost = maxCost >= 7 ? UNITS.filter(u =>
             (u.cost === 7 || u.cost === 10) &&
             (state.unitPool[u.id] ?? 0) > 0 &&
             (u.cost === 10 ? player.unlocked10cost : player.unlocked7cost.includes(u.id))
-        );
+        ) : [];
 
         player.shop = [];
         for (let i = 0; i < 5; i++) {
@@ -34,20 +37,24 @@ export class ShopSystem {
                 const pick = unlockedHighCost[Math.floor(Math.random() * unlockedHighCost.length)];
                 player.shop.push(pick.id);
             } else {
-                const unitId = this.rollUnit(state, odds);
+                const unitId = this.rollUnit(state, odds, maxCost);
                 player.shop.push(unitId);
             }
         }
     }
 
     /** 확률+풀 기반 유닛 1종 뽑기 */
-    private rollUnit(state: GameState, odds: number[]): string | null {
+    private rollUnit(state: GameState, odds: number[], maxCost: number = 5): string | null {
+        // 코스트 상한에 맞춰 odds 재조정
+        const cappedOdds = odds.slice(0, maxCost);
+        const totalOdds = cappedOdds.reduce((a, b) => a + b, 0);
+
         // 1) 코스트 결정 (가중치 랜덤)
-        const roll = Math.random() * 100;
+        const roll = Math.random() * totalOdds;
         let cumulative = 0;
         let targetCost = 1;
-        for (let i = 0; i < odds.length; i++) {
-            cumulative += odds[i];
+        for (let i = 0; i < cappedOdds.length; i++) {
+            cumulative += cappedOdds[i];
             if (roll < cumulative) {
                 targetCost = i + 1;
                 break;

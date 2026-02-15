@@ -232,6 +232,7 @@ export interface GameState {
     players: PlayerState[];    // 멀티: 최대 8명
     // 유닛 풀 (남은 수량 — 멀티에서 공유)
     unitPool: Record<string, number>;
+    stageId: number;           // 캠페인 스테이지 ID (코스트 제한용)
 }
 
 // ─── Commands (Command 패턴) ────────────────────────────────

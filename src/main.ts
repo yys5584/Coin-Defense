@@ -47,6 +47,7 @@ async function initProLobby() {
 // 로비→게임 전환
 setOnStartGame(async (stageId: number) => {
   currentStageId = stageId;
+  state.stageId = stageId;  // 상점 코스트 제한용
   collectedBossGrades = {};
 
   try {

@@ -48,12 +48,13 @@ export function createUnitPool(): Record<string, number> {
 }
 
 /** 새 게임 상태 생성 (싱글 또는 멀티) */
-export function createGameState(playerIds: string[]): GameState {
+export function createGameState(playerIds: string[], stageId: number = 1): GameState {
     return {
         round: 0,
         phase: GamePhase.Prep,
         players: playerIds.map(id => createPlayerState(id)),
         unitPool: createUnitPool(),
+        stageId,
     };
 }
 
