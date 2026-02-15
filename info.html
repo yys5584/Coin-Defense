@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinRandomDefense — 게임 정보</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f1319;
+            --surface: #1a1f2e;
+            --surface2: #232a3b;
+            --border: #2d3548;
+            --text: #e8ecf4;
+            --muted: #8892a8;
+            --accent: #5b9df5;
+            --gold: #fcd34d;
+            --green: #34d399;
+            --purple: #a78bfa;
+            --hp: #f87171;
+            --orange: #fb923c;
+            --cyan: #22d3ee;
+            --pink: #f472b6;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 0 20px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--gold), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .tab:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Section headers */
+        h2 {
+            font-size: 20px;
+            color: var(--accent);
+            margin: 24px 0 14px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 16px;
+            color: var(--green);
+            margin: 18px 0 10px;
+        }
+
+        /* Cost tier separator */
+        .cost-tier-header {
+            background: var(--surface2);
+            padding: 8px 14px;
+            margin: 16px 0 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            border-left: 3px solid var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cost-tier-header .tier-stats {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 400;
+            margin-left: auto;
+        }
+
+        /* Unit cards grid */
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 10px;
+        }
+
+        .unit-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            transition: border-color .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .unit-card:hover {
+            border-color: var(--accent);
+        }
+
+        .unit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+
+        .unit-card.cost-1::before {
+            background: #94a3b8;
+        }
+
+        .unit-card.cost-2::before {
+            background: #22c55e;
+        }
+
+        .unit-card.cost-3::before {
+            background: #3b82f6;
+        }
+
+        .unit-card.cost-4::before {
+            background: #a855f7;
+        }
+
+        .unit-card.cost-5::before {
+            background: #f97316;
+        }
+
+        .unit-card.cost-7::before {
+            background: #eab308;
+        }
+
+        .unit-card.cost-10::before {
+            background: linear-gradient(90deg, #ef4444, #f97316, #eab308);
+        }
+
+        .unit-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .unit-emoji {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .unit-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .unit-origin {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .cost-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        .cost-1 .cost-badge {
+            background: rgba(148, 163, 184, .2);
+            color: #94a3b8;
+        }
+
+        .cost-2 .cost-badge {
+            background: rgba(34, 197, 94, .2);
+            color: #22c55e;
+        }
+
+        .cost-3 .cost-badge {
+            background: rgba(59, 130, 246, .2);
+            color: #3b82f6;
+        }
+
+        .cost-4 .cost-badge {
+            background: rgba(168, 85, 247, .2);
+            color: #a855f7;
+        }
+
+        .cost-5 .cost-badge {
+            background: rgba(249, 115, 22, .2);
+            color: #f97316;
+        }
+
+        .cost-7 .cost-badge {
+            background: rgba(234, 179, 8, .2);
+            color: #eab308;
+        }
+
+        .cost-10 .cost-badge {
+            background: rgba(239, 68, 68, .2);
+            color: #ef4444;
+        }
+
+        .unit-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            background: var(--surface2);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-val {
+            font-weight: 700;
+        }
+
+        .stat-val.dmg {
+            color: var(--hp);
+        }
+
+        .stat-val.spd {
+            color: var(--cyan);
+        }
+
+        .stat-val.dps {
+            color: var(--gold);
+        }
+
+        .unit-skill {
+            font-size: 12px;
+            padding: 6px 8px;
+            background: rgba(91, 157, 245, .08);
+            border-radius: 6px;
+            border-left: 2px solid var(--accent);
+        }
+
+        .skill-name {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .skill-desc {
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .cc-tags {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .cc-tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .cc-stun {
+            background: rgba(234, 179, 8, .2);
+            color: #eab308;
+        }
+
+        .cc-slow {
+            background: rgba(59, 130, 246, .2);
+            color: #60a5fa;
+        }
+
+        .cc-freeze {
+            background: rgba(34, 211, 238, .2);
+            color: #22d3ee;
+        }
+
+        .cc-armor {
+            background: rgba(168, 85, 247, .2);
+            color: #a78bfa;
+        }
+
+        .cc-crit {
+            background: rgba(249, 115, 22, .2);
+            color: #fb923c;
+        }
+
+        .cc-buff {
+            background: rgba(52, 211, 153, .2);
+            color: #34d399;
+        }
+
+        .cc-scale {
+            background: rgba(244, 114, 182, .2);
+            color: #f472b6;
+        }
+
+        .unique-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(239, 68, 68, .15);
+            color: #ef4444;
+            font-weight: 700;
+            margin-top: 6px;
+            display: inline-block;
+        }
+
+        /* Search */
+        .search-box {
+            padding: 10px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 16px;
+        }
+
+        .search-box::placeholder {
+            color: var(--muted);
+        }
+
+        /* Filter buttons */
+        .filter-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all .2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        /* Synergy cards */
+        .synergy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 12px;
+        }
+
+        .synergy-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .synergy-card h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .synergy-emoji {
+            font-size: 20px;
+            margin-right: 6px;
+        }
+
+        .bp-row {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bp-row:last-child {
+            border-bottom: none;
+        }
+
+        .bp-count {
+            font-weight: 700;
+            color: var(--gold);
+            min-width: 24px;
+            text-align: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(252, 211, 77, .1);
+            margin-right: 10px;
+        }
+
+        .bp-effect {
+            color: var(--text);
+        }
+
+        .synergy-units-list {
+            margin-top: 10px;
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .synergy-unit-chip {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--surface2);
+            color: var(--muted);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--surface);
+            color: var(--muted);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tr:hover td {
+            background: rgba(91, 157, 245, .04);
+        }
+
+        .prob-highlight {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        /* Mechanics info cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .info-card h4 {
+            color: var(--accent);
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--muted);
+        }
+
+        .info-value {
+            font-weight: 600;
+        }
+
+        /* Monster HP preview table */
+        .hp-table {
+            max-width: 600px;
+        }
+
+        .hp-table td {
+            text-align: right;
+        }
+
+        .hp-table th {
+            text-align: right;
+        }
+
+        .hp-table td:first-child,
+        .hp-table th:first-child {
+            text-align: left;
+        }
+
+        .boss-row {
+            background: rgba(248, 113, 113, .06);
+        }
+
+        .boss-row td {
+            color: var(--hp);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .unit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .synergy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 CoinRandomDefense</h1>
+            <p>유닛 로스터, 시너지, 확률, 게임 메카닉 — 모든 정보를 한눈에</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="units">🎮 유닛 (46)</button>
+            <button class="tab" data-tab="synergies">🧬 시너지</button>
+            <button class="tab" data-tab="probability">🎲 확률표</button>
+            <button class="tab" data-tab="mechanics">📖 메카닉</button>
+            <button class="tab" data-tab="monsters">🐉 몬스터</button>
+        </div>
+
+        <!-- ===== 유닛 ===== -->
+        <div id="tab-units" class="tab-content active">
+            <input type="text" class="search-box" id="unit-search" placeholder="🔍 유닛 이름 또는 특성 검색...">
+            <div class="filter-row" id="origin-filters"></div>
+            <div id="unit-list"></div>
+        </div>
+
+        <!-- ===== 시너지 ===== -->
+        <div id="tab-synergies" class="tab-content">
+            <h2>🔮 특성 시너지 (Origin)</h2>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:14px">같은 특성 유닛을 모으면 팀 전체에 버프. 브레이크포인트: 2/4/6/8</p>
+            <div class="synergy-grid" id="synergy-grid"></div>
+        </div>
+
+        <!-- ===== 확률표 ===== -->
+        <div id="tab-probability" class="tab-content">
+            <h2>🎰 레벨별 상점 등장 확률</h2>
+            <div style="overflow-x:auto">
+                <table id="prob-table">
+                    <thead>
+                        <tr>
+                            <th>레벨</th>
+                            <th>슬롯</th>
+                            <th>필요XP</th>
+                            <th>1코</th>
+                            <th>2코</th>
+                            <th>3코</th>
+                            <th>4코</th>
+                            <th>5코</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prob-tbody"></tbody>
+                </table>
+            </div>
+
+            <h3>⭐ 스타 업그레이드</h3>
+            <table style="max-width:500px">
+                <thead>
+                    <tr>
+                        <th>스타</th>
+                        <th>필요 유닛</th>
+                        <th>DMG 배율</th>
+                        <th>판매가</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>⭐</td>
+                        <td>1</td>
+                        <td>×1.0</td>
+                        <td>코스트 ×1</td>
+                    </tr>
+                    <tr>
+                        <td>⭐⭐</td>
+                        <td>3</td>
+                        <td style="color:var(--green);font-weight:700">×3.0</td>
+                        <td>코스트 ×3</td>
+                    </tr>
+                    <tr>
+                        <td>⭐⭐⭐</td>
+                        <td>9 (3개 ⭐⭐)</td>
+                        <td style="color:var(--gold);font-weight:700">×9.0</td>
+                        <td>코스트 ×9</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎲 유닛풀 사이즈</h3>
+            <table style="max-width:500px">
+                <thead>
+                    <tr>
+                        <th>코스트</th>
+                        <th>풀 사이즈</th>
+                        <th>유닛 종류</th>
+                        <th>유닛당</th>
+                    </tr>
+                </thead>
+                <tbody id="pool-tbody"></tbody>
+            </table>
+
+            <h3>🔓 히든 유닛 해금</h3>
+            <table style="max-width:500px">
+                <tbody>
+                    <tr>
+                        <td>7코 히든 (5종)</td>
+                        <td style="color:var(--gold);font-weight:600">스테이지 4+ (R18~) 해금, 15% 확률 등장</td>
+                    </tr>
+                    <tr>
+                        <td>10코 궁극 (1종)</td>
+                        <td style="color:var(--hp);font-weight:600">스테이지 6+ (R32~) 해금, 3% 확률 등장</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== 메카닉 ===== -->
+        <div id="tab-mechanics" class="tab-content">
+            <h2>📖 게임 메카닉</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>💰 골드 수입</h4>
+                    <div class="info-row"><span class="info-label">스테이지별 기본 수입</span><span class="info-value">S1:0 S2:1
+                            S3:3 S4:4 S5:6 S6:7 S7:8</span></div>
+                    <div class="info-row"><span class="info-label">이자</span><span class="info-value">보유골드÷10 (최대
+                            3G)</span></div>
+                    <div class="info-row"><span class="info-label">연승/연패</span><span class="info-value">2연속:+1 / 5연속:+2
+                            / 6연속:+3</span></div>
+                    <div class="info-row"><span class="info-label">리롤 비용</span><span class="info-value">2G</span></div>
+                    <div class="info-row"><span class="info-label">XP 구매</span><span class="info-value">4G → 4XP</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h4>🗺️ 전투 시스템</h4>
+                    <div class="info-row"><span class="info-label">경로</span><span class="info-value">보드 외곽 시계방향</span>
+                    </div>
+                    <div class="info-row"><span class="info-label">기본 몬스터 속도</span><span class="info-value">0.7 +
+                            R×0.012</span></div>
+                    <div class="info-row"><span class="info-label">1바퀴 통과 피해</span><span class="info-value">HP -1 (보스:
+                            HP -5)</span></div>
+                    <div class="info-row"><span class="info-label">시작 HP</span><span class="info-value">20</span></div>
+                    <div class="info-row"><span class="info-label">시작 골드</span><span class="info-value">10G</span></div>
+                </div>
+                <div class="info-card">
+                    <h4>🐉 보스 라운드</h4>
+                    <div class="info-row"><span class="info-label">보스 등장</span><span class="info-value">매 스테이지 7번째
+                            (x-7)</span></div>
+                    <div class="info-row"><span class="info-label">보스 HP</span><span class="info-value">R²×9 + R×110 +
+                            150</span></div>
+                    <div class="info-row"><span class="info-label">일반 HP</span><span class="info-value">R²×0.62 + R×8.5
+                            + 5</span></div>
+                    <div class="info-row"><span class="info-label">일반 몬수</span><span class="info-value">S1: 1~5마리 / S2+:
+                            10마리</span></div>
+                </div>
+                <div class="info-card">
+                    <h4>🏟️ 스테이지 구조</h4>
+                    <div class="info-row"><span class="info-label">S1 (R1-R3)</span><span class="info-value">워밍업
+                            3라운드</span></div>
+                    <div class="info-row"><span class="info-label">S2 (R4-R10)</span><span class="info-value">7라운드,
+                            Boss@R10</span></div>
+                    <div class="info-row"><span class="info-label">S3 (R11-R17)</span><span class="info-value">7라운드,
+                            Boss@R17</span></div>
+                    <div class="info-row"><span class="info-label">S4 (R18-R24)</span><span class="info-value">7라운드,
+                            Boss@R24</span></div>
+                    <div class="info-row"><span class="info-label">S5~S7</span><span class="info-value">R25~R45,
+                            Boss@R31/38/45</span></div>
+                </div>
+                <div class="info-card">
+                    <h4>⌨️ 단축키</h4>
+                    <div class="info-row"><span class="info-label">Space</span><span class="info-value">전투 시작 /
+                            일시정지</span></div>
+                    <div class="info-row"><span class="info-label">D</span><span class="info-value">상점 리롤</span></div>
+                    <div class="info-row"><span class="info-label">F</span><span class="info-value">XP 구매</span></div>
+                    <div class="info-row"><span class="info-label">E</span><span class="info-value">선택 유닛 판매</span>
+                    </div>
+                    <div class="info-row"><span class="info-label">우클릭</span><span class="info-value">유닛 즉시 판매</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h4>📱 모바일</h4>
+                    <div class="info-row"><span class="info-label">길게 누르기</span><span class="info-value">드래그 (유닛
+                            이동)</span></div>
+                    <div class="info-row"><span class="info-label">탭</span><span class="info-value">유닛 선택 / 상점 구매</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 몬스터 HP ===== -->
+        <div id="tab-monsters" class="tab-content">
+            <h2>🐉 라운드별 몬스터 HP</h2>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:14px">일반: R²×0.62 + R×8.5 + 5 / 보스: R²×9 + R×110 +
+                150 (이전 라운드 대비 ~1.5배 DPS 요구)</p>
+            <div style="overflow-x:auto">
+                <table class="hp-table" id="hp-table">
+                    <thead>
+                        <tr>
+                            <th>라운드</th>
+                            <th>스테이지</th>
+                            <th>유형</th>
+                            <th>HP</th>
+                            <th>몬스터 수</th>
+                            <th>총 HP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hp-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        import { UNITS, SYNERGIES, LEVELS, STAR_MULTIPLIER, POOL_SIZE } from '/src/core/config.ts';
+
+        // ===== UNIT CARDS =====
+        const unitList = document.getElementById('unit-list');
+        const costOrder = [10, 7, 5, 4, 3, 2, 1];
+        const costLabels = { 10: '🌟 10코 궁극', 7: '⭐ 7코 히든', 5: '🔶 5코', 4: '🟣 4코', 3: '🔵 3코', 2: '🟢 2코', 1: '⚪ 1코' };
+
+        // CC detection
+        function getCCTags(unit) {
+            const tags = [];
+            const sk = unit.skill;
+            if (!sk) return tags;
+            const p = sk.params || {};
+            const desc = sk.desc || '';
+            if (p.stunDuration || p.bossStunSec || p.stunSec || desc.includes('스턴')) tags.push({ type: 'stun', label: '스턴' });
+            if (p.freezeDuration || p.freezeSlow || p.freezeChance || desc.includes('빙결')) tags.push({ type: 'freeze', label: '빙결' });
+            if (p.slowPct || desc.includes('이속-') || desc.includes('이속 -')) tags.push({ type: 'slow', label: '슬로우' });
+            if (p.armorIgnore || desc.includes('방어') && desc.includes('무시')) tags.push({ type: 'armor', label: '방무' });
+            if (p.critBonus || p.critMultiplier || desc.includes('크리')) tags.push({ type: 'crit', label: '크리' });
+            if (p.teamDmgPct || p.teamAtkSpd || p.originDmgPct || desc.includes('[팀]') || desc.includes('[비트코인]') || desc.includes('[거래소]') || desc.includes('[DeFi]'))
+                tags.push({ type: 'buff', label: '버프' });
+            if (p.selfDmgPct && !p.maxPct && !p.buffDuration || desc.includes('영구') || desc.includes('누적'))
+                tags.push({ type: 'scale', label: '누적' });
+            if (p.splashPct || desc.includes('스플래시')) tags.push({ type: 'buff', label: '범위' });
+            return tags;
+        }
+
+        const sorted = [...UNITS].sort((a, b) => {
+            const ai = costOrder.indexOf(a.cost); const bi = costOrder.indexOf(b.cost);
+            if (ai !== bi) return ai - bi;
+            return a.name.localeCompare(b.name);
+        });
+
+        for (const cost of costOrder) {
+            const units = sorted.filter(u => u.cost === cost);
+            if (!units.length) continue;
+
+            const avgDps = (units.reduce((s, u) => s + u.baseDmg * u.attackSpeed, 0) / units.length).toFixed(0);
+            const header = document.createElement('div');
+            header.className = 'cost-tier-header';
+            header.innerHTML = `${costLabels[cost]} (${units.length}종) <span class="tier-stats">평균 DPS: ${avgDps}</span>`;
+            unitList.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'unit-grid';
+
+            for (const u of units) {
+                const dps = (u.baseDmg * u.attackSpeed).toFixed(0);
+                const ccTags = getCCTags(u);
+                const card = document.createElement('div');
+                card.className = `unit-card cost-${u.cost}`;
+                card.dataset.name = u.name.toLowerCase();
+                card.dataset.origin = u.origin.toLowerCase();
+                card.dataset.cost = u.cost;
+
+                let skillHtml = '';
+                if (u.skill) {
+                    skillHtml = `<div class="unit-skill">
+                        <span class="skill-name">${u.skill.name}</span>
+                        <span style="font-size:10px;color:var(--muted);margin-left:4px">[${u.skill.type}]</span>
+                        ${u.skill.cooldown ? `<span style="font-size:10px;color:var(--cyan);margin-left:4px">${u.skill.cooldown}s</span>` : ''}
+                        <div class="skill-desc">${u.skill.desc}</div>
+                    </div>`;
+                }
+
+                let ccHtml = '';
+                if (ccTags.length > 0) {
+                    ccHtml = `<div class="cc-tags">${ccTags.map(t =>
+                        `<span class="cc-tag cc-${t.type}">${t.label}</span>`
+                    ).join('')}</div>`;
+                }
+
+                let uniqueHtml = '';
+                if (u.uniqueEffect) {
+                    uniqueHtml = `<div class="unique-badge">🔥 ${u.uniqueEffect}</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="unit-top">
+                        <div class="unit-emoji">${u.emoji}</div>
+                        <div>
+                            <div class="unit-name">${u.name}</div>
+                            <div class="unit-origin">${u.origin}</div>
+                        </div>
+                        <span class="cost-badge">${u.cost}G</span>
+                    </div>
+                    <div class="unit-stats">
+                        <div><div class="stat-label">DMG</div><div class="stat-val dmg">${u.baseDmg}</div></div>
+                        <div><div class="stat-label">공속</div><div class="stat-val spd">${u.attackSpeed}/s</div></div>
+                        <div><div class="stat-label">DPS</div><div class="stat-val dps">${dps}</div></div>
+                    </div>
+                    ${skillHtml}
+                    ${ccHtml}
+                    ${uniqueHtml}
+                `;
+                grid.appendChild(card);
+            }
+            unitList.appendChild(grid);
+        }
+
+        // ===== FILTERS =====
+        const filterRow = document.getElementById('origin-filters');
+        const origins = [...new Set(UNITS.map(u => u.origin))];
+        const allBtn = document.createElement('button');
+        allBtn.className = 'filter-btn active'; allBtn.textContent = '전체';
+        allBtn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            allBtn.classList.add('active');
+            document.querySelectorAll('.unit-card').forEach(c => c.style.display = '');
+            document.querySelectorAll('.cost-tier-header').forEach(h => h.style.display = '');
+        });
+        filterRow.appendChild(allBtn);
+        for (const o of origins) {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn'; btn.textContent = o;
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.unit-card').forEach(c => {
+                    c.style.display = c.dataset.origin === o.toLowerCase() ? '' : 'none';
+                });
+                document.querySelectorAll('.cost-tier-header').forEach(h => h.style.display = '');
+            });
+            filterRow.appendChild(btn);
+        }
+
+        // Search
+        document.getElementById('unit-search').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('.unit-card').forEach(c => {
+                const text = c.textContent.toLowerCase();
+                c.style.display = text.includes(q) ? '' : 'none';
+            });
+        });
+
+        // ===== SYNERGIES =====
+        const synGrid = document.getElementById('synergy-grid');
+        for (const syn of SYNERGIES) {
+            const card = document.createElement('div');
+            card.className = 'synergy-card';
+            const bps = syn.breakpoints.map(bp =>
+                `<div class="bp-row"><span class="bp-count">${bp.count}</span><span class="bp-effect">${bp.effect}</span></div>`
+            ).join('');
+            const originKey = syn.id.replace('origin_', '');
+            const units = UNITS.filter(u => u.origin.toLowerCase() === originKey);
+            const unitChips = units.map(u =>
+                `<span class="synergy-unit-chip">${u.emoji} ${u.name} (${u.cost}코)</span>`
+            ).join('');
+
+            card.innerHTML = `
+                <h4><span class="synergy-emoji">${syn.emoji}</span>${syn.cryptoName} <span style="color:var(--muted);font-size:12px">(${syn.fantasyName})</span></h4>
+                ${bps}
+                <div class="synergy-units-list">${unitChips}</div>
+            `;
+            synGrid.appendChild(card);
+        }
+
+        // ===== PROBABILITY =====
+        const probTbody = document.getElementById('prob-tbody');
+        for (const lvl of LEVELS) {
+            const probs = lvl.shopOdds;
+            if (!probs) continue;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>Lv.${lvl.level}</b></td>
+                <td>${lvl.slots}</td>
+                <td>${lvl.requiredXp}</td>
+                ${probs.map((p) => `<td${p > 0 ? ' class="prob-highlight"' : ''}>${p}%</td>`).join('')}
+            `;
+            probTbody.appendChild(tr);
+        }
+
+        // Pool sizes
+        const poolTbody = document.getElementById('pool-tbody');
+        const unitCounts = {};
+        UNITS.forEach(u => { unitCounts[u.cost] = (unitCounts[u.cost] || 0) + 1; });
+        for (const cost of [1, 2, 3, 4, 5, 7, 10]) {
+            const pool = POOL_SIZE[cost] || 0;
+            const cnt = unitCounts[cost] || 0;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><b>${cost}코</b></td><td>${pool}</td><td>${cnt}종</td><td>${cnt > 0 ? Math.floor(pool / cnt) : 0}개</td>`;
+            poolTbody.appendChild(tr);
+        }
+
+        // ===== MONSTER HP TABLE =====
+        const hpTbody = document.getElementById('hp-tbody');
+        function getStage(r) { return r <= 3 ? 1 : Math.min(Math.floor((r - 4) / 7) + 2, 7); }
+        function isBoss(r) { return r > 3 && (r - 3) % 7 === 0; }
+        function stageLabel(r) {
+            const s = getStage(r);
+            return s === 1 ? `${s}-${r}` : `${s}-${((r - 4) % 7) + 1}`;
+        }
+
+        for (let r = 1; r <= 45; r++) {
+            const boss = isBoss(r);
+            const s = getStage(r);
+            const hp = boss
+                ? Math.floor(r * r * 9 + r * 110 + 150)
+                : Math.floor(r * r * 0.62 + r * 8.5 + 5);
+            const cnt = boss ? 1 : (s === 1 ? (r === 1 ? 1 : r === 2 ? 3 : 5) : 10);
+            const totalHp = hp * cnt;
+
+            const tr = document.createElement('tr');
+            if (boss) tr.className = 'boss-row';
+            tr.innerHTML = `
+                <td>R${r}</td>
+                <td>${stageLabel(r)}</td>
+                <td>${boss ? '🐉 보스' : '👾 일반'}</td>
+                <td>${hp.toLocaleString()}</td>
+                <td>${cnt}</td>
+                <td>${totalHp.toLocaleString()}</td>
+            `;
+            hpTbody.appendChild(tr);
+        }
+    </script>
+</body>
+
+</html>
