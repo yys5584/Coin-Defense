@@ -4,6 +4,8 @@
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
 import authRoutes, { JWT_SECRET } from './routes/auth.js';
 import meRoutes from './routes/me.js';
@@ -49,8 +51,18 @@ app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// ── Production: serve Vite build ──
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(distPath));
+
+// SPA fallback: non-API routes → index.html
+app.get('*', (_req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+});
+
 // ── Start ──
-app.listen(PORT, () => {
-    console.log(`[Server] CoinRandomDefense PRO API running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[Server] CoinRandomDefense PRO running on port ${PORT}`);
     console.log(`[Server] Routes: /api/auth, /api/me, /api/run, /api/missions, /api/quests`);
 });
