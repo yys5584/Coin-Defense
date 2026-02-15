@@ -1,23 +1,18 @@
 /* ============================================================
-   Lobby PRO — Warm Pixel RPG Style (어스톤 도트 RPG)
-   Inspired by Guardian Tales / Idle RPG pixel art games
+   Lobby PRO — Warm Pixel RPG with Spritesheet Assets
+   Uses sliced sprites from RPG UI kit
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap');
 
 /* ── Root variables (Warm Earth Tones) ── */
 :root {
-    /* 메인 배경 — 깊은 갈색 */
     --bg-main: #1c1410;
     --bg-warm: #2c1f16;
-
-    /* 카드/패널 — 따뜻한 나무 톤 */
     --panel-bg: #3d2b1e;
     --panel-border: #8b6914;
     --panel-light: #4e3828;
     --panel-inner: #2a1e14;
-
-    /* 악센트 컬러 */
     --gold: #ffd700;
     --gold-dark: #c4a000;
     --amber: #f59e0b;
@@ -29,14 +24,9 @@
     --red: #ef4444;
     --blue: #60a5fa;
     --teal: #2dd4bf;
-
-    /* 텍스트 */
     --text-bright: #fff5e1;
     --text-normal: #e8d5b8;
     --text-dim: #a89070;
-    --text-dark: #6b5540;
-
-    /* 폰트 */
     --font-main: 'DotGothic16', monospace;
     --font-title: 'Press Start 2P', monospace;
 }
@@ -67,7 +57,6 @@
     pointer-events: none;
 }
 
-/* 따뜻한 비네트 효과 */
 .lobby-pro-root::after {
     content: '';
     position: fixed;
@@ -82,18 +71,29 @@
 }
 
 /* ══════════════════════════════════════════════
-   PIXEL BORDER MIXIN (나무 프레임 효과)
+   WOOD PANEL — 나무 프레임 (스프라이트 9-slice)
+   wood-panel-large.png를 border-image로 사용
    ══════════════════════════════════════════════ */
+.wood-card {
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 12px 14px;
+}
 
-/* 기본 패널 — 나무 프레임 */
-.wood-panel {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        inset 0 0 12px rgba(0, 0, 0, 0.3),
-        0 4px 0 #1a1008,
-        0 4px 8px rgba(0, 0, 0, 0.5);
+/* hanging board 스타일 */
+.wood-board {
+    border: 14px solid transparent;
+    border-image: url('/images/ui/wood-panel-hanging.png') 20 fill / 20px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 14px 16px;
+}
+
+/* sign (간판) 스타일 */
+.wood-sign {
+    border: 8px solid transparent;
+    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
+    image-rendering: pixelated;
 }
 
 /* ══════════════════════════════════════════════
@@ -104,9 +104,10 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background: linear-gradient(180deg, #3d2b1e 0%, #2c1f16 100%);
-    border-bottom: 3px solid var(--panel-border);
-    box-shadow: 0 3px 0 #1a1008, 0 3px 10px rgba(0, 0, 0, 0.5);
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    margin: 6px 6px 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -129,9 +130,9 @@
 .lobby-uid {
     font-size: 11px;
     color: var(--text-dim);
-    background: var(--panel-inner);
+    background: rgba(0, 0, 0, 0.2);
     padding: 2px 8px;
-    border: 2px solid #5a3d20;
+    border: 2px solid rgba(139, 105, 20, 0.4);
 }
 
 .lobby-currency {
@@ -143,7 +144,7 @@
     font-family: var(--font-title);
     font-size: 10px;
     color: var(--gold);
-    background: var(--panel-inner);
+    background: rgba(0, 0, 0, 0.2);
     padding: 4px 12px;
     border: 2px solid var(--gold-dark);
     box-shadow: inset 0 0 6px rgba(255, 215, 0, 0.1);
@@ -155,7 +156,7 @@
    ══════════════════════════════════════════════ */
 .lobby-body {
     flex: 1;
-    padding: 16px 20px 90px;
+    padding: 10px 10px 90px;
 }
 
 /* ══════════════════════════════════════════════
@@ -164,44 +165,29 @@
 .lobby-home {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     max-width: 560px;
     margin: 0 auto;
 }
 
-/* ── Progress Card ── */
+/* ── Progress Card (Hero Banner) ── */
 .lobby-progress-card {
-    background: linear-gradient(180deg, #4e3828 0%, #3d2b1e 50%, #2c1f16 100%);
-    border: 3px solid var(--amber);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 4px 0 #1a1008,
-        0 4px 12px rgba(0, 0, 0, 0.5);
-    padding: 16px 20px;
+    border: 14px solid transparent;
+    border-image: url('/images/ui/wood-panel-hanging.png') 20 fill / 20px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 14px 16px;
     position: relative;
 }
 
 .lobby-progress-card::before {
-    content: '⚔';
+    content: '';
     position: absolute;
-    top: 10px;
-    right: 14px;
-    font-size: 16px;
-    opacity: 0.4;
-    animation: sway 3s ease-in-out infinite;
-}
-
-@keyframes sway {
-
-    0%,
-    100% {
-        transform: rotate(-5deg);
-    }
-
-    50% {
-        transform: rotate(5deg);
-    }
+    top: 6px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    background: url('/images/ui/emblem-star.png') center/contain no-repeat;
+    image-rendering: pixelated;
 }
 
 .progress-title {
@@ -235,7 +221,6 @@
     padding: 8px 12px;
     background: rgba(245, 158, 11, 0.1);
     border: 2px dashed var(--gold-dark);
-    border-image: none;
 }
 
 .progress-complete {
@@ -248,9 +233,9 @@
 /* ── CTA Button ── */
 .lobby-cta-main {
     width: 100%;
-    padding: 16px 24px;
+    padding: 14px 24px;
     background: linear-gradient(180deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
-    border: 3px solid #fbbf24;
+    border: 4px solid #fbbf24;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.2),
         inset 0 -2px 0 #9a3412,
@@ -267,6 +252,7 @@
     letter-spacing: 1px;
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
     transition: transform 0.08s, box-shadow 0.08s;
+    image-rendering: pixelated;
 }
 
 .lobby-cta-main:hover {
@@ -291,12 +277,10 @@
 
 /* ── Daily preview ── */
 .lobby-daily-preview {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        0 4px 0 #1a1008;
-    padding: 14px 18px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 12px 14px;
 }
 
 .daily-title {
@@ -323,8 +307,6 @@
 
 .daily-item.done {
     color: var(--green);
-    text-decoration: line-through;
-    text-decoration-color: rgba(74, 222, 128, 0.3);
 }
 
 .daily-empty {
@@ -341,40 +323,31 @@
 .lobby-menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
 }
 
 .lobby-menu-btn {
-    padding: 16px 12px;
-    background: linear-gradient(180deg, #4e3828 0%, #3d2b1e 100%);
-    border: 3px solid var(--panel-border);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        inset 0 0 0 1px #5a3d20,
-        0 3px 0 #1a1008;
+    padding: 14px 10px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    background: none;
     color: var(--text-normal);
     font-family: var(--font-main);
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.08s, box-shadow 0.08s;
+    transition: transform 0.08s;
     text-align: center;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .lobby-menu-btn:hover {
-    transform: translateY(-2px);
-    border-color: var(--amber);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        inset 0 0 0 1px #5a3d20,
-        0 5px 0 #1a1008,
-        0 0 8px rgba(245, 158, 11, 0.2);
+    transform: scale(1.03);
 }
 
 .lobby-menu-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 #1a1008;
+    transform: scale(0.97);
 }
 
 .lobby-menu-btn.lobby-locked,
@@ -401,10 +374,10 @@
     right: 0;
     display: flex;
     justify-content: space-around;
-    background: linear-gradient(0deg, #2c1f16 0%, #3d2b1e 100%);
-    border-top: 3px solid var(--panel-border);
-    box-shadow: 0 -3px 0 #1a1008, 0 -3px 10px rgba(0, 0, 0, 0.5);
-    padding: 6px 0 env(safe-area-inset-bottom, 6px);
+    border: 8px solid transparent;
+    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 4px 0 env(safe-area-inset-bottom, 4px);
     z-index: 9001;
 }
 
@@ -467,32 +440,25 @@
 .stage-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     max-width: 560px;
     margin: 0 auto;
 }
 
 .stage-card {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        0 3px 0 #1a1008;
-    padding: 12px 16px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
     gap: 14px;
     cursor: pointer;
-    transition: transform 0.08s, border-color 0.15s;
+    transition: transform 0.08s;
 }
 
 .stage-card.unlocked:hover {
     transform: translateX(4px);
-    border-color: var(--amber);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        0 3px 0 #1a1008,
-        0 0 8px rgba(245, 158, 11, 0.2);
 }
 
 .stage-card.locked {
@@ -552,19 +518,16 @@
 }
 
 .back-btn {
-    background: var(--panel-bg);
-    border: 2px solid var(--panel-border);
-    box-shadow: 0 2px 0 #1a1008;
+    background: none;
+    border: 8px solid transparent;
+    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
+    image-rendering: pixelated;
     color: var(--text-normal);
     font-family: var(--font-main);
     font-size: 14px;
     cursor: pointer;
-    padding: 8px 16px;
+    padding: 4px 12px;
     margin-bottom: 14px;
-}
-
-.back-btn:hover {
-    border-color: var(--amber);
 }
 
 .detail-header h2 {
@@ -584,10 +547,10 @@
 
 .detail-boss-grades,
 .detail-rewards {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow: inset 0 0 0 1px #5a3d20, 0 3px 0 #1a1008;
-    padding: 14px 18px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 12px 14px;
     margin: 14px 0;
 }
 
@@ -655,19 +618,15 @@
 }
 
 .mission-card {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow: inset 0 0 0 1px #5a3d20, 0 3px 0 #1a1008;
-    padding: 14px 18px;
-    margin-bottom: 10px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 12px 14px;
+    margin-bottom: 8px;
 }
 
 .mission-card.complete {
-    border-color: var(--green-dark);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        0 3px 0 #1a1008,
-        0 0 8px rgba(74, 222, 128, 0.15);
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
 }
 
 .mission-card.claimed {
@@ -701,9 +660,7 @@
     padding: 8px 18px;
     background: linear-gradient(180deg, #4ade80, #16a34a);
     border: 2px solid #86efac;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 3px 0 #15803d;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #15803d;
     color: #fff;
     font-family: var(--font-main);
     font-size: 13px;
@@ -747,16 +704,16 @@
 .collection-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .collection-cost-group {
     display: flex;
     justify-content: space-between;
-    padding: 14px 18px;
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow: inset 0 0 0 1px #5a3d20, 0 3px 0 #1a1008;
+    padding: 10px 14px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
     font-size: 15px;
     color: var(--text-normal);
 }
@@ -789,19 +746,15 @@
 }
 
 .license-card {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow: inset 0 0 0 1px #5a3d20, 0 3px 0 #1a1008;
-    padding: 18px;
-    margin-bottom: 14px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 14px 16px;
+    margin-bottom: 12px;
 }
 
 .license-card.unlocked {
-    border-color: var(--gold-dark);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        0 3px 0 #1a1008,
-        0 0 8px rgba(255, 215, 0, 0.15);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
 }
 
 .license-title {
@@ -815,7 +768,7 @@
 .license-bar-wrap {
     height: 14px;
     background: var(--panel-inner);
-    border: 2px solid #5a3d20;
+    border: 2px solid rgba(139, 105, 20, 0.4);
     overflow: hidden;
 }
 
@@ -824,6 +777,7 @@
     background: linear-gradient(90deg, var(--amber), var(--gold));
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.2);
     transition: width 0.5s ease;
+    image-rendering: pixelated;
 }
 
 .license-progress {
@@ -844,9 +798,7 @@
     padding: 10px 22px;
     background: linear-gradient(180deg, var(--amber), #d97706);
     border: 2px solid var(--gold);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 3px 0 #92400e;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #92400e;
     color: #fff;
     font-family: var(--font-main);
     font-size: 14px;
@@ -879,14 +831,14 @@
 .shop-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .shop-item {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow: inset 0 0 0 1px #5a3d20, 0 3px 0 #1a1008;
-    padding: 12px 16px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -914,9 +866,7 @@
     padding: 8px 16px;
     background: linear-gradient(180deg, var(--orange), #ea580c);
     border: 2px solid var(--amber);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 3px 0 #9a3412;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #9a3412;
     color: #fff;
     font-family: var(--font-main);
     font-size: 13px;
@@ -960,10 +910,10 @@
 .settings-item {
     display: flex;
     justify-content: space-between;
-    padding: 14px 18px;
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow: inset 0 0 0 1px #5a3d20;
+    padding: 12px 14px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
     font-size: 15px;
     color: var(--text-normal);
 }
@@ -988,28 +938,25 @@
 .result-screen {
     max-width: 560px;
     margin: 0 auto;
-    padding: 24px 20px;
+    padding: 24px 16px;
 }
 
 .result-header {
     text-align: center;
-    padding: 24px 0;
+    padding: 20px 0;
     margin-bottom: 16px;
 }
 
 .result-header.win {
-    background: linear-gradient(180deg, #4e3828, #3d2b1e);
-    border: 3px solid var(--gold);
-    box-shadow:
-        inset 0 0 20px rgba(255, 215, 0, 0.1),
-        0 4px 0 #1a1008,
-        0 0 16px rgba(255, 215, 0, 0.15);
+    border: 14px solid transparent;
+    border-image: url('/images/ui/wood-panel-hanging.png') 20 fill / 20px / 0 stretch;
+    image-rendering: pixelated;
 }
 
 .result-header.lose {
-    background: var(--panel-bg);
-    border: 3px solid #991b1b;
-    box-shadow: 0 4px 0 #1a1008;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
 }
 
 .result-header h1 {
@@ -1036,11 +983,11 @@
 
 .result-grades,
 .result-rewards {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow: inset 0 0 0 1px #5a3d20, 0 3px 0 #1a1008;
-    padding: 16px 18px;
-    margin-bottom: 12px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 14px 14px;
+    margin-bottom: 10px;
 }
 
 .result-grades h3,
@@ -1049,7 +996,6 @@
     font-size: 8px;
     color: var(--amber);
     margin-bottom: 12px;
-    letter-spacing: 0.5px;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
@@ -1065,8 +1011,8 @@
     font-size: 14px;
     padding: 6px 10px;
     color: var(--text-normal);
-    background: var(--panel-inner);
-    border: 2px solid #5a3d20;
+    background: rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(139, 105, 20, 0.3);
 }
 
 .no-boss {
@@ -1082,14 +1028,12 @@
 }
 
 .result-unlocks {
-    background: var(--panel-bg);
-    border: 3px solid var(--green-dark);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        0 3px 0 #1a1008,
-        0 0 8px rgba(74, 222, 128, 0.15);
-    padding: 16px 18px;
-    margin-bottom: 12px;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
+    padding: 14px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.15);
 }
 
 .unlock-item {
@@ -1113,6 +1057,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.08s;
+    background: none;
 }
 
 .result-btn:active {
@@ -1122,19 +1067,15 @@
 .result-btn.retry {
     background: linear-gradient(180deg, var(--orange), #ea580c);
     border: 3px solid var(--amber);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 3px 0 #9a3412;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #9a3412;
     color: #fff;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
 }
 
 .result-btn.home {
-    background: var(--panel-bg);
-    border: 3px solid var(--panel-border);
-    box-shadow:
-        inset 0 0 0 1px #5a3d20,
-        0 3px 0 #1a1008;
+    border: 12px solid transparent;
+    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
+    image-rendering: pixelated;
     color: var(--text-normal);
 }
 
@@ -1146,11 +1087,11 @@
     top: 60px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--panel-bg);
-    border: 3px solid var(--amber);
-    box-shadow: 0 4px 0 #1a1008, 0 0 12px rgba(245, 158, 11, 0.3);
+    border: 8px solid transparent;
+    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
+    image-rendering: pixelated;
     color: var(--text-bright);
-    padding: 10px 24px;
+    padding: 6px 20px;
     font-family: var(--font-main);
     font-size: 13px;
     font-weight: bold;
@@ -1187,25 +1128,24 @@
    ══════════════════════════════════════════════ */
 .tab-bar {
     display: flex;
-    gap: 0;
+    gap: 4px;
     margin-bottom: 16px;
 }
 
 .tab-bar button {
     flex: 1;
     padding: 10px;
-    background: var(--panel-bg);
-    border: 2px solid var(--panel-border);
+    border: 8px solid transparent;
+    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
+    image-rendering: pixelated;
+    background: none;
     color: var(--text-dim);
     font-family: var(--font-main);
     font-size: 12px;
     cursor: pointer;
-    transition: all 0.15s;
 }
 
 .tab-bar button.active {
-    background: var(--panel-light);
     color: var(--gold);
-    border-color: var(--gold-dark);
     text-shadow: 0 0 4px rgba(255, 215, 0, 0.3);
 }
