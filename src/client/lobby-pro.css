@@ -1,34 +1,59 @@
 /* ============================================================
-   Lobby PRO — Warm Pixel RPG with Spritesheet Assets
-   Uses sliced sprites from RPG UI kit
+   Lobby PRO — Warm Pixel RPG (Strict Pixel Art Rules)
+   ──────────────────────────────────────────────────────────
+   ✅ image-rendering: pixelated 전역 적용
+   ✅ 정수배 스케일만 (32→64/96/128)
+   ✅ border-image 사용 금지 (stretch 깨짐)
+   ✅ CSS-only 나무 프레임 + 스프라이트 장식
+   ✅ 비율 왜곡 금지 (width/height 정수배)
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap');
 
-/* ── Root variables (Warm Earth Tones) ── */
+/* ── 글로벌 픽셀아트 렌더링 ── */
+* {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* ── Root variables ── */
 :root {
     --bg-main: #1c1410;
     --bg-warm: #2c1f16;
-    --panel-bg: #3d2b1e;
-    --panel-border: #8b6914;
-    --panel-light: #4e3828;
-    --panel-inner: #2a1e14;
+
+    /* 나무 프레임 팔레트 (스프라이트시트에서 추출한 컬러) */
+    --wood-dark: #3d2410;
+    --wood-mid: #6b4420;
+    --wood-light: #a06830;
+    --wood-highlight: #c89050;
+    --wood-border: #2a1a08;
+
+    /* 골드 핀/못 컬러 */
+    --pin-gold: #d4a840;
+    --pin-dark: #8a6820;
+
+    /* 텍스트 */
+    --text-bright: #fff5e1;
+    --text-normal: #e8d5b8;
+    --text-dim: #a89070;
     --gold: #ffd700;
     --gold-dark: #c4a000;
     --amber: #f59e0b;
     --orange: #f97316;
-    --brown-light: #d4a574;
-    --brown-mid: #a0714a;
     --green: #4ade80;
     --green-dark: #16a34a;
     --red: #ef4444;
     --blue: #60a5fa;
-    --teal: #2dd4bf;
-    --text-bright: #fff5e1;
-    --text-normal: #e8d5b8;
-    --text-dim: #a89070;
+
     --font-main: 'DotGothic16', monospace;
     --font-title: 'Press Start 2P', monospace;
+
+    /* 정수배 스프라이트 사이즈 (32px 기반) */
+    --sprite-1x: 32px;
+    --sprite-2x: 64px;
+    --sprite-3x: 96px;
+    --sprite-4x: 128px;
 }
 
 /* ── Root container ── */
@@ -43,7 +68,6 @@
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
-    image-rendering: pixelated;
 }
 
 .lobby-pro-root::before {
@@ -51,8 +75,7 @@
     position: fixed;
     inset: 0;
     background: url('/images/lobby-bg.png') center/cover no-repeat;
-    image-rendering: pixelated;
-    opacity: 0.15;
+    opacity: 0.18;
     z-index: -1;
     pointer-events: none;
 }
@@ -71,29 +94,23 @@
 }
 
 /* ══════════════════════════════════════════════
-   WOOD PANEL — 나무 프레임 (스프라이트 9-slice)
-   wood-panel-large.png를 border-image로 사용
+   WOOD PANEL — CSS-only 나무 프레임
+   스프라이트시트의 나무 색감을 재현한 CSS
    ══════════════════════════════════════════════ */
-.wood-card {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
-    padding: 12px 14px;
-}
-
-/* hanging board 스타일 */
-.wood-board {
-    border: 14px solid transparent;
-    border-image: url('/images/ui/wood-panel-hanging.png') 20 fill / 20px / 0 stretch;
-    image-rendering: pixelated;
-    padding: 14px 16px;
-}
-
-/* sign (간판) 스타일 */
-.wood-sign {
-    border: 8px solid transparent;
-    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
-    image-rendering: pixelated;
+.wood-frame {
+    background: linear-gradient(180deg,
+            var(--wood-light) 0%,
+            var(--wood-mid) 4px,
+            var(--wood-mid) calc(100% - 4px),
+            var(--wood-dark) 100%);
+    border: 4px solid var(--wood-border);
+    box-shadow:
+        inset 0 2px 0 var(--wood-highlight),
+        inset 0 -2px 0 var(--wood-dark),
+        inset 2px 0 0 var(--wood-highlight),
+        inset -2px 0 0 var(--wood-dark),
+        0 4px 0 #0a0604,
+        0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* ══════════════════════════════════════════════
@@ -103,11 +120,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
-    margin: 6px 6px 0;
+    padding: 8px 16px;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow:
+        inset 0 2px 0 var(--wood-light),
+        0 4px 0 #0a0604;
+    margin: 4px 4px 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -116,38 +135,36 @@
 .lobby-profile {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .lobby-nickname {
     font-family: var(--font-title);
     font-size: 10px;
     color: var(--gold);
-    letter-spacing: 0.5px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .lobby-uid {
     font-size: 11px;
     color: var(--text-dim);
-    background: rgba(0, 0, 0, 0.2);
-    padding: 2px 8px;
-    border: 2px solid rgba(139, 105, 20, 0.4);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 6px;
+    border: 2px solid var(--wood-dark);
 }
 
 .lobby-currency {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
 
 .lobby-soft {
     font-family: var(--font-title);
     font-size: 10px;
     color: var(--gold);
-    background: rgba(0, 0, 0, 0.2);
-    padding: 4px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 10px;
     border: 2px solid var(--gold-dark);
-    box-shadow: inset 0 0 6px rgba(255, 215, 0, 0.1);
     text-shadow: 0 0 4px rgba(255, 215, 0, 0.3);
 }
 
@@ -156,7 +173,7 @@
    ══════════════════════════════════════════════ */
 .lobby-body {
     flex: 1;
-    padding: 10px 10px 90px;
+    padding: 10px 8px 90px;
 }
 
 /* ══════════════════════════════════════════════
@@ -172,37 +189,41 @@
 
 /* ── Progress Card (Hero Banner) ── */
 .lobby-progress-card {
-    border: 14px solid transparent;
-    border-image: url('/images/ui/wood-panel-hanging.png') 20 fill / 20px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-mid));
+    border: 4px solid var(--wood-border);
+    box-shadow:
+        inset 0 2px 0 var(--wood-highlight),
+        inset 0 -2px 0 var(--wood-dark),
+        0 4px 0 #0a0604;
     padding: 14px 16px;
     position: relative;
 }
 
+/* 엠블럼 장식 — 정수배(2x = 64px) */
 .lobby-progress-card::before {
     content: '';
     position: absolute;
-    top: 6px;
-    right: 10px;
-    width: 28px;
-    height: 28px;
-    background: url('/images/ui/emblem-star.png') center/contain no-repeat;
-    image-rendering: pixelated;
+    top: -8px;
+    right: 8px;
+    width: var(--sprite-2x);
+    /* 64px = 32×2 */
+    height: var(--sprite-2x);
+    background: url('/images/ui/tile_r0_c6.png') center/contain no-repeat;
 }
 
 .progress-title {
     font-family: var(--font-title);
     font-size: 9px;
-    margin-bottom: 12px;
-    color: var(--amber);
+    margin-bottom: 10px;
+    color: var(--gold);
     letter-spacing: 1px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .progress-stage,
 .progress-best {
     font-size: 15px;
-    margin: 6px 0;
+    margin: 5px 0;
     color: var(--text-normal);
 }
 
@@ -211,20 +232,20 @@
     color: var(--gold);
     font-family: var(--font-title);
     font-size: 11px;
-    text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+    text-shadow: 0 0 4px rgba(255, 215, 0, 0.3);
 }
 
 .progress-next {
-    margin-top: 12px;
+    margin-top: 10px;
     font-size: 13px;
     color: var(--amber);
-    padding: 8px 12px;
-    background: rgba(245, 158, 11, 0.1);
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.2);
     border: 2px dashed var(--gold-dark);
 }
 
 .progress-complete {
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 13px;
     color: var(--green);
     text-shadow: 0 0 4px rgba(74, 222, 128, 0.3);
@@ -234,13 +255,13 @@
 .lobby-cta-main {
     width: 100%;
     padding: 14px 24px;
-    background: linear-gradient(180deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+    background: linear-gradient(180deg, #f97316, #ea580c, #c2410c);
     border: 4px solid #fbbf24;
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
         inset 0 -2px 0 #9a3412,
         0 4px 0 #7c2d12,
-        0 4px 12px rgba(0, 0, 0, 0.5);
+        0 4px 8px rgba(0, 0, 0, 0.5);
     color: #fff;
     font-family: var(--font-title);
     font-size: 13px;
@@ -252,23 +273,20 @@
     letter-spacing: 1px;
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
     transition: transform 0.08s, box-shadow 0.08s;
-    image-rendering: pixelated;
 }
 
 .lobby-cta-main:hover {
     transform: translateY(-2px);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
         inset 0 -2px 0 #9a3412,
         0 6px 0 #7c2d12,
-        0 6px 16px rgba(0, 0, 0, 0.5);
+        0 6px 12px rgba(0, 0, 0, 0.5);
 }
 
 .lobby-cta-main:active {
     transform: translateY(2px);
-    box-shadow:
-        inset 0 2px 0 #9a3412,
-        0 1px 0 #7c2d12;
+    box-shadow: inset 0 2px 0 #9a3412, 0 1px 0 #7c2d12;
 }
 
 .cta-icon {
@@ -277,28 +295,29 @@
 
 /* ── Daily preview ── */
 .lobby-daily-preview {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow:
+        inset 0 2px 0 var(--wood-light),
+        0 4px 0 #0a0604;
     padding: 12px 14px;
 }
 
 .daily-title {
     font-family: var(--font-title);
     font-size: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: var(--amber);
-    letter-spacing: 0.5px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .daily-item {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    padding: 5px 0;
+    padding: 4px 0;
     color: var(--text-normal);
-    border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+    border-bottom: 1px solid rgba(160, 104, 48, 0.3);
 }
 
 .daily-item:last-child {
@@ -328,10 +347,12 @@
 
 .lobby-menu-btn {
     padding: 14px 10px;
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
-    background: none;
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-mid));
+    border: 4px solid var(--wood-border);
+    box-shadow:
+        inset 0 2px 0 var(--wood-highlight),
+        inset 0 -2px 0 var(--wood-dark),
+        0 3px 0 #0a0604;
     color: var(--text-normal);
     font-family: var(--font-main);
     font-size: 15px;
@@ -339,15 +360,16 @@
     cursor: pointer;
     transition: transform 0.08s;
     text-align: center;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .lobby-menu-btn:hover {
-    transform: scale(1.03);
+    transform: translateY(-2px);
 }
 
 .lobby-menu-btn:active {
-    transform: scale(0.97);
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #0a0604;
 }
 
 .lobby-menu-btn.lobby-locked,
@@ -374,9 +396,11 @@
     right: 0;
     display: flex;
     justify-content: space-around;
-    border: 8px solid transparent;
-    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(0deg, var(--wood-dark), var(--wood-mid));
+    border-top: 4px solid var(--wood-border);
+    box-shadow:
+        inset 0 2px 0 var(--wood-light),
+        0 -2px 8px rgba(0, 0, 0, 0.5);
     padding: 4px 0 env(safe-area-inset-bottom, 4px);
     z-index: 9001;
 }
@@ -385,7 +409,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
     padding: 6px 14px;
     background: none;
     border: none;
@@ -405,11 +429,11 @@
     content: '';
     position: absolute;
     bottom: 0;
-    left: 15%;
-    right: 15%;
+    left: 20%;
+    right: 20%;
     height: 3px;
     background: var(--gold);
-    box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 4px rgba(255, 215, 0, 0.4);
 }
 
 .lobby-nav-btn:hover {
@@ -431,10 +455,9 @@
 .campaign-header h2 {
     font-family: var(--font-title);
     font-size: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: var(--amber);
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .stage-grid {
@@ -446,19 +469,22 @@
 }
 
 .stage-card {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow:
+        inset 0 2px 0 var(--wood-light),
+        0 3px 0 #0a0604;
     padding: 10px 14px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     cursor: pointer;
-    transition: transform 0.08s;
+    transition: transform 0.08s, border-color 0.15s;
 }
 
 .stage-card.unlocked:hover {
     transform: translateX(4px);
+    border-color: var(--amber);
 }
 
 .stage-card.locked {
@@ -472,7 +498,7 @@
     color: var(--amber);
     min-width: 48px;
     text-align: center;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .stage-card.locked .stage-num {
@@ -518,16 +544,19 @@
 }
 
 .back-btn {
-    background: none;
-    border: 8px solid transparent;
-    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-mid));
+    border: 3px solid var(--wood-border);
+    box-shadow: inset 0 1px 0 var(--wood-highlight), 0 2px 0 #0a0604;
     color: var(--text-normal);
     font-family: var(--font-main);
     font-size: 14px;
     cursor: pointer;
-    padding: 4px 12px;
-    margin-bottom: 14px;
+    padding: 6px 14px;
+    margin-bottom: 12px;
+}
+
+.back-btn:hover {
+    border-color: var(--amber);
 }
 
 .detail-header h2 {
@@ -535,7 +564,7 @@
     font-size: 13px;
     margin-bottom: 6px;
     color: var(--amber);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .detail-def,
@@ -547,30 +576,29 @@
 
 .detail-boss-grades,
 .detail-rewards {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604;
     padding: 12px 14px;
-    margin: 14px 0;
+    margin: 12px 0;
 }
 
 .detail-boss-grades h3,
 .detail-rewards h3 {
     font-family: var(--font-title);
     font-size: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: var(--amber);
-    letter-spacing: 0.5px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .boss-grade-item {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    padding: 5px 0;
+    padding: 4px 0;
     color: var(--text-normal);
-    border-bottom: 1px solid rgba(139, 105, 20, 0.15);
+    border-bottom: 1px solid rgba(160, 104, 48, 0.2);
 }
 
 .boss-grade-item:last-child {
@@ -612,21 +640,22 @@
 .missions-page h2 {
     font-family: var(--font-title);
     font-size: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: var(--amber);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .mission-card {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604;
     padding: 12px 14px;
     margin-bottom: 8px;
 }
 
 .mission-card.complete {
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+    border-color: var(--green-dark);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604, 0 0 8px rgba(74, 222, 128, 0.15);
 }
 
 .mission-card.claimed {
@@ -637,7 +666,7 @@
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: var(--text-normal);
 }
 
@@ -645,7 +674,7 @@
     color: var(--amber);
     font-family: var(--font-title);
     font-size: 9px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .mission-reward {
@@ -659,7 +688,7 @@
     margin-top: 8px;
     padding: 8px 18px;
     background: linear-gradient(180deg, #4ade80, #16a34a);
-    border: 2px solid #86efac;
+    border: 3px solid #86efac;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #15803d;
     color: #fff;
     font-family: var(--font-main);
@@ -692,13 +721,13 @@
     font-size: 12px;
     margin-bottom: 14px;
     color: var(--amber);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .collection-info {
     font-size: 13px;
     color: var(--text-dim);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
 .collection-grid {
@@ -711,9 +740,9 @@
     display: flex;
     justify-content: space-between;
     padding: 10px 14px;
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604;
     font-size: 15px;
     color: var(--text-normal);
 }
@@ -726,7 +755,7 @@
     color: var(--amber);
     font-family: var(--font-title);
     font-size: 10px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 /* ══════════════════════════════════════════════
@@ -740,35 +769,36 @@
 .license-page h2 {
     font-family: var(--font-title);
     font-size: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: var(--amber);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .license-card {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604;
     padding: 14px 16px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .license-card.unlocked {
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+    border-color: var(--gold-dark);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604, 0 0 8px rgba(255, 215, 0, 0.15);
 }
 
 .license-title {
     font-family: var(--font-title);
     font-size: 9px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     color: var(--text-bright);
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
 }
 
 .license-bar-wrap {
-    height: 14px;
-    background: var(--panel-inner);
-    border: 2px solid rgba(139, 105, 20, 0.4);
+    height: 12px;
+    background: var(--wood-dark);
+    border: 2px solid var(--wood-border);
     overflow: hidden;
 }
 
@@ -777,27 +807,25 @@
     background: linear-gradient(90deg, var(--amber), var(--gold));
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.2);
     transition: width 0.5s ease;
-    image-rendering: pixelated;
 }
 
 .license-progress {
     font-size: 13px;
     color: var(--text-dim);
     margin-top: 6px;
-    margin-bottom: 6px;
 }
 
 .license-source {
     font-size: 12px;
     color: var(--text-dim);
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .license-unlock-btn {
-    margin-top: 10px;
-    padding: 10px 22px;
+    margin-top: 8px;
+    padding: 10px 20px;
     background: linear-gradient(180deg, var(--amber), #d97706);
-    border: 2px solid var(--gold);
+    border: 3px solid var(--gold);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #92400e;
     color: #fff;
     font-family: var(--font-main);
@@ -823,9 +851,9 @@
 .shop-page h2 {
     font-family: var(--font-title);
     font-size: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: var(--amber);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .shop-grid {
@@ -835,13 +863,13 @@
 }
 
 .shop-item {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604;
     padding: 10px 14px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
 .shop-item-icon {
@@ -863,9 +891,9 @@
 }
 
 .shop-buy-btn {
-    padding: 8px 16px;
+    padding: 8px 14px;
     background: linear-gradient(180deg, var(--orange), #ea580c);
-    border: 2px solid var(--amber);
+    border: 3px solid var(--amber);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #9a3412;
     color: #fff;
     font-family: var(--font-main);
@@ -896,9 +924,9 @@
 .settings-page h2 {
     font-family: var(--font-title);
     font-size: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: var(--amber);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .settings-list {
@@ -911,9 +939,9 @@
     display: flex;
     justify-content: space-between;
     padding: 12px 14px;
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light);
     font-size: 15px;
     color: var(--text-normal);
 }
@@ -938,42 +966,45 @@
 .result-screen {
     max-width: 560px;
     margin: 0 auto;
-    padding: 24px 16px;
+    padding: 24px 12px;
 }
 
 .result-header {
     text-align: center;
-    padding: 20px 0;
-    margin-bottom: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
 }
 
 .result-header.win {
-    border: 14px solid transparent;
-    border-image: url('/images/ui/wood-panel-hanging.png') 20 fill / 20px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-mid));
+    border: 4px solid var(--gold-dark);
+    box-shadow:
+        inset 0 2px 0 var(--wood-highlight),
+        0 4px 0 #0a0604,
+        0 0 16px rgba(255, 215, 0, 0.15);
 }
 
 .result-header.lose {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid #991b1b;
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 4px 0 #0a0604;
 }
 
 .result-header h1 {
     font-family: var(--font-title);
     font-size: 18px;
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     letter-spacing: 2px;
 }
 
 .result-header.win h1 {
     color: var(--gold);
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4), 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4), 2px 2px 0 #000;
 }
 
 .result-header.lose h1 {
     color: var(--red);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 0 #000;
 }
 
 .result-round {
@@ -983,10 +1014,10 @@
 
 .result-grades,
 .result-rewards {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
-    padding: 14px 14px;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604;
+    padding: 12px 14px;
     margin-bottom: 10px;
 }
 
@@ -995,24 +1026,24 @@
     font-family: var(--font-title);
     font-size: 8px;
     color: var(--amber);
-    margin-bottom: 12px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 0 #000;
 }
 
 .grade-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .grade-item {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    padding: 6px 10px;
+    padding: 5px 8px;
     color: var(--text-normal);
     background: rgba(0, 0, 0, 0.15);
-    border: 2px solid rgba(139, 105, 20, 0.3);
+    border: 2px solid rgba(160, 104, 48, 0.3);
 }
 
 .no-boss {
@@ -1028,12 +1059,11 @@
 }
 
 .result-unlocks {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
-    padding: 14px 14px;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--green-dark);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604, 0 0 8px rgba(74, 222, 128, 0.15);
+    padding: 12px 14px;
     margin-bottom: 10px;
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.15);
 }
 
 .unlock-item {
@@ -1045,13 +1075,13 @@
 
 .result-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 18px;
+    gap: 10px;
+    margin-top: 16px;
 }
 
 .result-btn {
     flex: 1;
-    padding: 14px;
+    padding: 12px;
     font-family: var(--font-main);
     font-size: 15px;
     font-weight: bold;
@@ -1073,9 +1103,9 @@
 }
 
 .result-btn.home {
-    border: 12px solid transparent;
-    border-image: url('/images/ui/wood-panel-large.png') 16 fill / 16px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 4px solid var(--wood-border);
+    box-shadow: inset 0 2px 0 var(--wood-light), 0 3px 0 #0a0604;
     color: var(--text-normal);
 }
 
@@ -1087,16 +1117,16 @@
     top: 60px;
     left: 50%;
     transform: translateX(-50%);
-    border: 8px solid transparent;
-    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
-    image-rendering: pixelated;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 3px solid var(--amber);
+    box-shadow: 0 4px 0 #0a0604, 0 0 12px rgba(245, 158, 11, 0.3);
     color: var(--text-bright);
-    padding: 6px 20px;
+    padding: 8px 20px;
     font-family: var(--font-main);
     font-size: 13px;
     font-weight: bold;
     z-index: 10000;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 #000;
     animation: toastIn 0.2s ease, toastOut 0.3s 2.5s ease forwards;
 }
 
@@ -1129,16 +1159,14 @@
 .tab-bar {
     display: flex;
     gap: 4px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .tab-bar button {
     flex: 1;
-    padding: 10px;
-    border: 8px solid transparent;
-    border-image: url('/images/ui/sign-small.png') 10 fill / 10px / 0 stretch;
-    image-rendering: pixelated;
-    background: none;
+    padding: 8px;
+    background: linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border: 3px solid var(--wood-border);
     color: var(--text-dim);
     font-family: var(--font-main);
     font-size: 12px;
@@ -1147,5 +1175,45 @@
 
 .tab-bar button.active {
     color: var(--gold);
+    border-color: var(--gold-dark);
     text-shadow: 0 0 4px rgba(255, 215, 0, 0.3);
+}
+
+/* ══════════════════════════════════════════════
+   SPRITE ICON UTILITY — 정수배 only
+   32→64(2x), 32→96(3x), 32→128(4x)
+   ══════════════════════════════════════════════ */
+.sprite-icon {
+    display: inline-block;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.sprite-icon-1x {
+    width: 32px;
+    height: 32px;
+}
+
+.sprite-icon-2x {
+    width: 64px;
+    height: 64px;
+}
+
+.sprite-icon-3x {
+    width: 96px;
+    height: 96px;
+}
+
+.sprite-icon-4x {
+    width: 128px;
+    height: 128px;
+}
+
+.sprite-emblem-star {
+    background-image: url('/images/ui/tile_r0_c6.png');
+}
+
+.sprite-emblem-gem {
+    background-image: url('/images/ui/tile_r0_c7.png');
 }
