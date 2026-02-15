@@ -1184,148 +1184,107 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DOCK SHOP BAR — TFT-style bottom bar
+   BOTTOM AREA — Control Bar + Shop Card Bar
    ═══════════════════════════════════════════════════════════ */
 
-#dock-shop-bar {
+#bottom-area {
     flex-shrink: 0;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Control Bar ── */
+#control-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    height: 68px;
     background: rgba(10, 14, 26, .92);
     backdrop-filter: blur(12px);
     border-top: 1px solid var(--border-accent);
-    position: relative;
-    z-index: 100;
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    border-bottom: 1px solid rgba(255, 255, 255, .04);
 }
 
-/* Expand / Collapse handle */
-#dock-expand-handle {
-    position: absolute;
-    top: -16px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 48px;
-    height: 16px;
-    background: rgba(10, 14, 26, .9);
-    border: 1px solid var(--border-accent);
-    border-bottom: none;
-    border-radius: 8px 8px 0 0;
+/* Left group: Lv + XP bar + XP buy */
+.cb-left {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 101;
-    transition: background .15s;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
-#dock-expand-handle:hover {
-    background: rgba(30, 44, 75, .95);
-}
-
-.dock-handle-icon {
-    font-size: 10px;
-    color: var(--muted);
-    transition: transform .2s;
-}
-
-#dock-shop-bar.expanded .dock-handle-icon {
-    transform: rotate(180deg);
-}
-
-/* Expandable info panel */
-.dock-expand-panel {
-    background: rgba(10, 14, 26, .88);
-    border-bottom: 1px solid rgba(255, 255, 255, .06);
-    padding: 8px 16px;
-    max-height: 120px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    font-size: 12px;
-    color: var(--muted);
-}
-
-.dock-expand-panel.hidden {
-    display: none;
-}
-
-/* ═══ Floating Control Panel (above shop bar) ═══ */
-
-#floating-ctrl-panel {
-    position: absolute;
-    bottom: 160px;
-    /* dock-row height (140) + padding (16) + gap */
-    left: 12px;
-    z-index: 150;
+.cb-level {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 140px;
-    background: rgba(10, 14, 26, .92);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border-accent);
-    border-radius: 10px;
-    padding: 10px;
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, .5);
+    align-items: baseline;
+    gap: 3px;
+    flex-shrink: 0;
 }
 
-/* Level row: Lv + value + XP bar + text */
-.fcp-level-row {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
-    grid-template-rows: auto auto;
-    align-items: center;
-    gap: 2px 6px;
-    margin-bottom: 4px;
-}
-
-.fcp-level-label {
+.cb-level-label {
     font-size: 12px;
     color: var(--muted);
     font-weight: 600;
-    grid-row: 1;
-    grid-column: 1;
 }
 
-.fcp-level-value {
+.cb-level-value {
     font-size: 20px;
     font-weight: 800;
     color: var(--gold);
     line-height: 1;
-    grid-row: 1;
-    grid-column: 2;
 }
 
-.fcp-xp-bar {
-    grid-row: 1;
-    grid-column: 3;
+.cb-xp {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.cb-xp-bar {
+    width: 60px;
     height: 6px;
     background: rgba(255, 255, 255, .08);
     border-radius: 3px;
     overflow: hidden;
-    align-self: center;
 }
 
-.fcp-xp-fill {
+.cb-xp-fill {
     height: 100%;
     background: linear-gradient(90deg, #3b82f6, #60a5fa);
     border-radius: 3px;
     transition: width .3s;
 }
 
-.fcp-xp-text {
-    grid-row: 2;
-    grid-column: 1 / -1;
-    font-size: 10px;
+.cb-xp-text {
+    font-size: 11px;
     color: var(--muted);
-    text-align: center;
+    white-space: nowrap;
 }
 
-/* Floating panel buttons — shared */
-.fcp-btn {
+/* Mid group: Reroll + Lock */
+.cb-mid {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 6px;
+    flex: 1;
+    justify-content: center;
+}
+
+/* Right group: Combat */
+.cb-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* ── Shared button style ── */
+.cb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 14px;
     border: 1px solid var(--border);
     background: rgba(255, 255, 255, .04);
     color: var(--text);
@@ -1336,118 +1295,89 @@ body {
     font-weight: 600;
     transition: all .15s;
     white-space: nowrap;
-    padding: 8px 6px;
 }
 
-.fcp-btn:hover {
+.cb-btn:hover {
     border-color: var(--gold);
     color: var(--gold);
     background: var(--gold-dim);
 }
 
-.fcp-btn:disabled {
+.cb-btn:disabled {
     opacity: .35;
     cursor: not-allowed;
 }
 
-.fcp-btn:active:not(:disabled) {
+.cb-btn:active:not(:disabled) {
     transform: scale(.96);
 }
 
-.fcp-btn-cost {
+.cb-cost {
     font-weight: 800;
     color: var(--gold);
-    font-size: 12px;
 }
 
 /* XP Buy — PROMINENT gold/orange */
-.fcp-btn-xp {
-    flex-direction: column;
-    gap: 2px;
-    background: linear-gradient(135deg, rgba(234, 179, 8, .2), rgba(249, 115, 34, .25));
-    border-color: rgba(234, 179, 8, .5);
+.cb-btn-xp {
+    background: linear-gradient(135deg, rgba(234, 179, 8, .18), rgba(249, 115, 34, .22));
+    border: 2px solid rgba(234, 179, 8, .5);
     color: #fbbf24;
-    padding: 10px 6px;
     font-size: 14px;
-}
-
-.fcp-btn-xp .fcp-btn-main {
     font-weight: 800;
-    font-size: 14px;
+    padding: 8px 18px;
 }
 
-.fcp-btn-xp .fcp-btn-cost {
-    background: rgba(0, 0, 0, .3);
-    padding: 2px 10px;
-    border-radius: 4px;
-    font-size: 13px;
-    color: #fbbf24;
-}
-
-.fcp-btn-xp:hover {
+.cb-btn-xp:hover {
     background: linear-gradient(135deg, rgba(234, 179, 8, .35), rgba(249, 115, 34, .4));
     border-color: rgba(234, 179, 8, .8);
     color: #fff;
     box-shadow: 0 0 14px rgba(234, 179, 8, .3);
 }
 
-/* Reroll */
-.fcp-btn-reroll {
+.cb-btn-xp .cb-cost {
+    background: rgba(0, 0, 0, .3);
+    padding: 1px 8px;
+    border-radius: 4px;
     font-size: 13px;
+    color: #fbbf24;
 }
 
 /* Lock */
-.fcp-btn-lock {
+.cb-btn-lock {
     font-size: 12px;
-    padding: 6px;
 }
 
-.fcp-btn-lock.locked {
+.cb-btn-lock.locked {
     border-color: var(--gold);
     color: var(--gold);
     background: var(--gold-dim);
 }
 
-/* Main dock row — simplified: cards + combat only */
-.dock-row {
-    display: flex;
-    align-items: stretch;
-    gap: 8px;
-    padding: 8px 12px;
-    height: 140px;
-}
-
-/* Combat start button */
-.dock-btn-combat {
-    background: linear-gradient(135deg, rgba(91, 157, 245, .2), rgba(59, 130, 246, .3)) !important;
-    border-color: var(--accent) !important;
-    color: #fff !important;
-    font-weight: 700 !important;
-    font-size: 13px;
-    padding: 12px 16px;
+/* Combat start — BLUE accent, largest */
+.cb-btn-combat {
+    background: linear-gradient(135deg, rgba(91, 157, 245, .2), rgba(59, 130, 246, .3));
+    border: 2px solid var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 24px;
     border-radius: 8px;
-    min-width: 90px;
 }
 
-.dock-btn-combat:hover {
-    background: linear-gradient(135deg, rgba(91, 157, 245, .3), rgba(59, 130, 246, .4)) !important;
-    box-shadow: 0 0 12px rgba(59, 130, 246, .3);
+.cb-btn-combat:hover {
+    background: linear-gradient(135deg, rgba(91, 157, 245, .35), rgba(59, 130, 246, .5));
+    box-shadow: 0 0 16px rgba(59, 130, 246, .4);
 }
 
-/* Right column */
-.dock-right {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 90px;
+/* ── Shop Card Bar ── */
+#shop-bar {
+    background: rgba(10, 14, 26, .88);
+    padding: 8px 14px 10px;
 }
 
-/* Center: Shop card slots */
-.dock-cards {
-    flex: 1;
+.shop-card-row {
     display: flex;
     gap: 6px;
-    min-width: 0;
 }
 
 .shop-slot {

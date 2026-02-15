@@ -94,48 +94,38 @@
 
       </main>
 
-      <!-- ═══ Floating Control Panel (above shop bar) ═══ -->
-      <div id="floating-ctrl-panel">
-        <!-- Lv + XP progress -->
-        <div class="fcp-level-row">
-          <span class="fcp-level-label">Lv</span>
-          <span class="fcp-level-value" id="hud-level">1</span>
-          <div class="fcp-xp-bar">
-            <div class="fcp-xp-fill" id="dock-xp-fill" style="width:0%"></div>
+      <!-- ═══ BOTTOM: Control Bar + Shop Bar ═══ -->
+      <div id="bottom-area">
+        <!-- Control Bar (above shop cards) -->
+        <div id="control-bar">
+          <div class="cb-left">
+            <div class="cb-level">
+              <span class="cb-level-label">Lv</span>
+              <span class="cb-level-value" id="hud-level">1</span>
+            </div>
+            <div class="cb-xp">
+              <div class="cb-xp-bar">
+                <div class="cb-xp-fill" id="dock-xp-fill" style="width:0%"></div>
+              </div>
+              <span class="cb-xp-text" id="hud-xp">0/2 XP</span>
+            </div>
+            <button id="btn-buy-xp" class="cb-btn cb-btn-xp">
+              📈 XP 구매 <span class="cb-cost">4G</span>
+            </button>
           </div>
-          <span class="fcp-xp-text" id="hud-xp">0/2 XP</span>
+          <div class="cb-mid">
+            <button id="btn-reroll" class="cb-btn">🔄 리롤 <span class="cb-cost">2G</span></button>
+            <button id="btn-lock" class="cb-btn cb-btn-lock">🔒 잠금</button>
+          </div>
+          <div class="cb-right">
+            <button id="btn-next-round" class="cb-btn cb-btn-combat">⚔️ 전투 시작</button>
+          </div>
         </div>
-        <!-- XP Buy (prominent) -->
-        <button id="btn-buy-xp" class="fcp-btn fcp-btn-xp">
-          <span class="fcp-btn-main">📈 XP 구매</span>
-          <span class="fcp-btn-cost">4G</span>
-        </button>
-        <!-- Reroll -->
-        <button id="btn-reroll" class="fcp-btn fcp-btn-reroll">
-          🔄 리롤 <span class="fcp-btn-cost">2G</span>
-        </button>
-        <!-- Lock toggle -->
-        <button id="btn-lock" class="fcp-btn fcp-btn-lock">🔒 잠금</button>
+        <!-- Shop Card Bar -->
+        <div id="shop-bar">
+          <div id="shop-slots" class="shop-card-row"></div>
+        </div>
       </div>
-
-      <!-- ═══ BOTTOM: Dock Shop Bar ═══ -->
-      <footer id="dock-shop-bar">
-        <!-- Expand handle -->
-        <div id="dock-expand-handle" title="확장/접기">
-          <span class="dock-handle-icon">▲</span>
-        </div>
-        <!-- Expandable info panel (hidden by default) -->
-        <div id="dock-expand-panel" class="dock-expand-panel hidden">
-          <div id="dock-expand-content"><!-- filled by JS --></div>
-        </div>
-        <!-- Main dock row: cards + combat only -->
-        <div class="dock-row">
-          <div id="shop-slots" class="dock-cards"></div>
-          <div class="dock-right">
-            <button id="btn-next-round" class="dock-btn dock-btn-combat">⚔️ 전투 시작</button>
-          </div>
-        </div>
-      </footer>
 
       <!-- Hidden compat elements removed (v3.5 cleanup) -->
     </div>

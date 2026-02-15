@@ -2296,7 +2296,7 @@ if (goldHudItem) {
 }
 
 // level hover  
-const levelHudItem = document.getElementById('floating-ctrl-panel') || $('hud-level').closest('.hud-pill');
+const levelHudItem = document.getElementById('control-bar') || $('hud-level').closest('.hud-pill');
 if (levelHudItem) {
   (levelHudItem as HTMLElement).style.position = 'relative';
   levelHudItem.addEventListener('mouseenter', () => showLevelTooltip(levelHudItem as HTMLElement));
