@@ -35,6 +35,11 @@
     image-rendering: -moz-crisp-edges;
 }
 
+body {
+    background: #050810;
+    overflow: hidden;
+}
+
 :root {
     --bg: #0a0e1a;
     --surface: rgba(15, 20, 35, .85);
@@ -74,7 +79,7 @@ body {
    ═══════════════════════════════════════════════════════════ */
 
 #lobby {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 9999;
     display: flex;
@@ -354,12 +359,18 @@ body {
    APP SHELL
    ═══════════════════════════════════════════════════════════ */
 
+/* ── Scale Wrapper (fixed PC layout) ── */
+#game-scale-wrapper {
+    position: fixed;
+    width: 1440px;
+    height: 810px;
+    overflow: hidden;
+    transform-origin: top left;
+}
+
 #app {
-    width: 100%;
-    max-width: 1400px;
-    height: 100vh;
-    height: 100dvh;
-    margin: 0 auto;
+    width: 1440px;
+    height: 810px;
     display: flex;
     flex-direction: column;
     background: var(--bg);
@@ -1786,7 +1797,7 @@ body {
 
 /* 보스 경고 */
 .fx-boss-warn {
-    position: fixed;
+    position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
@@ -2130,7 +2141,7 @@ body {
    ═══════════════════════════════════════════════════════════ */
 
 .settings-overlay {
-    position: fixed;
+    position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, .65);
     backdrop-filter: blur(8px);
@@ -2289,7 +2300,7 @@ body {
    ═══════════════════════════════════════════════════════════ */
 
 .chest-overlay {
-    position: fixed;
+    position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.75);
     display: flex;
@@ -2537,7 +2548,7 @@ body {
    ═══════════════════════════════════════════════════════════ */
 
 .game-over-overlay {
-    position: fixed;
+    position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, .85);
     backdrop-filter: blur(12px);
@@ -2725,35 +2736,7 @@ body {
     transform: translateY(0);
 }
 
-@media (max-height: 600px) {
-    #hud {
-        padding: 3px 10px;
-    }
 
-    .hud-pill {
-        padding: 2px 6px;
-    }
-
-    .bench-slot {
-        min-height: 32px;
-    }
-
-    #shop-section {
-        padding: 4px 10px 6px;
-    }
-
-    .shop-slot {
-        min-height: 50px;
-    }
-
-    #board-grid {
-        inset: 24px;
-    }
-
-    #log-panel {
-        max-height: 80px;
-    }
-}
 
 /* Grade flash animation */
 @keyframes gradeFlash {

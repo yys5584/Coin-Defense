@@ -3,194 +3,213 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=1440, initial-scale=1, user-scalable=no">
   <title>CoinRandomDefense v3.5</title>
   <link rel="stylesheet" href="/src/client/style.css">
   <link rel="stylesheet" href="/src/client/lobby-pro.css">
 </head>
 
 <body>
-  <!-- PRO Lobby (동적 렌더링) -->
-  <div id="lobby-pro" class="lobby-pro-root"></div>
+  <div id="game-scale-wrapper">
+    <!-- PRO Lobby (동적 렌더링) -->
+    <div id="lobby-pro" class="lobby-pro-root"></div>
 
-  <!-- 결과 화면 -->
-  <div id="result-view" class="result-view hidden"></div>
+    <!-- 결과 화면 -->
+    <div id="result-view" class="result-view hidden"></div>
 
-  <div id="app" class="hidden">
+    <div id="app" class="hidden">
 
-    <!-- ═══ TOP HUD BAR ═══ -->
-    <header id="hud">
-      <div class="hud-left">
-        <div class="hud-pill">
-          <span class="hud-label">ROUND</span>
-          <span class="hud-value" id="hud-round">0</span>
-        </div>
-        <div class="hud-hp-bar">
-          <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
-          <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
-        </div>
-      </div>
-      <div class="hud-right">
-        <div class="hud-pill gold-pill">
-          <span class="hud-gold-icon">💰</span>
-          <span class="hud-value" id="hud-gold">10</span>
-        </div>
-        <div class="hud-pill">
-          <span class="hud-label">Lv</span>
-          <span class="hud-value" id="hud-level">1</span>
-          <span class="hud-sub" id="hud-xp">0/2 XP</span>
-        </div>
-
-        <div class="hud-pill">
-          <span class="hud-label">DPS</span>
-          <span class="hud-value" id="hud-dps">0</span>
-        </div>
-        <button id="btn-info" class="hud-icon-btn" title="유닛 정보">📋</button>
-        <button id="btn-speed" class="hud-icon-btn speed-btn" title="게임 속도">▶ 1x</button>
-        <button id="btn-settings" class="hud-icon-btn" title="설정">⚙️</button>
-      </div>
-    </header>
-
-    <!-- ═══ MAIN AREA: Bench(left) + Board(center) + Synergy(right) ═══ -->
-    <main id="game-area">
-
-      <!-- Left: Bench column -->
-      <aside id="bench-panel">
-        <div class="bench-header">
-          <span>📦 벤치</span>
-          <span class="bench-count" id="bench-count">0/9</span>
-        </div>
-        <div id="bench-slots"></div>
-      </aside>
-
-      <!-- Center: Board arena -->
-      <section id="board-section">
-        <div id="map-wrapper">
-          <!-- Monster outer path (rectangular loop) -->
-          <div id="monster-path">
-            <div id="path-start">▶ START</div>
+      <!-- ═══ TOP HUD BAR ═══ -->
+      <header id="hud">
+        <div class="hud-left">
+          <div class="hud-pill">
+            <span class="hud-label">ROUND</span>
+            <span class="hud-value" id="hud-round">0</span>
           </div>
-          <!-- Board grid (inside the path) -->
-          <div id="board-grid"></div>
-          <!-- Board count badge -->
-          <div id="board-badge">
-            <span>🗺️</span>
-            <span id="board-count">0/1</span>
+          <div class="hud-hp-bar">
+            <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
+            <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
           </div>
         </div>
+        <div class="hud-right">
+          <div class="hud-pill gold-pill">
+            <span class="hud-gold-icon">💰</span>
+            <span class="hud-value" id="hud-gold">10</span>
+          </div>
+          <div class="hud-pill">
+            <span class="hud-label">Lv</span>
+            <span class="hud-value" id="hud-level">1</span>
+            <span class="hud-sub" id="hud-xp">0/2 XP</span>
+          </div>
+
+          <div class="hud-pill">
+            <span class="hud-label">DPS</span>
+            <span class="hud-value" id="hud-dps">0</span>
+          </div>
+          <button id="btn-info" class="hud-icon-btn" title="유닛 정보">📋</button>
+          <button id="btn-speed" class="hud-icon-btn speed-btn" title="게임 속도">▶ 1x</button>
+          <button id="btn-settings" class="hud-icon-btn" title="설정">⚙️</button>
+        </div>
+      </header>
+
+      <!-- ═══ MAIN AREA: Bench(left) + Board(center) + Synergy(right) ═══ -->
+      <main id="game-area">
+
+        <!-- Left: Bench column -->
+        <aside id="bench-panel">
+          <div class="bench-header">
+            <span>📦 벤치</span>
+            <span class="bench-count" id="bench-count">0/9</span>
+          </div>
+          <div id="bench-slots"></div>
+        </aside>
+
+        <!-- Center: Board arena -->
+        <section id="board-section">
+          <div id="map-wrapper">
+            <!-- Monster outer path (rectangular loop) -->
+            <div id="monster-path">
+              <div id="path-start">▶ START</div>
+            </div>
+            <!-- Board grid (inside the path) -->
+            <div id="board-grid"></div>
+            <!-- Board count badge -->
+            <div id="board-badge">
+              <span>🗺️</span>
+              <span id="board-count">0/1</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right: Synergy + DPS + Log + Info -->
+        <aside id="right-panel">
+          <div id="synergy-section">
+            <div class="panel-title">🧬 시너지</div>
+            <div style="font-size:11px;color:#f59e0b;padding:2px 8px;opacity:0.8">⚠️ 직업 시너지: 비활성화 (업데이트 중)</div>
+            <div id="synergy-list"></div>
+          </div>
+          <div id="dps-section">
+            <div class="dps-header">⚔️ DPS</div>
+            <div id="dps-list"></div>
+          </div>
+          <div id="log-panel">
+            <div class="panel-title">📜 로그</div>
+            <div id="log-content"></div>
+          </div>
+        </aside>
+
+      </main>
+
+      <!-- ═══ BOTTOM: Shop ═══ -->
+      <section id="shop-section">
+        <div id="shop-controls">
+          <button id="btn-reroll" class="shop-btn">🔄 리롤 <span class="btn-cost">2G</span></button>
+          <button id="btn-buy-xp" class="shop-btn">📈 XP구매 <span class="btn-cost">4G</span></button>
+          <button id="btn-lock" class="shop-btn">🔒 잠금</button>
+          <div class="shop-spacer"></div>
+          <button id="btn-next-round" class="shop-btn combat-btn">⚔️ 전투 시작</button>
+        </div>
+        <div id="shop-slots"></div>
       </section>
 
-      <!-- Right: Synergy + DPS + Log + Info -->
-      <aside id="right-panel">
-        <div id="synergy-section">
-          <div class="panel-title">🧬 시너지</div>
-          <div style="font-size:11px;color:#f59e0b;padding:2px 8px;opacity:0.8">⚠️ 직업 시너지: 비활성화 (업데이트 중)</div>
-          <div id="synergy-list"></div>
-        </div>
-        <div id="dps-section">
-          <div class="dps-header">⚔️ DPS</div>
-          <div id="dps-list"></div>
-        </div>
-        <div id="log-panel">
-          <div class="panel-title">📜 로그</div>
-          <div id="log-content"></div>
-        </div>
-      </aside>
-
-    </main>
-
-    <!-- ═══ BOTTOM: Shop ═══ -->
-    <section id="shop-section">
-      <div id="shop-controls">
-        <button id="btn-reroll" class="shop-btn">🔄 리롤 <span class="btn-cost">2G</span></button>
-        <button id="btn-buy-xp" class="shop-btn">📈 XP구매 <span class="btn-cost">4G</span></button>
-        <button id="btn-lock" class="shop-btn">🔒 잠금</button>
-        <div class="shop-spacer"></div>
-        <button id="btn-next-round" class="shop-btn combat-btn">⚔️ 전투 시작</button>
-      </div>
-      <div id="shop-slots"></div>
-    </section>
-
-    <!-- Hidden compat elements removed (v3.5 cleanup) -->
-  </div>
-  <script type="module" src="/src/main.ts"></script>
-
-  <!-- Settings Modal -->
-  <div id="settings-overlay" class="settings-overlay hidden">
-    <div class="settings-modal">
-      <h2>⚙️ 설정</h2>
-      <div class="settings-group">
-        <button id="settings-restart" class="settings-action-btn danger">🔄 다시 시작</button>
-        <button id="settings-pause" class="settings-action-btn">⏸️ 일시정지</button>
-      </div>
-      <div class="settings-group">
-        <label class="settings-label">🔊 효과음</label>
-        <input type="range" id="settings-sfx" min="0" max="100" value="80" class="settings-slider">
-        <span id="settings-sfx-val">80%</span>
-      </div>
-      <div class="settings-group">
-        <label class="settings-label">🎵 BGM</label>
-        <input type="range" id="settings-bgm" min="0" max="100" value="60" class="settings-slider">
-        <span id="settings-bgm-val">60%</span>
-      </div>
-      <button id="settings-close" class="settings-action-btn accent">✖ 닫기</button>
+      <!-- Hidden compat elements removed (v3.5 cleanup) -->
     </div>
-  </div>
+    <script type="module" src="/src/main.ts"></script>
 
-  <!-- Game Over Modal -->
-  <div id="game-over-overlay" class="game-over-overlay hidden">
-    <div class="game-over-modal">
-      <div class="game-over-header">
-        <h1 id="game-over-title" class="game-over-title">💀 GAME OVER</h1>
-        <div id="game-over-subtitle" class="game-over-subtitle">체력이 모두 소진되었습니다</div>
+    <!-- Settings Modal -->
+    <div id="settings-overlay" class="settings-overlay hidden">
+      <div class="settings-modal">
+        <h2>⚙️ 설정</h2>
+        <div class="settings-group">
+          <button id="settings-restart" class="settings-action-btn danger">🔄 다시 시작</button>
+          <button id="settings-pause" class="settings-action-btn">⏸️ 일시정지</button>
+        </div>
+        <div class="settings-group">
+          <label class="settings-label">🔊 효과음</label>
+          <input type="range" id="settings-sfx" min="0" max="100" value="80" class="settings-slider">
+          <span id="settings-sfx-val">80%</span>
+        </div>
+        <div class="settings-group">
+          <label class="settings-label">🎵 BGM</label>
+          <input type="range" id="settings-bgm" min="0" max="100" value="60" class="settings-slider">
+          <span id="settings-bgm-val">60%</span>
+        </div>
+        <button id="settings-close" class="settings-action-btn accent">✖ 닫기</button>
       </div>
-
-      <div class="game-over-stats">
-        <div class="stat-card">
-          <div class="stat-icon">🏁</div>
-          <div class="stat-label">최종 라운드</div>
-          <div id="stat-final-round" class="stat-value">-</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">💸</div>
-          <div class="stat-label">사용한 골드</div>
-          <div id="stat-gold-spent" class="stat-value">-</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">💎</div>
-          <div class="stat-label">고급 유닛</div>
-          <div id="stat-premium-units" class="stat-value">-</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">⚔️</div>
-          <div class="stat-label">최종 DPS</div>
-          <div id="stat-final-dps" class="stat-value">-</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">🧬</div>
-          <div class="stat-label">활성 시너지</div>
-          <div id="stat-synergies" class="stat-value">-</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">⏱️</div>
-          <div class="stat-label">플레이 시간</div>
-          <div id="stat-play-time" class="stat-value">-</div>
-        </div>
-      </div>
-
-      <div class="game-over-units">
-        <div class="units-label">최종 유닛</div>
-        <div id="game-over-unit-list" class="unit-list-display"></div>
-      </div>
-
-      <button id="btn-game-over-restart" class="game-over-restart-btn">🔄 다시 시작</button>
     </div>
-  </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-overlay" class="game-over-overlay hidden">
+      <div class="game-over-modal">
+        <div class="game-over-header">
+          <h1 id="game-over-title" class="game-over-title">💀 GAME OVER</h1>
+          <div id="game-over-subtitle" class="game-over-subtitle">체력이 모두 소진되었습니다</div>
+        </div>
+
+        <div class="game-over-stats">
+          <div class="stat-card">
+            <div class="stat-icon">🏁</div>
+            <div class="stat-label">최종 라운드</div>
+            <div id="stat-final-round" class="stat-value">-</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">💸</div>
+            <div class="stat-label">사용한 골드</div>
+            <div id="stat-gold-spent" class="stat-value">-</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">💎</div>
+            <div class="stat-label">고급 유닛</div>
+            <div id="stat-premium-units" class="stat-value">-</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">⚔️</div>
+            <div class="stat-label">최종 DPS</div>
+            <div id="stat-final-dps" class="stat-value">-</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">🧬</div>
+            <div class="stat-label">활성 시너지</div>
+            <div id="stat-synergies" class="stat-value">-</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-label">플레이 시간</div>
+            <div id="stat-play-time" class="stat-value">-</div>
+          </div>
+        </div>
+
+        <div class="game-over-units">
+          <div class="units-label">최종 유닛</div>
+          <div id="game-over-unit-list" class="unit-list-display"></div>
+        </div>
+
+        <button id="btn-game-over-restart" class="game-over-restart-btn">🔄 다시 시작</button>
+      </div>
+    </div>
+  </div><!-- /game-scale-wrapper -->
+
+  <script>
+    (function () {
+      var W = 1440, H = 810;
+      var wr = document.getElementById('game-scale-wrapper');
+      function fit() {
+        var vw = window.innerWidth, vh = window.innerHeight;
+        var s = Math.min(vw / W, vh / H);
+        wr.style.transform = 'scale(' + s + ')';
+        wr.style.left = ((vw - W * s) / 2) + 'px';
+        wr.style.top = ((vh - H * s) / 2) + 'px';
+      }
+      window.addEventListener('resize', fit);
+      window.addEventListener('orientationchange', function () { setTimeout(fit, 100); });
+      fit();
+    })();
+  </script>
 </body>
 
 </html>

@@ -1445,7 +1445,7 @@ function handleBossBox(round: number): Promise<void> {
         <div class="chest-reward hidden" id="chest-reward"></div>
       </div>
     `;
-    document.body.appendChild(overlay);
+    (document.getElementById('game-scale-wrapper') || document.body).appendChild(overlay);
 
     const chestIcon = overlay.querySelector('#chest-icon') as HTMLElement;
     const rewardEl = overlay.querySelector('#chest-reward') as HTMLElement;
