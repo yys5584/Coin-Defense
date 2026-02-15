@@ -8,7 +8,30 @@
    ✅ 비율 왜곡 금지 (width/height 정수배)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap');
+/* ── Monogram 픽셀 폰트 (로컬) ── */
+@font-face {
+    font-family: 'Monogram';
+    src: url('/fonts/monogram.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Monogram Extended';
+    src: url('/fonts/monogram-extended.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Monogram Extended';
+    src: url('/fonts/monogram-extended-italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
 
 /* ── 글로벌 픽셀아트 렌더링 ── */
 * {
@@ -22,7 +45,7 @@
     --bg-main: #1c1410;
     --bg-warm: #2c1f16;
 
-    /* 나무 프레임 팔레트 (스프라이트시트에서 추출한 컬러) */
+    /* 나무 프레임 팔레트 */
     --wood-dark: #3d2410;
     --wood-mid: #6b4420;
     --wood-light: #a06830;
@@ -46,8 +69,8 @@
     --red: #ef4444;
     --blue: #60a5fa;
 
-    --font-main: 'DotGothic16', monospace;
-    --font-title: 'Press Start 2P', monospace;
+    --font-main: 'Monogram Extended', 'Monogram', monospace;
+    --font-title: 'Monogram', monospace;
 
     /* 정수배 스프라이트 사이즈 (32px 기반) */
     --sprite-1x: 32px;
