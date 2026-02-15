@@ -66,7 +66,7 @@ body {
     font-family: 'Monogram Extended', 'Monogram', monospace;
     background: var(--bg);
     color: var(--text);
-    height: 100vh;
+    height: 810px;
     overflow: hidden;
 }
 
@@ -117,7 +117,7 @@ body {
     position: relative;
     z-index: 1;
     width: 420px;
-    max-width: 90vw;
+    max-width: 420px;
     text-align: center;
     animation: lobbyFadeIn .6s ease-out;
 }
@@ -387,7 +387,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: clamp(4px, 1vh, 10px) clamp(8px, 2vw, 20px);
+    padding: 8px 20px;
     background: var(--glass);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-accent);
@@ -407,12 +407,12 @@ body {
 .hud-pill {
     display: flex;
     align-items: center;
-    gap: clamp(3px, 0.5vw, 6px);
-    padding: clamp(3px, 0.6vh, 6px) clamp(8px, 1.2vw, 14px);
+    gap: 6px;
+    padding: 6px 14px;
     background: rgba(10, 14, 26, .7);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    font-size: clamp(11px, 1.2vw, 15px);
+    font-size: 15px;
     white-space: nowrap;
     position: relative;
 }
@@ -436,7 +436,7 @@ body {
 
 .hud-value {
     font-weight: 700;
-    font-size: clamp(14px, 1.5vw, 18px);
+    font-size: 18px;
     color: var(--text);
 }
 
@@ -446,8 +446,8 @@ body {
 }
 
 .hud-hp-bar {
-    width: clamp(100px, 15vw, 200px);
-    height: clamp(18px, 2.5vh, 24px);
+    width: 200px;
+    height: 24px;
     background: rgba(10, 14, 26, .8);
     border: 1px solid var(--glass-border);
     border-radius: 11px;
@@ -539,7 +539,7 @@ body {
 #game-area {
     flex: 1;
     display: grid;
-    grid-template-columns: clamp(100px, 13vw, 180px) 1fr clamp(150px, 18vw, 240px);
+    grid-template-columns: 180px 1fr 240px;
     min-height: 0;
     overflow: hidden;
 }
@@ -619,8 +619,8 @@ body {
 #map-wrapper {
     width: 100%;
     height: 100%;
-    max-width: min(720px, 55vw);
-    max-height: min(480px, 65vh);
+    max-width: 720px;
+    max-height: 480px;
     position: relative;
     border-radius: 12px;
     overflow: hidden;
@@ -1190,7 +1190,7 @@ body {
     background: var(--glass);
     backdrop-filter: blur(12px);
     border-top: 1px solid var(--border-accent);
-    padding: clamp(6px, 1vh, 12px) clamp(10px, 2vw, 24px) clamp(8px, 1.2vh, 16px);
+    padding: 10px 20px 12px;
     width: 100%;
     max-width: min(680px, 85%);
     margin: 0 auto;
@@ -2387,161 +2387,9 @@ body {
     }
 }
 
-@media (max-width: 768px) {
-    #game-area {
-        grid-template-columns: clamp(70px, 12vw, 100px) 1fr clamp(110px, 15vw, 160px);
-    }
 
-    .hud-pill {
-        padding: 3px 8px;
-        font-size: 11px;
-    }
 
-    .hud-value {
-        font-size: 14px;
-    }
 
-    .hud-hp-bar {
-        width: 100px;
-        height: 18px;
-    }
-
-    .hud-icon-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 13px;
-    }
-
-    .bench-header {
-        padding: 4px 6px;
-        font-size: 11px;
-    }
-
-    .bench-slot {
-        min-height: 36px;
-    }
-
-    .unit-card .unit-emoji {
-        font-size: 18px;
-    }
-
-    .unit-card .unit-name {
-        font-size: 9px;
-    }
-
-    .shop-slot {
-        min-height: 60px;
-    }
-
-    .shop-btn {
-        padding: 4px 8px;
-        font-size: 11px;
-    }
-
-    #shop-section {
-        max-width: 95%;
-    }
-
-    .panel-title {
-        font-size: 11px;
-        padding: 5px 6px;
-    }
-
-    .synergy-row {
-        font-size: 11px;
-        padding: 3px 6px;
-    }
-
-    .dps-row {
-        font-size: 10px;
-        padding: 2px 6px;
-    }
-
-    #log-content {
-        font-size: 9px;
-    }
-
-    #board-grid {
-        inset: 30px;
-    }
-
-    .board-cell {
-        border-radius: 4px;
-    }
-}
-
-@media (max-width: 480px) {
-    #game-area {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-    }
-
-    #bench-panel {
-        flex-direction: row;
-        overflow-x: auto;
-        max-height: 60px;
-        border-right: none;
-        border-bottom: 1px solid var(--glass-border);
-    }
-
-    #bench-slots {
-        flex-direction: row;
-    }
-
-    .bench-slot {
-        min-width: 50px;
-        min-height: unset;
-        height: 50px;
-    }
-
-    .bench-header {
-        writing-mode: horizontal-tb;
-        white-space: nowrap;
-    }
-
-    #right-panel {
-        grid-column: 1;
-        flex-direction: row;
-        max-height: 80px;
-        border-left: none;
-        border-top: 1px solid var(--glass-border);
-        overflow-x: auto;
-    }
-
-    #synergy-section {
-        min-width: 150px;
-    }
-
-    #dps-section {
-        min-width: 120px;
-        border-top: none;
-        border-left: 1px solid var(--glass-border);
-    }
-
-    #log-panel {
-        min-width: 120px;
-        border-top: none;
-        border-left: 1px solid var(--glass-border);
-        max-height: unset;
-    }
-
-    #shop-section {
-        max-width: 100%;
-        padding: 4px 6px 6px;
-    }
-
-    .shop-slot .unit-origin {
-        display: none;
-    }
-
-    .shop-slot {
-        min-height: 50px;
-    }
-
-    .shop-btn .btn-cost {
-        display: none;
-    }
-}
 
 /* ═══════════════════════════════════════════════════════════
    GAME OVER OVERLAY
@@ -2576,7 +2424,7 @@ body {
     padding: 40px;
     max-width: 700px;
     width: 90%;
-    max-height: 85vh;
+    max-height: 690px;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, .5), 0 0 40px rgba(239, 68, 68, .15);
     animation: slideUp .5s ease-out .2s backwards;
@@ -2611,7 +2459,7 @@ body {
 }
 
 .game-over-title {
-    font-size: clamp(32px, 5vw, 48px);
+    font-size: 48px;
     font-weight: 900;
     margin: 0 0 12px 0;
     color: #ef4444;
