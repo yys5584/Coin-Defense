@@ -539,7 +539,7 @@ body {
 #game-area {
     flex: 1;
     display: grid;
-    grid-template-columns: 180px 1fr 240px;
+    grid-template-columns: 220px 1fr 240px;
     min-height: 0;
     overflow: hidden;
 }
@@ -614,6 +614,22 @@ body {
     padding: 16px 24px;
     position: relative;
     overflow: hidden;
+}
+
+#board-hud-overlay {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 40;
+    padding: 4px 12px;
+    background: rgba(10, 14, 26, .8);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
 }
 
 #map-wrapper {

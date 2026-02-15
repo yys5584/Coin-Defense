@@ -21,16 +21,7 @@
 
       <!-- ═══ TOP HUD BAR ═══ -->
       <header id="hud">
-        <div class="hud-left">
-          <div class="hud-pill">
-            <span class="hud-label">ROUND</span>
-            <span class="hud-value" id="hud-round">0</span>
-          </div>
-          <div class="hud-hp-bar">
-            <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
-            <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
-          </div>
-        </div>
+
         <div class="hud-right">
           <div class="hud-pill gold-pill">
             <span class="hud-gold-icon">💰</span>
@@ -66,6 +57,17 @@
 
         <!-- Center: Board arena -->
         <section id="board-section">
+          <!-- Round & HP overlay on board -->
+          <div id="board-hud-overlay">
+            <div class="hud-pill board-round-pill">
+              <span class="hud-label">ROUND</span>
+              <span class="hud-value" id="hud-round">0</span>
+            </div>
+            <div class="hud-hp-bar">
+              <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
+              <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
+            </div>
+          </div>
           <div id="map-wrapper">
             <!-- Monster outer path (rectangular loop) -->
             <div id="monster-path">
