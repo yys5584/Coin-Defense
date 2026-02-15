@@ -19,46 +19,45 @@
 
     <div id="app" class="hidden">
 
-      <!-- ═══ TOP HUD BAR ═══ -->
-      <header id="hud">
-        <div class="hud-left">
-          <div class="hud-pill">
-            <span class="hud-label">ROUND</span>
-            <span class="hud-value" id="hud-round">0</span>
-          </div>
-          <div class="hud-hp-bar">
-            <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
-            <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
-          </div>
+      <!-- ═══ Column 1: Bench Sidebar ═══ -->
+      <aside id="bench-panel">
+        <div class="bench-header">
+          <span>📦 벤치</span>
+          <span class="bench-count" id="bench-count">0/9</span>
         </div>
-        <div class="hud-right">
-          <div class="hud-pill gold-pill">
-            <span class="hud-gold-icon">💰</span>
-            <span class="hud-value" id="hud-gold">10</span>
-          </div>
-          <div class="hud-pill">
-            <span class="hud-label">DPS</span>
-            <span class="hud-value" id="hud-dps">0</span>
-          </div>
-          <button id="btn-info" class="hud-icon-btn" title="유닛 정보">📋</button>
-          <button id="btn-speed" class="hud-icon-btn speed-btn" title="게임 속도">▶ 1x</button>
-          <button id="btn-settings" class="hud-icon-btn" title="설정">⚙️</button>
-        </div>
-      </header>
+        <div id="bench-slots"></div>
+      </aside>
 
-      <!-- ═══ MAIN AREA: Bench(left) + Board(center) + Synergy(right) ═══ -->
-      <main id="game-area">
-
-        <!-- Left: Bench column -->
-        <aside id="bench-panel">
-          <div class="bench-header">
-            <span>📦 벤치</span>
-            <span class="bench-count" id="bench-count">0/9</span>
+      <!-- ═══ Column 2: Main Column ═══ -->
+      <div id="main-column">
+        <!-- Top HUD Bar -->
+        <header id="hud">
+          <div class="hud-left">
+            <div class="hud-pill">
+              <span class="hud-label">ROUND</span>
+              <span class="hud-value" id="hud-round">0</span>
+            </div>
+            <div class="hud-hp-bar">
+              <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
+              <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
+            </div>
           </div>
-          <div id="bench-slots"></div>
-        </aside>
+          <div class="hud-right">
+            <div class="hud-pill gold-pill">
+              <span class="hud-gold-icon">💰</span>
+              <span class="hud-value" id="hud-gold">10</span>
+            </div>
+            <div class="hud-pill">
+              <span class="hud-label">DPS</span>
+              <span class="hud-value" id="hud-dps">0</span>
+            </div>
+            <button id="btn-info" class="hud-icon-btn" title="유닛 정보">📋</button>
+            <button id="btn-speed" class="hud-icon-btn speed-btn" title="게임 속도">▶ 1x</button>
+            <button id="btn-settings" class="hud-icon-btn" title="설정">⚙️</button>
+          </div>
+        </header>
 
-        <!-- Center: Board arena -->
+        <!-- Board Area -->
         <section id="board-section">
           <div id="map-wrapper">
             <!-- Monster outer path (rectangular loop) -->
@@ -75,28 +74,7 @@
           </div>
         </section>
 
-        <!-- Right: Synergy + DPS + Log + Info -->
-        <aside id="right-panel">
-          <div id="synergy-section">
-            <div class="panel-title">🧬 시너지</div>
-            <div style="font-size:11px;color:#f59e0b;padding:2px 8px;opacity:0.8">⚠️ 직업 시너지: 비활성화 (업데이트 중)</div>
-            <div id="synergy-list"></div>
-          </div>
-          <div id="dps-section">
-            <div class="dps-header">⚔️ DPS</div>
-            <div id="dps-list"></div>
-          </div>
-          <div id="log-panel">
-            <div class="panel-title">📜 로그</div>
-            <div id="log-content"></div>
-          </div>
-        </aside>
-
-      </main>
-
-      <!-- ═══ BOTTOM: Control Bar + Shop Bar ═══ -->
-      <div id="bottom-area">
-        <!-- Control Bar (above shop cards) -->
+        <!-- Control Bar -->
         <div id="control-bar">
           <div class="cb-left">
             <div class="cb-level">
@@ -119,13 +97,29 @@
             <button id="btn-next-round" class="cb-btn cb-btn-combat">⚔️ 전투 시작</button>
           </div>
         </div>
+
         <!-- Shop Card Bar -->
         <div id="shop-bar">
           <div id="shop-slots" class="shop-card-row"></div>
         </div>
       </div>
 
-      <!-- Hidden compat elements removed (v3.5 cleanup) -->
+      <!-- ═══ Column 3: Right Panel ═══ -->
+      <aside id="right-panel">
+        <div id="synergy-section">
+          <div class="panel-title">🧬 시너지</div>
+          <div style="font-size:11px;color:#f59e0b;padding:2px 8px;opacity:0.8">⚠️ 직업 시너지: 비활성화 (업데이트 중)</div>
+          <div id="synergy-list"></div>
+        </div>
+        <div id="dps-section">
+          <div class="dps-header">⚔️ DPS</div>
+          <div id="dps-list"></div>
+        </div>
+        <div id="log-panel">
+          <div class="panel-title">📜 로그</div>
+          <div id="log-content"></div>
+        </div>
+      </aside>
     </div>
     <script type="module" src="/src/main.ts"></script>
 

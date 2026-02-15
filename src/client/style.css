@@ -371,12 +371,20 @@ body {
 #app {
     width: 1440px;
     height: 810px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 220px 1fr 240px;
     background: var(--bg);
     overflow: hidden;
     border-left: 1px solid var(--glass-border);
     border-right: 1px solid var(--glass-border);
+}
+
+/* ═══ Main Column (center) ═══ */
+#main-column {
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -532,19 +540,20 @@ body {
     }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   GAME AREA — 3-Column: Bench | Board | Synergy+DPS
-   ═══════════════════════════════════════════════════════════ */
-
-#game-area {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 220px 1fr 240px;
+/* Board section fills remaining space in main column */
+#board-section {
     min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
 }
 
-/* ── Left: Bench Panel ── */
+#board-section #map-wrapper {
+    max-width: 100%;
+    max-height: 100%;
+}
+
 #bench-panel {
     background: var(--glass);
     backdrop-filter: blur(8px);
