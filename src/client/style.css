@@ -1276,6 +1276,7 @@ body {
     align-items: center;
     justify-content: flex-end;
     flex-shrink: 0;
+    margin-left: auto;
 }
 
 /* ── Shared button style ── */
@@ -1359,8 +1360,8 @@ body {
     border: 2px solid var(--accent);
     color: #fff;
     font-weight: 700;
-    font-size: 14px;
-    padding: 10px 24px;
+    font-size: 15px;
+    padding: 12px 32px;
     border-radius: 8px;
 }
 
