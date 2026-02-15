@@ -21,18 +21,21 @@
 
       <!-- ═══ TOP HUD BAR ═══ -->
       <header id="hud">
-
+        <div class="hud-left">
+          <div class="hud-pill">
+            <span class="hud-label">ROUND</span>
+            <span class="hud-value" id="hud-round">0</span>
+          </div>
+          <div class="hud-hp-bar">
+            <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
+            <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
+          </div>
+        </div>
         <div class="hud-right">
           <div class="hud-pill gold-pill">
             <span class="hud-gold-icon">💰</span>
             <span class="hud-value" id="hud-gold">10</span>
           </div>
-          <div class="hud-pill">
-            <span class="hud-label">Lv</span>
-            <span class="hud-value" id="hud-level">1</span>
-            <span class="hud-sub" id="hud-xp">0/2 XP</span>
-          </div>
-
           <div class="hud-pill">
             <span class="hud-label">DPS</span>
             <span class="hud-value" id="hud-dps">0</span>
@@ -57,17 +60,6 @@
 
         <!-- Center: Board arena -->
         <section id="board-section">
-          <!-- Round & HP overlay on board -->
-          <div id="board-hud-overlay">
-            <div class="hud-pill board-round-pill">
-              <span class="hud-label">ROUND</span>
-              <span class="hud-value" id="hud-round">0</span>
-            </div>
-            <div class="hud-hp-bar">
-              <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
-              <span class="hud-hp-text">❤️ <span id="hud-hp">30</span></span>
-            </div>
-          </div>
           <div id="map-wrapper">
             <!-- Monster outer path (rectangular loop) -->
             <div id="monster-path">
@@ -104,6 +96,11 @@
 
       <!-- ═══ BOTTOM: Shop ═══ -->
       <section id="shop-section">
+        <div id="shop-level-badge" class="hud-pill">
+          <span class="hud-label">Lv</span>
+          <span class="hud-value" id="hud-level">1</span>
+          <span class="hud-sub" id="hud-xp">0/2 XP</span>
+        </div>
         <div id="shop-controls">
           <button id="btn-reroll" class="shop-btn">🔄 리롤 <span class="btn-cost">2G</span></button>
           <button id="btn-buy-xp" class="shop-btn">📈 XP구매 <span class="btn-cost">4G</span></button>

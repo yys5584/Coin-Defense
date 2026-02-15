@@ -616,21 +616,7 @@ body {
     overflow: hidden;
 }
 
-#board-hud-overlay {
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 40;
-    padding: 4px 12px;
-    background: rgba(10, 14, 26, .8);
-    backdrop-filter: blur(8px);
-    border-radius: 20px;
-    border: 1px solid var(--glass-border);
-}
+
 
 #map-wrapper {
     width: 100%;
@@ -1210,6 +1196,20 @@ body {
     width: 100%;
     max-width: min(680px, 85%);
     margin: 0 auto;
+    position: relative;
+}
+
+#shop-level-badge {
+    position: absolute;
+    top: -14px;
+    left: 10px;
+    z-index: 10;
+    background: rgba(10, 14, 26, .9);
+    border: 1px solid var(--border-accent);
+    border-radius: 16px;
+    padding: 3px 12px;
+    font-size: 13px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
 }
 
 #shop-controls {
