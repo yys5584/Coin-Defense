@@ -314,6 +314,14 @@ function renderHUD(): void {
   $('hud-round').textContent = `${getStageRound(state.round)}`;
   $('hud-level').textContent = `${p.level}`;
   $('hud-xp').textContent = `${xpNeeded} XP`;
+  // Update XP fill bar
+  const xpFill = document.getElementById('dock-xp-fill');
+  if (xpFill && p.level < 10) {
+    const pct = (p.xp / nextLvl.requiredXp) * 100;
+    xpFill.style.width = `${Math.min(100, pct)}%`;
+  } else if (xpFill) {
+    xpFill.style.width = '100%';
+  }
   $('hud-gold').textContent = `${p.gold}`;
   $('hud-hp').textContent = `${p.hp}`;
   // Update HP fill bar
@@ -2288,7 +2296,7 @@ if (goldHudItem) {
 }
 
 // level hover  
-const levelHudItem = $('hud-level').closest('.hud-pill');
+const levelHudItem = $('hud-level').closest('.dock-left') || $('hud-level').closest('.hud-pill');
 if (levelHudItem) {
   (levelHudItem as HTMLElement).style.position = 'relative';
   levelHudItem.addEventListener('mouseenter', () => showLevelTooltip(levelHudItem as HTMLElement));
@@ -2384,100 +2392,30 @@ $('settings-pause').addEventListener('click', () => {
   bgm.volume = parseInt(val) / 100;
 });
 
-// Escape로 설정 모달 닫기 (키보드 핸들러 보강)
+// Escape로 설정 모달 닫기
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !$('settings-overlay').classList.contains('hidden')) {
     closeSettings();
     e.stopPropagation();
-    return;
-  }
-  // Shop overlay — ESC closes
-  if (e.key === 'Escape') {
-    const so = document.getElementById('shop-overlay');
-    if (so && (so.classList.contains('open') || so.classList.contains('pinned'))) {
-      so.classList.remove('open', 'pinned');
-      e.stopPropagation();
-      return;
-    }
-  }
-  // Tab or S — toggle pin shop overlay
-  if (e.key === 'Tab' || e.key === 's' || e.key === 'S') {
-    // Don't intercept if typing in input
-    if ((e.target as HTMLElement).tagName === 'INPUT') return;
-    // Don't intercept S if settings modal is open
-    if (!$('settings-overlay').classList.contains('hidden')) return;
-    const so = document.getElementById('shop-overlay');
-    if (!so) return;
-    if (so.classList.contains('pinned')) {
-      so.classList.remove('pinned', 'open');
-    } else {
-      so.classList.add('pinned');
-      so.classList.remove('open');
-    }
-    if (e.key === 'Tab') e.preventDefault();
   }
 });
 
-// ─── Shop Overlay Controller ───────────────────────────────
+// ─── Dock Shop Bar — expand/collapse ───────────────────────
 
-(function setupShopOverlay() {
-  const overlay = document.getElementById('shop-overlay');
-  const hotzone = document.getElementById('shop-hotzone');
-  const toggleBtn = document.getElementById('shop-toggle-btn');
-  if (!overlay || !hotzone) return;
+(function setupDockExpand() {
+  const handle = document.getElementById('dock-expand-handle');
+  const bar = document.getElementById('dock-shop-bar');
+  const panel = document.getElementById('dock-expand-panel');
+  if (!handle || !bar || !panel) return;
 
-  let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  // Hotzone hover → open
-  hotzone.addEventListener('mouseenter', () => {
-    if (overlay.classList.contains('pinned')) return;
-    overlay.classList.add('open');
+  handle.addEventListener('click', () => {
+    bar.classList.toggle('expanded');
+    panel.classList.toggle('hidden');
   });
-
-  // Overlay hover → keep open
-  overlay.addEventListener('mouseenter', () => {
-    if (overlay.classList.contains('pinned')) return;
-    if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
-    overlay.classList.add('open');
-  });
-
-  // Leave overlay → close after short delay
-  overlay.addEventListener('mouseleave', () => {
-    if (overlay.classList.contains('pinned')) return;
-    hoverTimeout = setTimeout(() => {
-      overlay.classList.remove('open');
-    }, 200);
-  });
-
-  // Also close when leaving hotzone if not over overlay
-  hotzone.addEventListener('mouseleave', () => {
-    if (overlay.classList.contains('pinned')) return;
-    hoverTimeout = setTimeout(() => {
-      if (!overlay.matches(':hover')) {
-        overlay.classList.remove('open');
-      }
-    }, 200);
-  });
-
-  // Mobile: detect touch device and show toggle button
-  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-    if (toggleBtn) toggleBtn.style.display = 'block';
-  }
-
-  // Mobile toggle button
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      if (overlay.classList.contains('pinned')) {
-        overlay.classList.remove('pinned', 'open');
-      } else {
-        overlay.classList.add('pinned');
-      }
-    });
-  }
 })();
 
 // ─── 첫 렌더 ────────────────────────────────────────────────
 
 log('🎮 CoinRandomDefense v3.5 시작!', 'green');
-log('D=리롤, F=XP구매, E=판매, Space=전투, Tab/S=상점 열기', 'blue');
+log('D=리롤, F=XP구매, E=판매, Space=전투, 우클릭=판매', 'blue');
 render();

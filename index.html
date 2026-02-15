@@ -94,28 +94,45 @@
 
       </main>
 
-      <!-- ═══ SHOP OVERLAY (slide-up) ═══ -->
-      <div id="shop-overlay" class="shop-overlay">
-        <section id="shop-section">
-          <div id="shop-level-badge" class="hud-pill">
-            <span class="hud-label">Lv</span>
-            <span class="hud-value" id="hud-level">1</span>
-            <span class="hud-sub" id="hud-xp">0/2 XP</span>
+      <!-- ═══ BOTTOM: Dock Shop Bar ═══ -->
+      <footer id="dock-shop-bar">
+        <!-- Expand handle -->
+        <div id="dock-expand-handle" title="확장/접기">
+          <span class="dock-handle-icon">▲</span>
+        </div>
+        <!-- Expandable info panel (hidden by default) -->
+        <div id="dock-expand-panel" class="dock-expand-panel hidden">
+          <div id="dock-expand-content"><!-- filled by JS --></div>
+        </div>
+        <!-- Main dock row -->
+        <div class="dock-row">
+          <!-- Left: Level + XP buy -->
+          <div class="dock-left">
+            <div class="dock-level">
+              <span class="dock-level-label">Lv</span>
+              <span class="dock-level-value" id="hud-level">1</span>
+            </div>
+            <div class="dock-xp-info">
+              <div class="dock-xp-bar">
+                <div class="dock-xp-fill" id="dock-xp-fill" style="width:0%"></div>
+              </div>
+              <span class="dock-xp-text" id="hud-xp">0/2 XP</span>
+            </div>
+            <button id="btn-buy-xp" class="dock-btn dock-btn-xp">📈 <span class="btn-cost">4G</span></button>
           </div>
-          <div id="shop-controls">
-            <button id="btn-reroll" class="shop-btn">🔄 리롤 <span class="btn-cost">2G</span></button>
-            <button id="btn-buy-xp" class="shop-btn">📈 XP구매 <span class="btn-cost">4G</span></button>
-            <button id="btn-lock" class="shop-btn">🔒 잠금</button>
-            <div class="shop-spacer"></div>
-            <button id="btn-next-round" class="shop-btn combat-btn">⚔️ 전투 시작</button>
+          <!-- Center-left: Reroll + Lock -->
+          <div class="dock-actions">
+            <button id="btn-reroll" class="dock-btn">🔄 리롤 <span class="btn-cost">2G</span></button>
+            <button id="btn-lock" class="dock-btn">🔒</button>
           </div>
-          <div id="shop-slots"></div>
-        </section>
-      </div>
-      <!-- Bottom hotzone (invisible trigger) -->
-      <div id="shop-hotzone"></div>
-      <!-- Mobile toggle button -->
-      <button id="shop-toggle-btn" class="shop-toggle-btn">🛒 상점</button>
+          <!-- Center: 5 Shop cards -->
+          <div id="shop-slots" class="dock-cards"></div>
+          <!-- Right: Combat start -->
+          <div class="dock-right">
+            <button id="btn-next-round" class="dock-btn dock-btn-combat">⚔️ 전투 시작</button>
+          </div>
+        </div>
+      </footer>
 
       <!-- Hidden compat elements removed (v3.5 cleanup) -->
     </div>
