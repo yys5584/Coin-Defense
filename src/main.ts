@@ -1955,7 +1955,8 @@ function afterCombatCleanup(p: typeof state.players[0]): void {
 async function showGameOver(): Promise<void> {
   const p = player();
   const reachedRound = state.round;
-  const cleared = reachedRound >= 70; // R70 = S7 클리어
+  const targetStage = currentStageId + 1;
+  const cleared = getStage(reachedRound) >= targetStage && getStageRound(reachedRound) === `${targetStage}-7`;
   inCountdown = false;
 
   // 게임 화면 즉시 숨기기

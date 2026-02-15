@@ -545,7 +545,7 @@ export function renderResult(container: HTMLElement, resultData: {
         <div class="result-screen">
             <div class="result-header ${win ? 'win' : 'lose'}">
                 <h1>${win ? '🏆 클리어!' : '💀 실패'}</h1>
-                <div class="result-round">도달 라운드: R${resultData.reachedRound}</div>
+                <div class="result-round">${win ? `스테이지 ${resultData.stageId + 1} 완료!` : `도달 라운드: R${resultData.reachedRound}`}</div>
             </div>
 
             <div class="result-grades">
