@@ -2389,11 +2389,95 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !$('settings-overlay').classList.contains('hidden')) {
     closeSettings();
     e.stopPropagation();
+    return;
+  }
+  // Shop overlay — ESC closes
+  if (e.key === 'Escape') {
+    const so = document.getElementById('shop-overlay');
+    if (so && (so.classList.contains('open') || so.classList.contains('pinned'))) {
+      so.classList.remove('open', 'pinned');
+      e.stopPropagation();
+      return;
+    }
+  }
+  // Tab or S — toggle pin shop overlay
+  if (e.key === 'Tab' || e.key === 's' || e.key === 'S') {
+    // Don't intercept if typing in input
+    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+    // Don't intercept S if settings modal is open
+    if (!$('settings-overlay').classList.contains('hidden')) return;
+    const so = document.getElementById('shop-overlay');
+    if (!so) return;
+    if (so.classList.contains('pinned')) {
+      so.classList.remove('pinned', 'open');
+    } else {
+      so.classList.add('pinned');
+      so.classList.remove('open');
+    }
+    if (e.key === 'Tab') e.preventDefault();
   }
 });
+
+// ─── Shop Overlay Controller ───────────────────────────────
+
+(function setupShopOverlay() {
+  const overlay = document.getElementById('shop-overlay');
+  const hotzone = document.getElementById('shop-hotzone');
+  const toggleBtn = document.getElementById('shop-toggle-btn');
+  if (!overlay || !hotzone) return;
+
+  let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // Hotzone hover → open
+  hotzone.addEventListener('mouseenter', () => {
+    if (overlay.classList.contains('pinned')) return;
+    overlay.classList.add('open');
+  });
+
+  // Overlay hover → keep open
+  overlay.addEventListener('mouseenter', () => {
+    if (overlay.classList.contains('pinned')) return;
+    if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
+    overlay.classList.add('open');
+  });
+
+  // Leave overlay → close after short delay
+  overlay.addEventListener('mouseleave', () => {
+    if (overlay.classList.contains('pinned')) return;
+    hoverTimeout = setTimeout(() => {
+      overlay.classList.remove('open');
+    }, 200);
+  });
+
+  // Also close when leaving hotzone if not over overlay
+  hotzone.addEventListener('mouseleave', () => {
+    if (overlay.classList.contains('pinned')) return;
+    hoverTimeout = setTimeout(() => {
+      if (!overlay.matches(':hover')) {
+        overlay.classList.remove('open');
+      }
+    }, 200);
+  });
+
+  // Mobile: detect touch device and show toggle button
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    if (toggleBtn) toggleBtn.style.display = 'block';
+  }
+
+  // Mobile toggle button
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      if (overlay.classList.contains('pinned')) {
+        overlay.classList.remove('pinned', 'open');
+      } else {
+        overlay.classList.add('pinned');
+      }
+    });
+  }
+})();
 
 // ─── 첫 렌더 ────────────────────────────────────────────────
 
 log('🎮 CoinRandomDefense v3.5 시작!', 'green');
-log('D=리롤, F=XP구매, E=판매, Space=전투, 우클릭=판매', 'blue');
+log('D=리롤, F=XP구매, E=판매, Space=전투, Tab/S=상점 열기', 'blue');
 render();

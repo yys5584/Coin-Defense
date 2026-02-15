@@ -94,22 +94,28 @@
 
       </main>
 
-      <!-- ═══ BOTTOM: Shop ═══ -->
-      <section id="shop-section">
-        <div id="shop-level-badge" class="hud-pill">
-          <span class="hud-label">Lv</span>
-          <span class="hud-value" id="hud-level">1</span>
-          <span class="hud-sub" id="hud-xp">0/2 XP</span>
-        </div>
-        <div id="shop-controls">
-          <button id="btn-reroll" class="shop-btn">🔄 리롤 <span class="btn-cost">2G</span></button>
-          <button id="btn-buy-xp" class="shop-btn">📈 XP구매 <span class="btn-cost">4G</span></button>
-          <button id="btn-lock" class="shop-btn">🔒 잠금</button>
-          <div class="shop-spacer"></div>
-          <button id="btn-next-round" class="shop-btn combat-btn">⚔️ 전투 시작</button>
-        </div>
-        <div id="shop-slots"></div>
-      </section>
+      <!-- ═══ SHOP OVERLAY (slide-up) ═══ -->
+      <div id="shop-overlay" class="shop-overlay">
+        <section id="shop-section">
+          <div id="shop-level-badge" class="hud-pill">
+            <span class="hud-label">Lv</span>
+            <span class="hud-value" id="hud-level">1</span>
+            <span class="hud-sub" id="hud-xp">0/2 XP</span>
+          </div>
+          <div id="shop-controls">
+            <button id="btn-reroll" class="shop-btn">🔄 리롤 <span class="btn-cost">2G</span></button>
+            <button id="btn-buy-xp" class="shop-btn">📈 XP구매 <span class="btn-cost">4G</span></button>
+            <button id="btn-lock" class="shop-btn">🔒 잠금</button>
+            <div class="shop-spacer"></div>
+            <button id="btn-next-round" class="shop-btn combat-btn">⚔️ 전투 시작</button>
+          </div>
+          <div id="shop-slots"></div>
+        </section>
+      </div>
+      <!-- Bottom hotzone (invisible trigger) -->
+      <div id="shop-hotzone"></div>
+      <!-- Mobile toggle button -->
+      <button id="shop-toggle-btn" class="shop-toggle-btn">🛒 상점</button>
 
       <!-- Hidden compat elements removed (v3.5 cleanup) -->
     </div>
