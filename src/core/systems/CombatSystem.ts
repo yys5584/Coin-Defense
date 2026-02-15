@@ -34,21 +34,21 @@ const LAP_DAMAGE = 1;                 // 몬스터 1바퀴당 플레이어 HP �
 function buildPerimeterPath(): PathPoint[] {
     const path: PathPoint[] = [];
 
-    // 1) 좌측: (0,0) → (0,3) — 아래로 (x=-1.5 기준, 보드 왼쪽 바깥)
+    // 1) 좌측: 아래로 — 트랙 중앙(inset 26px ≈ gridOffset - 16px ≈ -0.68 cell)
     for (let y = 0; y <= BOARD_H; y++) {
-        path.push({ px: -1.5, py: y - 0.5 });
+        path.push({ px: -0.7, py: y - 0.5 });
     }
-    // 2) 하단: (0,3) → (6,3) — 오른쪽 (보드 아래 바깥)
+    // 2) 하단: 오른쪽 — 트랙 중앙
     for (let x = 0; x <= BOARD_W; x++) {
-        path.push({ px: x - 0.5, py: BOARD_H + 0.5 });
+        path.push({ px: x - 0.5, py: BOARD_H - 0.3 });
     }
-    // 3) 우측: (6,3) → (6,0) — 위로
+    // 3) 우측: 위로 — 트랙 중앙
     for (let y = BOARD_H; y >= 0; y--) {
-        path.push({ px: BOARD_W + 0.5, py: y - 0.5 });
+        path.push({ px: BOARD_W - 0.3, py: y - 0.5 });
     }
-    // 4) 상단: (6,0) → (0,0) — 왼쪽
+    // 4) 상단: 왼쪽 — 트랙 중앙
     for (let x = BOARD_W; x >= 0; x--) {
-        path.push({ px: x - 0.5, py: -1.5 });
+        path.push({ px: x - 0.5, py: -0.7 });
     }
 
     return path;

@@ -551,8 +551,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: visible;
-    position: relative;
+    overflow: hidden;
 }
 
 #board-section #map-wrapper {
