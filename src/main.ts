@@ -33,14 +33,21 @@ let collectedBossGrades: Record<string, string> = {};
 async function initProLobby() {
   try {
     await initUserState();
-    if (lobbyProEl) {
-      renderLobby(lobbyProEl);
-    }
   } catch (e) {
-    console.error('[Lobby] Init failed:', e);
-    // 오프라인 fallback: 로비 없이 바로 게임
-    lobbyProEl?.classList.add('hidden');
-    appEl?.classList.remove('hidden');
+    console.warn('[Lobby] Server unreachable, using offline state:', e);
+    // 오프라인 fallback 상태 생성
+    setCachedState({
+      userId: 'offline',
+      profile: { nickname: 'Player' },
+      wallet: { soft: 0, hard: 0 },
+      progress: { unlockedStage: 1, bestRound: 0, bestBossGrades: {} },
+      unlocks: { unlockedCosts: {}, license7: false, license10: false, license7Shards: 0, license10Shards: 0 },
+      missions: { daily: [], dailyResetAt: '' },
+    });
+  }
+  // 항상 로비 렌더링
+  if (lobbyProEl) {
+    renderLobby(lobbyProEl);
   }
 }
 
