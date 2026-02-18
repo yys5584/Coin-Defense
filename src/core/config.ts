@@ -887,6 +887,18 @@ export const AUGMENTS: AugmentDef[] = [
         minRound: 30,
         effect: '모든 몬스터 기본 이속 -20%'
     },
+
+    // ═══ 신규 증강 ═══
+    {
+        id: 'aug_adaptive', name: '적응형 관통', emoji: '🔮',
+        minRound: 20,
+        effect: '모든 유닛이 적의 물방/마방 중 낮은 값으로 데미지 적용'
+    },
+    {
+        id: 'aug_clone', name: '스마트 컨트랙트 복제', emoji: '📋',
+        minRound: 20,
+        effect: '보유 중인 7코/10코 유닛 1마리를 즉시 복제하여 벤치에 추가'
+    },
 ];
 
 // ─── 보스 전자 드롭 테이블 ──────────────────────────────────

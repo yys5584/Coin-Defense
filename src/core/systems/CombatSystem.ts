@@ -85,6 +85,7 @@ export class CombatSystem {
     private _paused = false;
     private _gameSpeed = 1;
     private _augments: Set<string> = new Set();
+    private _adaptiveDmg = false;
 
     /** 게임 속도 (1x, 2x, 3x) */
     get gameSpeed(): number { return this._gameSpeed; }
@@ -248,6 +249,27 @@ export class CombatSystem {
         if (augs.has('aug_synergy_amp')) {
             synergyBuffs.dmgMultiplier *= 1.10;
             synergyBuffs.atkSpeedMultiplier *= 1.05;
+        }
+        // 🔮 적응형 관통: 물방/마방 중 낮은 값으로 적용 (flag 저장)
+        // (실제 적용은 데미지 계산 루프에서 this._adaptiveDmg 참조)
+        this._adaptiveDmg = augs.has('aug_adaptive');
+
+        // 📋 스마트 컨트랙트 복제: 보유 7/10코 유닛 1마리 복제 → 벤치
+        if (augs.has('aug_clone')) {
+            const highCostUnits = [...player.board, ...player.bench].filter(
+                u => (UNIT_MAP[u.unitId]?.cost ?? 0) >= 7
+            );
+            if (highCostUnits.length > 0 && player.bench.length < 9) {
+                const pick = highCostUnits[Math.floor(Math.random() * highCostUnits.length)];
+                const clone: UnitInstance = {
+                    instanceId: `clone_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                    unitId: pick.unitId,
+                    star: 1,
+                    position: null,
+                };
+                player.bench.push(clone);
+                this.events.emit('unit:bought', { unit: clone });
+            }
         }
         // 증강 적용한 후 몬스터 속도 재계산에 반영하기 위해 저장
         this._augments = augs;
@@ -903,7 +925,13 @@ export class CombatSystem {
 
                 // ── DEF/MDEF 비율 감소 적용 (LoL식: DMG × 100 / (100 + effectiveDef)) ──
                 const unitDmgType = def.dmgType ?? 'physical';
-                const rawArmor = unitDmgType === 'physical' ? target.def : target.mdef;
+                let rawArmor: number;
+                if (this._adaptiveDmg) {
+                    // 적응형 관통: 물방/마방 중 낮은 값 사용
+                    rawArmor = Math.min(target.def, target.mdef);
+                } else {
+                    rawArmor = unitDmgType === 'physical' ? target.def : target.mdef;
+                }
                 const armorIgnore = buffs?.armorIgnore ?? 0;
                 const effectiveArmor = rawArmor * (1 - armorIgnore);
                 if (effectiveArmor > 0) {
