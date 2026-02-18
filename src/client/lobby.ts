@@ -24,10 +24,11 @@ const UNLOCK_CONDITIONS: Record<number, string> = {
     7: 'S6 클리어',
 };
 
-export type LobbyView = 'home' | 'campaign' | 'stageDetail' | 'missions' | 'collection' | 'license' | 'shop' | 'settings';
+export type LobbyView = 'home' | 'campaign' | 'stageDetail' | 'freeplay' | 'freeplayDetail' | 'missions' | 'collection' | 'license' | 'shop' | 'settings';
 
 let currentView: LobbyView = 'home';
 let selectedStage: number = 1;
+let _cameFromFreeplay = false;
 let onStartGame: ((stageId: number) => void) | null = null;
 
 export function setOnStartGame(cb: (stageId: number) => void) {
@@ -95,6 +96,8 @@ function renderCurrentView(container: HTMLElement, state: ClientUserState) {
         switch (currentView) {
             case 'campaign': renderCampaign(scroll, state); break;
             case 'stageDetail': renderStageDetail(scroll, state); break;
+            case 'freeplay': renderFreeplay(scroll, state); break;
+            case 'freeplayDetail': renderStageDetail(scroll, state); break;
             case 'missions': renderMissions(scroll, state); break;
             case 'collection': renderCollection(scroll, state); break;
             case 'license': renderLicense(scroll, state); break;
@@ -104,15 +107,14 @@ function renderCurrentView(container: HTMLElement, state: ClientUserState) {
     }
 
     // Bottom Tab Bar
-    if (currentView !== 'stageDetail') {
+    if (currentView !== 'stageDetail' && currentView !== 'freeplayDetail') {
         const nav = document.createElement('div');
         nav.className = 'lobby-nav';
         const navItems = [
             { id: 'home', icon: '🏠', label: 'Home' },
-            { id: 'campaign', icon: '⚔️', label: 'Campaign' },
+            { id: 'campaign', icon: '📖', label: '캠페인' },
+            { id: 'freeplay', icon: '🎮', label: '일반전' },
             { id: 'missions', icon: '📋', label: 'Quest' },
-            { id: 'collection', icon: '📖', label: 'Book' },
-            { id: 'shop', icon: '🛒', label: 'Shop' },
             { id: 'license', icon: '🔑', label: 'License' },
         ];
 
@@ -130,14 +132,13 @@ function renderCurrentView(container: HTMLElement, state: ClientUserState) {
     }
 }
 
-// Home
+// Home — 모드 선택 허브
 function renderHome(body: HTMLElement, state: ClientUserState) {
-    const nextUnlock = getNextUnlock(state);
     const bestRound = state.progress.bestRound;
     const currentStage = state.progress.unlockedStage;
     const stageName = STAGE_INFO[currentStage]?.name ?? '';
 
-    // Left side menu
+    // ── 좌측 사이드 ──
     const leftPanel = document.createElement('div');
     leftPanel.className = 'side-panel';
     leftPanel.innerHTML = `
@@ -145,96 +146,124 @@ function renderHome(body: HTMLElement, state: ClientUserState) {
             <span class="side-icon">🛒</span>
             <span class="side-label">Shop</span>
         </button>
-        <button class="side-btn locked">
-            <span class="side-icon">👑</span>
-            <span class="side-label">VIP</span>
-            <span class="side-soon">SOON</span>
-        </button>
         <button class="side-btn" data-view="collection">
-            <span class="side-icon">📢</span>
-            <span class="side-label">Notice</span>
-            <span class="side-badge">NEW</span>
+            <span class="side-icon">📖</span>
+            <span class="side-label">Book</span>
         </button>
-    `;
-    body.appendChild(leftPanel);
-
-    // Center hub
-    const center = document.createElement('div');
-    center.className = 'center-hub';
-    center.innerHTML = `
-        <div class="wave-display">
-            <div class="wave-big">${bestRound}</div>
-            <div class="wave-sub">Best Wave</div>
-        </div>
-
-        <div class="progress-card">
-            <div class="prog-row">
-                <span class="prog-label">Stage</span>
-                <span class="prog-value">S${currentStage} ${stageName}</span>
-            </div>
-            <div class="prog-row">
-                <span class="prog-label">Best Round</span>
-                <span class="prog-value">R${bestRound}</span>
-            </div>
-            ${nextUnlock
-            ? `<div class="prog-next">🔓 Next: ${nextUnlock}</div>`
-            : '<div class="prog-next complete">✅ All Stages Unlocked!</div>'
-        }
-        </div>
-
-        <button class="cta-primary" id="cta-start">
-            <span>Campaign Start</span>
-            <span class="cta-sub-line">⚡ S${currentStage}</span>
-        </button>
-
-        <div class="secondary-actions">
-            <button class="btn-secondary" id="btn-difficulty">Difficulty</button>
-            <button class="btn-secondary disabled">Party (Soon)</button>
-        </div>
-    `;
-    body.appendChild(center);
-
-    // Right side menu
-    const rightPanel = document.createElement('div');
-    rightPanel.className = 'side-panel';
-    rightPanel.innerHTML = `
         <button class="side-btn" data-view="missions">
             <span class="side-icon">📋</span>
             <span class="side-label">Quest</span>
             <span class="side-badge dot"></span>
         </button>
-        <button class="side-btn" data-view="campaign">
-            <span class="side-icon">⚔️</span>
-            <span class="side-label">Stage</span>
+    `;
+    body.appendChild(leftPanel);
+
+    // ── 중앙: 모드 선택 허브 ──
+    const center = document.createElement('div');
+    center.className = 'center-hub mode-hub';
+    center.innerHTML = `
+        <div class="mode-hub-title">
+            <div class="mode-hub-logo">⚔️</div>
+            <div class="mode-hub-text">CoinRandomDefense</div>
+            <div class="mode-hub-sub">게임 모드를 선택하세요</div>
+        </div>
+
+        <div class="mode-cards">
+            <!-- 캠페인 -->
+            <div class="mode-card campaign" id="mode-campaign">
+                <div class="mode-card-glow"></div>
+                <div class="mode-card-icon">📖</div>
+                <div class="mode-card-title">캠페인</div>
+                <div class="mode-card-desc">스토리 모드 · 튜토리얼</div>
+                <div class="mode-card-info">
+                    <span class="mode-stage">S${currentStage} ${stageName}</span>
+                    <span class="mode-round">Best R${bestRound}</span>
+                </div>
+                <div class="mode-card-progress">
+                    <div class="mode-prog-bar">
+                        <div class="mode-prog-fill" style="width:${Math.min(100, (currentStage / 7) * 100)}%"></div>
+                    </div>
+                    <span class="mode-prog-text">${currentStage}/7 스테이지</span>
+                </div>
+                <div class="mode-card-cta">입장 →</div>
+            </div>
+
+            <!-- 일반전 -->
+            <div class="mode-card freeplay" id="mode-freeplay">
+                <div class="mode-card-glow"></div>
+                <div class="mode-card-icon">🎮</div>
+                <div class="mode-card-title">일반전</div>
+                <div class="mode-card-desc">자유 대전 · 싱글플레이</div>
+                <div class="mode-card-info">
+                    <span class="mode-players">👤 1 / 4</span>
+                    <span class="mode-label-soon">멀티 준비중</span>
+                </div>
+                <div class="mode-card-detail">
+                    자유롭게 스테이지를 선택하고<br>실력을 연마하세요
+                </div>
+                <div class="mode-card-cta">입장 →</div>
+            </div>
+
+            <!-- 랭크전 -->
+            <div class="mode-card ranked locked" id="mode-ranked">
+                <div class="mode-card-glow"></div>
+                <div class="mode-card-icon">🏆</div>
+                <div class="mode-card-title">랭크전</div>
+                <div class="mode-card-desc">시즌 경쟁 · ELO 매칭</div>
+                <div class="mode-card-info">
+                    <span class="mode-players">👤 4인 대전</span>
+                </div>
+                <div class="mode-card-lock-overlay">
+                    <span class="mode-lock-icon">🔒</span>
+                    <span class="mode-lock-text">COMING SOON</span>
+                    <span class="mode-lock-sub">시즌 1 준비중</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mode-hub-footer">
+            <div class="mode-stat">💰 ${state.wallet.soft.toLocaleString()} Gold</div>
+            <div class="mode-stat">🔑 ${state.unlocks.license7Shards} / ⭐ ${state.unlocks.license10Shards}</div>
+        </div>
+    `;
+    body.appendChild(center);
+
+    // ── 우측 사이드 ──
+    const rightPanel = document.createElement('div');
+    rightPanel.className = 'side-panel';
+    rightPanel.innerHTML = `
+        <button class="side-btn" data-view="license">
+            <span class="side-icon">🔑</span>
+            <span class="side-label">License</span>
         </button>
         <button class="side-btn locked">
             <span class="side-icon">🎫</span>
             <span class="side-label">Pass</span>
             <span class="side-soon">SOON</span>
         </button>
-        <button class="side-btn" data-view="license">
-            <span class="side-icon">🔑</span>
-            <span class="side-label">License</span>
-        </button>
         <button class="side-btn locked">
-            <span class="side-icon">🏆</span>
-            <span class="side-label">Rank</span>
+            <span class="side-icon">👑</span>
+            <span class="side-label">VIP</span>
             <span class="side-soon">SOON</span>
         </button>
     `;
     body.appendChild(rightPanel);
 
-    // Event listeners
-    center.querySelector('#cta-start')?.addEventListener('click', () => {
+    // ── 이벤트 ──
+    center.querySelector('#mode-campaign')?.addEventListener('click', () => {
         currentView = 'campaign';
         const container = body.parentElement!;
         renderCurrentView(container, state);
     });
 
-    center.querySelector('#btn-difficulty')?.addEventListener('click', () => {
-        currentView = 'campaign';
+    center.querySelector('#mode-freeplay')?.addEventListener('click', () => {
+        currentView = 'freeplay';
         const container = body.parentElement!;
         renderCurrentView(container, state);
+    });
+
+    center.querySelector('#mode-ranked')?.addEventListener('click', () => {
+        showToast('🏆 랭크전은 시즌 1 오픈 후 이용 가능합니다!', body);
     });
 
     body.querySelectorAll('.side-btn:not(.locked)').forEach(btn => {
@@ -257,7 +286,11 @@ function getNextUnlock(state: ClientUserState): string | null {
 
 // ── 캠페인 스테이지 선택 ──
 function renderCampaign(body: HTMLElement, state: ClientUserState) {
-    let html = '<div class="campaign-header"><h2>⚔️ 캠페인 스테이지 선택</h2></div><div class="stage-grid">';
+    _cameFromFreeplay = false;
+    let html = `<div class="campaign-header">
+        <h2>📖 캠페인</h2>
+        <div class="campaign-subtitle">스테이지를 순서대로 클리어하며 게임을 배워보세요</div>
+    </div><div class="stage-grid">`;
 
     for (let s = 1; s <= 7; s++) {
         const info = STAGE_INFO[s];
@@ -299,6 +332,44 @@ function renderCampaign(body: HTMLElement, state: ClientUserState) {
     });
 }
 
+// ── 일반전 스테이지 선택 ──
+function renderFreeplay(body: HTMLElement, state: ClientUserState) {
+    _cameFromFreeplay = true;
+    let html = `<div class="campaign-header freeplay-header">
+        <h2>🎮 일반전</h2>
+        <div class="campaign-subtitle">자유롭게 스테이지를 선택하세요 · 싱글플레이</div>
+        <div class="freeplay-mp-notice">👤 1 / 4 — 멀티플레이 업데이트 준비중</div>
+    </div><div class="stage-grid">`;
+
+    for (let s = 1; s <= 7; s++) {
+        const info = STAGE_INFO[s];
+        const best = state.progress.bestBossGrades[`S${s}`] ?? {};
+        const bestGrade = Object.values(best)[0] ?? '-';
+
+        html += `
+            <div class="stage-card unlocked freeplay-card" data-stage="${s}">
+                <div class="stage-num">S${s}</div>
+                <div class="stage-name">${info.name}</div>
+                <div class="stage-def">${info.defType}</div>
+                <div class="stage-rounds">${info.rounds}</div>
+                <div class="stage-best">Best: ${bestGrade}</div>
+            </div>
+        `;
+    }
+
+    html += '</div>';
+    body.innerHTML = html;
+
+    body.querySelectorAll('.stage-card').forEach(card => {
+        card.addEventListener('click', () => {
+            selectedStage = Number((card as HTMLElement).dataset.stage);
+            currentView = 'freeplayDetail';
+            const container = body.parentElement!;
+            renderCurrentView(container, state);
+        });
+    });
+}
+
 // ── 스테이지 상세 ──
 function renderStageDetail(body: HTMLElement, state: ClientUserState) {
     const info = STAGE_INFO[selectedStage];
@@ -336,7 +407,7 @@ function renderStageDetail(body: HTMLElement, state: ClientUserState) {
     `;
 
     body.querySelector('#back-to-campaign')?.addEventListener('click', () => {
-        currentView = 'campaign';
+        currentView = _cameFromFreeplay ? 'freeplay' : 'campaign';
         const container = body.parentElement!;
         renderCurrentView(container, state);
     });

@@ -1401,3 +1401,334 @@
         font-size: 16px;
     }
 }
+
+/* ══════════════════════════════════════════════════════════════ */
+/* MODE SELECTION HUB                                            */
+/* ══════════════════════════════════════════════════════════════ */
+
+.mode-hub {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 8px;
+}
+
+.mode-hub-title {
+    text-align: center;
+}
+
+.mode-hub-logo {
+    font-size: 36px;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+    animation: mode-logo-pulse 2s ease-in-out infinite;
+}
+
+@keyframes mode-logo-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+.mode-hub-text {
+    font-family: var(--font-title);
+    font-size: 22px;
+    color: var(--c-yellow);
+    text-shadow: 2px 2px 0 #000, 0 0 12px rgba(255, 215, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.mode-hub-sub {
+    font-size: 14px;
+    color: var(--t-dim);
+    margin-top: 2px;
+}
+
+/* Card container */
+.mode-cards {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+/* Individual card */
+.mode-card {
+    position: relative;
+    flex: 1;
+    max-width: 260px;
+    min-height: 240px;
+    background: linear-gradient(180deg, var(--c-panel-light), var(--c-panel));
+    border: 3px solid var(--c-outline);
+    border-radius: var(--r-lg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 0 var(--c-outline), 0 6px 16px rgba(0, 0, 0, 0.5);
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    overflow: hidden;
+}
+
+.mode-card:hover:not(.locked) {
+    transform: translateY(-4px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 0 var(--c-outline), 0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+.mode-card:active:not(.locked) {
+    transform: translateY(2px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 0 var(--c-outline);
+}
+
+/* Glow accent per mode */
+.mode-card-glow {
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 140%;
+    height: 80%;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.15;
+    filter: blur(30px);
+}
+
+.mode-card.campaign .mode-card-glow {
+    background: radial-gradient(ellipse, #ff8c00, transparent 70%);
+}
+
+.mode-card.freeplay .mode-card-glow {
+    background: radial-gradient(ellipse, #42a5f5, transparent 70%);
+}
+
+.mode-card.ranked .mode-card-glow {
+    background: radial-gradient(ellipse, #ab47bc, transparent 70%);
+}
+
+/* Card icon */
+.mode-card-icon {
+    font-size: 40px;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
+    z-index: 1;
+}
+
+/* Title */
+.mode-card-title {
+    font-family: var(--font-title);
+    font-size: 22px;
+    z-index: 1;
+}
+
+.mode-card.campaign .mode-card-title {
+    color: var(--c-yellow);
+    text-shadow: 1px 1px 0 #000, 0 0 8px rgba(255, 215, 0, 0.3);
+}
+
+.mode-card.freeplay .mode-card-title {
+    color: var(--c-blue);
+    text-shadow: 1px 1px 0 #000, 0 0 8px rgba(66, 165, 245, 0.3);
+}
+
+.mode-card.ranked .mode-card-title {
+    color: var(--c-purple);
+    text-shadow: 1px 1px 0 #000, 0 0 8px rgba(171, 71, 188, 0.3);
+}
+
+/* Desc */
+.mode-card-desc {
+    font-size: 13px;
+    color: var(--t-cream);
+    z-index: 1;
+}
+
+/* Info row */
+.mode-card-info {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--t-dim);
+    z-index: 1;
+}
+
+.mode-stage {
+    color: var(--c-yellow);
+    font-family: var(--font-title);
+}
+
+.mode-round {
+    color: var(--t-cream);
+}
+
+.mode-players {
+    color: var(--c-blue);
+}
+
+.mode-label-soon {
+    color: var(--c-orange);
+    font-size: 11px;
+    background: rgba(255, 140, 0, 0.15);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 140, 0, 0.3);
+}
+
+/* Progress bar (campaign) */
+.mode-card-progress {
+    width: 100%;
+    z-index: 1;
+}
+
+.mode-prog-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mode-prog-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--c-orange), var(--c-yellow));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.mode-prog-text {
+    font-size: 11px;
+    color: var(--t-dim);
+    display: block;
+    text-align: right;
+    margin-top: 2px;
+}
+
+/* Detail text */
+.mode-card-detail {
+    font-size: 12px;
+    color: var(--t-dim);
+    text-align: center;
+    line-height: 1.5;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* CTA button */
+.mode-card-cta {
+    font-family: var(--font-title);
+    font-size: 16px;
+    padding: 6px 16px;
+    border-radius: var(--r-sm);
+    z-index: 1;
+    margin-top: auto;
+    transition: background 0.15s;
+}
+
+.mode-card.campaign .mode-card-cta {
+    background: linear-gradient(180deg, var(--c-orange), var(--c-orange-dark));
+    color: #fff;
+    border: 2px solid var(--c-outline);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 0 var(--c-outline);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.mode-card.freeplay .mode-card-cta {
+    background: linear-gradient(180deg, #42a5f5, #1976d2);
+    color: #fff;
+    border: 2px solid var(--c-outline);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 0 var(--c-outline);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Locked (ranked) overlay */
+.mode-card.locked {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.mode-card-lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(2px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: var(--r-lg);
+    z-index: 5;
+}
+
+.mode-lock-icon {
+    font-size: 32px;
+}
+
+.mode-lock-text {
+    font-family: var(--font-title);
+    font-size: 20px;
+    color: var(--c-purple);
+    text-shadow: 0 0 12px rgba(171, 71, 188, 0.5);
+    letter-spacing: 2px;
+}
+
+.mode-lock-sub {
+    font-size: 12px;
+    color: var(--t-dim);
+}
+
+/* Hub footer */
+.mode-hub-footer {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--t-dim);
+}
+
+.mode-stat {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 3px 10px;
+    border-radius: var(--r-sm);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Campaign sub-header */
+.campaign-subtitle {
+    font-size: 14px;
+    color: var(--t-dim);
+    margin-top: 2px;
+}
+
+/* Freeplay header extras */
+.freeplay-header h2 {
+    color: var(--c-blue) !important;
+}
+
+.freeplay-mp-notice {
+    font-size: 12px;
+    color: var(--c-blue);
+    background: rgba(66, 165, 245, 0.1);
+    border: 1px solid rgba(66, 165, 245, 0.25);
+    padding: 3px 10px;
+    border-radius: var(--r-sm);
+    margin-top: 6px;
+}
+
+.freeplay-card {
+    border-color: rgba(66, 165, 245, 0.3) !important;
+}
+
+.freeplay-card:hover {
+    border-color: var(--c-blue) !important;
+    box-shadow: 0 0 12px rgba(66, 165, 245, 0.2) !important;
+}
