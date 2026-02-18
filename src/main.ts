@@ -540,7 +540,7 @@ function renderShop(): void {
           </div>` : ''}
           ${def.uniqueEffect ? `<div class="tt-effect">${def.uniqueEffect}</div>` : ''}
           ${def.cost >= 10 ? '<div class="tt-merge-warn">⚠️ 풀 1개 — 합성 불가 (즉시 종결 스펙)</div>'
-            : def.cost >= 7 ? '<div class="tt-merge-warn">⚠️ 풀 5개 — ★★까지만 가능</div>'
+            : def.cost >= 7 ? '<div class="tt-merge-warn">⚠️ 풀 2개 — 복제 증강 시 ★★ 가능</div>'
               : ''}
         `;
         tooltipEl.style.left = `${(e as MouseEvent).clientX + 12}px`;
