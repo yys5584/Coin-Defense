@@ -70,13 +70,15 @@ body {
 }
 
 body {
-    font-family: 'Monogram Extended', 'Monogram', 'Pretendard Variable', monospace;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
     background: var(--bg);
     color: var(--text);
     height: 810px;
     overflow: hidden;
     font-size: 16px;
     letter-spacing: 0.5px;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
 }
 
 .num {
@@ -99,7 +101,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Monogram Extended', 'Monogram', monospace;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
 }
 
 .lobby-bg {
@@ -242,7 +244,7 @@ body {
     border-radius: 8px;
     color: #e8ecf4;
     font-size: 14px;
-    font-family: 'Monogram Extended', 'Monogram', monospace;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
     outline: none;
     transition: border-color .2s;
 }
@@ -264,7 +266,7 @@ body {
     border-radius: 10px;
     cursor: pointer;
     text-align: center;
-    font-family: 'Monogram Extended', 'Monogram', monospace;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
     transition: all .2s;
     position: relative;
 }
@@ -316,7 +318,7 @@ body {
     color: #0a0e17;
     font-size: 16px;
     font-weight: 800;
-    font-family: 'Monogram Extended', 'Monogram', monospace;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
     cursor: pointer;
     transition: all .2s;
     box-shadow: 0 4px 20px rgba(240, 178, 50, .3);
@@ -1247,7 +1249,7 @@ body {
 
 #bottom-area {
     flex-shrink: 0;
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
 }
 
 /* ── Control Bar ── */
@@ -1715,7 +1717,7 @@ body {
 }
 
 .unit-card .name {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
@@ -1944,7 +1946,7 @@ body {
     text-shadow: 0 1px 3px rgba(0, 0, 0, .8), 0 0 6px rgba(250, 204, 21, .4);
     pointer-events: none;
     z-index: 20;
-    font-family: 'Monogram Extended', 'Monogram', monospace;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
 }
 
 /* 크리티컬 숫자 — 더 크고 빨간색 */
@@ -1957,7 +1959,7 @@ body {
     text-shadow: 0 0 8px rgba(255, 68, 68, .8), 0 0 16px rgba(255, 200, 50, .5), 0 2px 4px rgba(0, 0, 0, .9);
     pointer-events: none;
     z-index: 21;
-    font-family: 'Monogram Extended', 'Monogram', monospace;
+    font-family: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
     letter-spacing: 1px;
 }
 
