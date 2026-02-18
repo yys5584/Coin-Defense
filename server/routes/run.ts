@@ -38,6 +38,35 @@ router.post('/finish', (req: Request, res: Response) => {
     const { runId, stageId, reachedRound, cleared, bossGrades, stats } = req.body;
     if (!runId || !stageId) return res.status(400).json({ error: 'Missing fields' });
 
+    // ── Anti-Cheat Sanity Check ──
+    const run = db.prepare('SELECT stageId, createdAt FROM run_history WHERE id = ? AND userId = ?').get(runId, userId) as any;
+    if (!run) {
+        return res.status(403).json({ error: 'Invalid or unauthorized runId' });
+    }
+
+    // 1) stageId 일치 검증
+    if (run.stageId !== stageId) {
+        console.warn(`[ANTI-CHEAT] userId=${userId} stageId mismatch: started=${run.stageId}, claimed=${stageId}`);
+        return res.status(403).json({ error: 'Stage mismatch' });
+    }
+
+    // 2) 최소 플레이 시간 검증 (라운드당 최소 5초)
+    const startTime = new Date(run.createdAt + 'Z').getTime();
+    const elapsed = (Date.now() - startTime) / 1000;
+    const minSeconds = Math.max(10, (reachedRound ?? 1) * 5);
+    if (elapsed < minSeconds) {
+        console.warn(`[ANTI-CHEAT] userId=${userId} too fast: ${elapsed.toFixed(1)}s for ${reachedRound} rounds (min ${minSeconds}s)`);
+        return res.status(403).json({ error: 'Abnormal clear speed' });
+    }
+
+    // 3) 라운드 한도 검증 (스테이지별 최대 라운드)
+    const STAGE_MAX_ROUNDS: Record<number, number> = { 1: 3, 2: 7, 3: 7, 4: 7, 5: 7, 6: 7, 7: 7 };
+    const maxRound = STAGE_MAX_ROUNDS[stageId] ?? 7;
+    if ((reachedRound ?? 0) > maxRound) {
+        console.warn(`[ANTI-CHEAT] userId=${userId} impossible round: ${reachedRound} > max ${maxRound} for stage ${stageId}`);
+        return res.status(403).json({ error: 'Invalid round count' });
+    }
+
     // run_history 업데이트 (stats JSON 포함)
     db.prepare(`
         UPDATE run_history SET reachedRound = ?, cleared = ?, bossGrades = ?, stats = ? WHERE id = ? AND userId = ?

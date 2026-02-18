@@ -8,10 +8,14 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, 'data', 'coinrd.db');
+
+// DB 경로: 환경변수 DB_PATH (Railway 영구 볼륨) 우선, 없으면 로컬
+const DB_PATH = process.env.DB_PATH
+    ? path.resolve(process.env.DB_PATH)
+    : path.join(__dirname, 'data', 'coinrd.db');
 
 // Ensure data directory exists
-fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
