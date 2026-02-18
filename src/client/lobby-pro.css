@@ -35,8 +35,8 @@
     --t-cream: #ffe0b2;
     --t-dim: #a08060;
     --t-dark: #3d2410;
-    --font: 'neodgm', 'Monogram Extended', 'Monogram', monospace;
-    --font-title: 'neodgm', 'Monogram', monospace;
+    --font: 'neodgm', monospace;
+    --font-title: 'neodgm', monospace;
     --r-sm: 6px;
     --r-md: 10px;
     --r-lg: 14px;

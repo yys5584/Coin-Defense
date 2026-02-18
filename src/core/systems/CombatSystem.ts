@@ -901,11 +901,13 @@ export class CombatSystem {
                     }
                 }
 
-                // ── DEF/MDEF 감쇠 적용 ──
+                // ── DEF/MDEF 비율 감소 적용 (LoL식: DMG × 100 / (100 + effectiveDef)) ──
                 const unitDmgType = def.dmgType ?? 'physical';
-                const armor = unitDmgType === 'physical' ? target.def : target.mdef;
-                if (armor > 0) {
-                    dmg = dmg * 100 / (100 + armor);
+                const rawArmor = unitDmgType === 'physical' ? target.def : target.mdef;
+                const armorIgnore = buffs?.armorIgnore ?? 0;
+                const effectiveArmor = rawArmor * (1 - armorIgnore);
+                if (effectiveArmor > 0) {
+                    dmg = dmg * 100 / (100 + effectiveArmor);
                 }
 
                 // ── onHit 스킬 ──
