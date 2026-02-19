@@ -10,7 +10,7 @@ import { CombatSystem, getPositionOnPath, CombatResult } from './core/systems/Co
 import { SynergySystem } from './core/systems/SynergySystem';
 import { UNIT_MAP, SYNERGIES, STAR_MULTIPLIER, LEVELS, getBaseIncome, getInterest, getStreakBonus, getStageRound, getStage, isBossRound, BOX_DROP_TABLES, BOX_UNLOCK_CHANCE, UNLOCK_CONDITIONS, AUGMENTS, STAGE_HINTS, STAGE_DEFENSE } from './core/config';
 import { GameState, PlayerState, UnitInstance, CombatState, ActiveSynergy } from './core/types';
-import { createUnitVisual, preloadAllSprites, COST_GLOW, COST_GLOW_SHADOW, hasSpriteFor } from './client/sprites';
+import { createUnitVisual, preloadAllSprites, COST_GLOW, COST_GLOW_SHADOW, hasSpriteFor, hasUnitSprite, getUnitSprite, drawUnitSprite, drawMonsterSprite } from './client/sprites';
 
 import './client/style.css';
 
@@ -26,28 +26,21 @@ const appEl = document.getElementById('app');
 
 // 런 추적 변수
 let currentRunId: string | null = null;
-let currentStageId: number = 1;
+let currentStageId: number = 7;  // 기본값: 최종 스테이지 (7-7까지 진행)
 let collectedBossGrades: Record<string, string> = {};
 
 // PRO 로비 초기화
 async function initProLobby() {
   try {
     await initUserState();
+    if (lobbyProEl) {
+      renderLobby(lobbyProEl);
+    }
   } catch (e) {
-    console.warn('[Lobby] Server unreachable, using offline state:', e);
-    // 오프라인 fallback 상태 생성
-    setCachedState({
-      userId: 'offline',
-      profile: { nickname: 'Player' },
-      wallet: { soft: 0, hard: 0 },
-      progress: { unlockedStage: 1, bestRound: 0, bestBossGrades: {} },
-      unlocks: { unlockedCosts: {}, license7: false, license10: false, license7Shards: 0, license10Shards: 0 },
-      missions: { daily: [], dailyResetAt: '' },
-    });
-  }
-  // 항상 로비 렌더링
-  if (lobbyProEl) {
-    renderLobby(lobbyProEl);
+    console.error('[Lobby] Init failed:', e);
+    // 오프라인 fallback: 로비 없이 바로 게임
+    lobbyProEl?.classList.add('hidden');
+    appEl?.classList.remove('hidden');
   }
 }
 
@@ -87,9 +80,842 @@ function returnToLobby() {
 
 initProLobby();
 
+// ═══════════════════════════════════════════════════════════════
+// ─── ASYNC RACING MULTIPLAYER ────────────────────────────────
+// 각자 독립 진행 + 상태 릴레이 + 미니맵 라운드 표시
+// ═══════════════════════════════════════════════════════════════
+
+import {
+  connectSocket, joinQueue, leaveQueue, startWithBots,
+  emitSyncState, emitTimeAttack, emitClaimDraft, emitGetDraft,
+  emitPlayerDied, emitGameCleared,
+  onQueueUpdate, onGameStart, onSyncState,
+  onPlayerDisconnected, onTimeAttack, onUpdateDraft,
+  onPlayerDiedBroadcast, onPlayerClearedBroadcast, onMatchEnd,
+  disconnectSocket,
+  type GameStartData, type SyncStateData, type QueueUpdateData, type DraftCard, type MatchRanking,
+} from './client/socket';
+
+// ─── SPA Screen Management ───
+const lobbyScreenEl = document.getElementById('lobby-screen');
+const matchScreenEl = document.getElementById('match-screen');
+const gameScreenEl = document.getElementById('game-screen');
+
+function showScreen(id: string) {
+  lobbyScreenEl?.classList.add('hidden');
+  matchScreenEl?.classList.add('hidden');
+  gameScreenEl?.classList.add('hidden');
+  document.getElementById(id)?.classList.remove('hidden');
+}
+
+// ─── Multiplayer State ───
+let currentViewId = 0;   // 관전 대상 (0=나)
+let isMultiMode = false;
+let isHost = false;
+let mySlotIndex = 0;
+let multiPlayerNames: string[] = [];
+let botSlots: number[] = [];
+let syncInterval: number | null = null;
+let botAIInterval: number | null = null;
+// 원격 플레이어의 라운드 정보 저장
+const remoteRounds: Map<number, { round: number; label: string }> = new Map();
+
+// ─── Speedrun Bounty ───
+let gameStartTime = 0; // Date.now() at game start
+const SPEEDRUN_TARGET_LABEL = '2-7'; // 타겟 라운드
+const SPEEDRUN_TIME_LIMIT = 30;  // QA: 30초 (본번: 180초)
+const SPEEDRUN_BONUS_GOLD = 15;
+
+const viewPlayer = () => state.players[currentViewId] ?? state.players[0];
+
+// ─── SPA Lobby Buttons ───
+const lobbyModesEl = document.getElementById('lobby-modes');
+const lobbySubmodesEl = document.getElementById('lobby-submodes');
+
+document.getElementById('btn-campaign')?.addEventListener('click', () => {
+  alert('튜토리얼은 준비 중입니다.');
+});
+
+document.getElementById('btn-normal')?.addEventListener('click', () => {
+  lobbyModesEl?.classList.add('hidden');
+  lobbySubmodesEl?.classList.remove('hidden');
+});
+
+document.getElementById('btn-back-lobby')?.addEventListener('click', () => {
+  lobbySubmodesEl?.classList.add('hidden');
+  lobbyModesEl?.classList.remove('hidden');
+});
+
+document.getElementById('btn-solo')?.addEventListener('click', () => {
+  isMultiMode = false;
+  showScreen('game-screen');
+  startGameFromSPA(1);
+});
+
+document.getElementById('btn-4player')?.addEventListener('click', () => {
+  isMultiMode = true;
+  showScreen('match-screen');
+  connectSocket();
+  setupSocketListeners();
+  joinQueue(`Player_${Math.random().toString(36).slice(2, 6)}`);
+});
+
+document.getElementById('btn-cancel-match')?.addEventListener('click', () => {
+  cancelMatchmaking();
+  leaveQueue();
+  showScreen('lobby-screen');
+  lobbySubmodesEl?.classList.add('hidden');
+  lobbyModesEl?.classList.remove('hidden');
+});
+
+document.getElementById('btn-start-bots')?.addEventListener('click', () => {
+  startWithBots();
+  document.getElementById('btn-start-bots')?.classList.add('hidden');
+});
+
+// ─── Matchmaking UI ───
+let matchTimers: number[] = [];
+function cancelMatchmaking() {
+  matchTimers.forEach(t => clearTimeout(t));
+  matchTimers = [];
+  for (let i = 1; i <= 3; i++) {
+    const slot = document.getElementById(`mp-slot-${i}`);
+    if (slot) {
+      slot.className = 'match-player-slot waiting';
+      slot.querySelector('.mp-avatar')!.textContent = '❓';
+      slot.querySelector('.mp-name')!.textContent = '대기중...';
+      slot.querySelector('.mp-status')!.textContent = '';
+    }
+  }
+  document.getElementById('match-status')!.textContent = '1/4 대기중...';
+  document.getElementById('match-loading')?.classList.add('hidden');
+  document.getElementById('btn-cancel-match')?.classList.remove('hidden');
+}
+
+// ─── Socket Event Listeners ───
+let socketListenersSet = false;
+function setupSocketListeners() {
+  if (socketListenersSet) return;
+  socketListenersSet = true;
+
+  onQueueUpdate((data: QueueUpdateData) => {
+    document.getElementById('match-status')!.textContent = `${data.count}/4 대기중...`;
+    isHost = data.isHost;
+
+    const startBtn = document.getElementById('btn-start-bots');
+    if (startBtn) {
+      if (data.isHost && data.count >= 1) {
+        startBtn.classList.remove('hidden');
+        startBtn.textContent = `🤖 ${data.count}/4 - 봇 채우고 이대로 시작하기`;
+      } else {
+        startBtn.classList.add('hidden');
+      }
+    }
+
+    for (let i = 0; i < 3; i++) {
+      const slot = document.getElementById(`mp-slot-${i + 1}`);
+      if (!slot) continue;
+      if (i < data.count - 1) {
+        slot.className = 'match-player-slot joined';
+        slot.querySelector('.mp-avatar')!.textContent = '🎮';
+        slot.querySelector('.mp-name')!.textContent = data.players[i + 1] || `Player ${i + 2}`;
+        slot.querySelector('.mp-status')!.textContent = '✔ 준비됨';
+        (slot.querySelector('.mp-status') as HTMLElement).className = 'mp-status ready';
+      } else {
+        slot.className = 'match-player-slot waiting';
+        slot.querySelector('.mp-avatar')!.textContent = '❓';
+        slot.querySelector('.mp-name')!.textContent = '대기중...';
+        slot.querySelector('.mp-status')!.textContent = '';
+      }
+    }
+  });
+
+  onGameStart((data: GameStartData) => {
+    console.log('[MP] Game starting!', data);
+    mySlotIndex = data.myIndex;
+    isHost = data.isHost;
+    multiPlayerNames = data.players.map(p => p.name);
+    botSlots = data.players.filter(p => p.isBot).map(p => p.slotIndex);
+
+    const statusEl = document.getElementById('match-status')!;
+    const loadingEl = document.getElementById('match-loading')!;
+    const cancelBtn = document.getElementById('btn-cancel-match')!;
+    const startBtn = document.getElementById('btn-start-bots');
+
+    statusEl.textContent = '4/4 매칭 완료!';
+    cancelBtn.classList.add('hidden');
+    startBtn?.classList.add('hidden');
+    matchScreenEl?.classList.add('match-shake');
+
+    setTimeout(() => {
+      matchScreenEl?.classList.remove('match-shake');
+      loadingEl.classList.remove('hidden');
+      statusEl.textContent = '';
+      const fillEl = document.getElementById('match-loading-fill')!;
+      let progress = 0;
+      const loadInterval = window.setInterval(() => {
+        progress += 5;
+        fillEl.style.width = `${progress}%`;
+        if (progress >= 100) {
+          clearInterval(loadInterval);
+          showScreen('game-screen');
+          startMultiplayerGame(data);
+        }
+      }, 60);
+    }, 800);
+  });
+
+  // 다른 플레이어 상태 수신 (비동기 레이싱: round 포함!)
+  onSyncState((data: SyncStateData) => {
+    if (data.slotIndex === mySlotIndex) return;
+    const localIdx = findLocalIndex(data.slotIndex);
+    if (localIdx <= 0 || localIdx >= state.players.length) return;
+
+    const p = state.players[localIdx];
+    p.hp = data.hp;
+    p.gold = data.gold;
+    p.level = data.level;
+    p.board = data.boardUnits || [];
+    p.bench = data.benchUnits || [];
+
+    // 라운드 정보 저장
+    remoteRounds.set(localIdx, { round: data.round, label: data.roundLabel });
+
+    if (currentViewId === localIdx) render();
+    renderMinimapPanel();
+  });
+
+  onPlayerDisconnected((data) => {
+    const localIdx = findLocalIndex(data.slotIndex);
+    if (localIdx > 0 && localIdx < state.players.length) {
+      state.players[localIdx].hp = 0;
+      renderMinimapPanel();
+    }
+  });
+
+  // ── Speedrun Bounty: 상대방 타임어택 성공 알림 (FOMO 토스트) ──
+  onTimeAttack((data) => {
+    showFomoToast(`📢 ${data.playerName}님이 ${data.stage}스테이지 타임어택 보상을 차지했습니다! (${data.elapsed.toFixed(1)}s)`);
+  });
+
+  // ── Draft Room: 실시간 카드 상태 업데이트 ──
+  onUpdateDraft((data) => {
+    const prevCards = currentDraftCards;
+    currentDraftCards = data.cards;
+    renderDraftCards();
+
+    // 내가 방금 claim한 카드가 있으면 보상 적용!
+    const myName = multiPlayerNames[0] || '';
+    for (const card of data.cards) {
+      if (card.owner === myName) {
+        // 이전에는 null이었는데 이제 내 이름이면 → 방금 claim됨
+        const prev = prevCards.find(c => c.id === card.id);
+        if (!prev || prev.owner === null) {
+          applyDraftReward(card);
+          return;
+        }
+      }
+    }
+  });
+
+  // ── 사망/클리어 브로드캐스트 ─
+  onPlayerDiedBroadcast((data) => {
+    showFomoToast(`☠️ ${data.playerName}님이 ${data.round}에서 탈락했습니다!`);
+    renderMinimapPanel();
+  });
+
+  onPlayerClearedBroadcast((data) => {
+    showFomoToast(`🏆 ${data.playerName}님이 ${data.round} ALL CLEAR!`);
+    renderMinimapPanel();
+  });
+
+  onMatchEnd((_data) => {
+    console.log('[Match] Match ended, rankings:', _data.rankings);
+  });
+}
+
+// ─── Multiplayer Game Start ───
+function startMultiplayerGame(data: GameStartData) {
+  gameStartTime = Date.now(); // ⚡ 타임어택 타이머 시작!
+  currentStageId = 7;  // 멀티: 7-7까지 진행
+  state.stageId = 7;
+  collectedBossGrades = {};
+  currentViewId = 0;
+
+  const me = state.players[0];
+  me.id = data.players[mySlotIndex].name;
+  me.hp = 20; me.gold = 10; me.level = 1; me.xp = 0;
+  me.board = []; me.bench = [];
+  me.shop = [null, null, null, null, null];
+  me.winStreak = 0; me.lossStreak = 0;
+
+  while (state.players.length > 1) state.players.pop();
+  for (let i = 0; i < 4; i++) {
+    if (i === mySlotIndex) continue;
+    state.players.push({
+      id: data.players[i].name,
+      gold: 10, level: 1, xp: 0, hp: 20,
+      winStreak: 0, lossStreak: 0,
+      board: [], bench: [],
+      shop: [null, null, null, null, null],
+      shopLocked: false, items: [], augments: [],
+      unlocked7cost: [], unlocked10cost: false, freeRerolls: 0,
+    });
+  }
+
+  multiPlayerNames = ['나 (' + data.players[mySlotIndex].name + ')'];
+  for (let i = 0; i < 4; i++) {
+    if (i === mySlotIndex) continue;
+    multiPlayerNames.push(data.players[i].name);
+  }
+
+  lobbyProEl?.classList.add('hidden');
+  resultViewEl?.classList.add('hidden');
+
+  // 첫 라운드 시작 (각자 독립!)
+  state.round = 0; // 리셋 (모듈 초기화 시 이미 1로 올라간 상태)
+  cmd.execute(state, { type: 'END_ROUND' }); // round 0 → 1 = 1-1
+
+  bgm.play().catch(() => { });
+  render();
+  renderMinimapPanel();
+  updateSpectateState();
+  startSyncLoop();
+
+  // 경쟁전: 배속 버튼 잠금 표시
+  const speedBtn = document.getElementById('btn-speed');
+  if (speedBtn) {
+    speedBtn.textContent = '🔒 1x';
+    speedBtn.classList.add('speed-locked');
+  }
+
+  if (isHost && botSlots.length > 0) startBotAI();
+}
+
+function startGameFromSPA(stageId: number) {
+  currentStageId = stageId;
+  state.stageId = stageId;
+  collectedBossGrades = {};
+  lobbyProEl?.classList.add('hidden');
+  resultViewEl?.classList.add('hidden');
+  bgm.play().catch(() => { });
+}
+
+// ─── State Sync Loop (1초 간격) ───
+function startSyncLoop() {
+  stopSyncLoop();
+  syncInterval = window.setInterval(() => {
+    const p = player();
+    const roundLabel = getStageRound(state.round);
+    emitSyncState({
+      slotIndex: mySlotIndex,
+      hp: p.hp,
+      gold: p.gold,
+      level: p.level,
+      round: state.round,
+      roundLabel,
+      boardUnits: p.board.map(u => ({
+        instanceId: u.instanceId, unitId: u.unitId,
+        star: u.star, position: u.position,
+      })),
+      benchUnits: p.bench.map(u => ({
+        instanceId: u.instanceId, unitId: u.unitId, star: u.star,
+      })),
+    });
+
+    // 방장: 봇 상태도 전송
+    if (isHost) {
+      for (const bIdx of botSlots) {
+        const botLocalIdx = findLocalIndex(bIdx);
+        if (botLocalIdx > 0 && botLocalIdx < state.players.length) {
+          const bp = state.players[botLocalIdx];
+          emitSyncState({
+            slotIndex: bIdx,
+            hp: bp.hp, gold: bp.gold, level: bp.level,
+            round: state.round, roundLabel,
+            boardUnits: bp.board.map(u => ({
+              instanceId: u.instanceId, unitId: u.unitId,
+              star: u.star, position: u.position,
+            })),
+            benchUnits: bp.bench.map(u => ({
+              instanceId: u.instanceId, unitId: u.unitId, star: u.star,
+            })),
+          });
+        }
+      }
+    }
+  }, 1000);
+}
+
+function stopSyncLoop() {
+  if (syncInterval !== null) { clearInterval(syncInterval); syncInterval = null; }
+}
+
+// ─── Slot Index Mapping ───
+function findLocalIndex(serverSlot: number): number {
+  if (serverSlot === mySlotIndex) return 0;
+  let localIdx = 1;
+  for (let s = 0; s < 4; s++) {
+    if (s === mySlotIndex) continue;
+    if (s === serverSlot) return localIdx;
+    localIdx++;
+  }
+  return -1;
+}
+
+// ─── Bot AI (호스트만 실행) ───
+function startBotAI() {
+  stopBotAI();
+  if (!isMultiMode) return;
+
+  botAIInterval = window.setInterval(() => {
+    if (!isMultiMode) { stopBotAI(); return; }
+
+    for (let idx = 1; idx < state.players.length; idx++) {
+      const ai = state.players[idx];
+      if (ai.hp <= 0) continue;
+
+      // 상점에서 구매 가능한 유닛 1개 구매
+      for (let si = 0; si < 5; si++) {
+        const shopId = ai.shop[si];
+        if (!shopId) continue;
+        const def = UNIT_MAP[shopId];
+        if (def && ai.gold >= def.cost) {
+          const ok = cmd.execute(state, {
+            type: 'BUY_UNIT', playerId: ai.id, shopIndex: si,
+          });
+          if (ok) break;
+        }
+      }
+
+      // 벤치→보드 랜덤 배치
+      if (ai.bench.length > 0) {
+        const unit = ai.bench[0];
+        const emptySlots: { x: number; y: number }[] = [];
+        for (let y = 0; y < 4; y++) {
+          for (let x = 0; x < 7; x++) {
+            if (!ai.board.find(u => u.position?.x === x && u.position?.y === y)) {
+              emptySlots.push({ x, y });
+            }
+          }
+        }
+        if (emptySlots.length > 0) {
+          const slot = emptySlots[Math.floor(Math.random() * emptySlots.length)];
+          cmd.execute(state, {
+            type: 'MOVE_UNIT', playerId: ai.id,
+            instanceId: unit.instanceId, to: slot,
+          });
+        }
+      }
+
+      // 20% XP 구매
+      if (Math.random() < 0.2 && ai.gold >= 4) {
+        cmd.execute(state, { type: 'BUY_XP', playerId: ai.id });
+      }
+
+      // 상점 비면 리롤
+      if (ai.shop.every(s => s === null) && ai.gold >= 2) {
+        cmd.execute(state, { type: 'REROLL', playerId: ai.id });
+      }
+    }
+
+    if (currentViewId !== 0) render();
+    renderMinimapPanel();
+  }, 3500);
+}
+
+function stopBotAI() {
+  if (botAIInterval !== null) { clearInterval(botAIInterval); botAIInterval = null; }
+}
+
+// ─── Speedrun Bounty UI ───
+
+/** ⚡ 중앙 화려한 스피드런 보너스 애니메이션 */
+function showSpeedrunFlash() {
+  const flash = document.createElement('div');
+  flash.style.cssText = `
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 42px; font-weight: 900; color: #fbbf24;
+    text-shadow: 0 0 40px #fbbf24, 0 0 80px #f59e0b, 0 0 120px #d97706,
+                 0 4px 8px rgba(0,0,0,0.8);
+    z-index: 10000; pointer-events: none;
+    font-family: 'neodgm', monospace;
+    white-space: nowrap;
+    animation: speedrunFlash 2.5s ease-out forwards;
+  `;
+  flash.textContent = `⚡ SPEEDRUN BONUS +${SPEEDRUN_BONUS_GOLD}G ⚡`;
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 3000);
+
+  // 파티클 이펙트
+  for (let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    const angle = (Math.PI * 2 * i) / 20;
+    const dist = 60 + Math.random() * 100;
+    particle.style.cssText = `
+      position: fixed; top: 50%; left: 50%; width: 8px; height: 8px;
+      background: ${['#fbbf24', '#f59e0b', '#ef4444', '#fff'][i % 4]};
+      border-radius: 50%; z-index: 10001; pointer-events: none;
+      transform: translate(-50%, -50%);
+      animation: particleBurst 1.5s ease-out forwards;
+      --dx: ${Math.cos(angle) * dist}px;
+      --dy: ${Math.sin(angle) * dist}px;
+    `;
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 1600);
+  }
+}
+
+/** 📢 FOMO 토스트 알림 (상단 배너) */
+function showFomoToast(message: string) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #991b1b, #7f1d1d);
+    border: 2px solid #fbbf24; border-radius: 12px;
+    padding: 14px 28px; color: #fbbf24; font-size: 18px; font-weight: 900;
+    z-index: 10000; text-align: center;
+    box-shadow: 0 0 30px rgba(251,191,36,0.4), 0 4px 15px rgba(0,0,0,0.6);
+    font-family: 'neodgm', monospace;
+    animation: fomoSlideIn 0.4s ease-out, fomoFadeOut 0.5s ease-in 2.5s forwards;
+    max-width: 90vw;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// ─── Draft Room (비동기 선착순 드래프트) ───
+
+let currentDraftCards: DraftCard[] = [];
+let draftScreenOpen = false;
+
+function showDraftScreen() {
+  draftScreenOpen = true;
+  console.log('[Draft] Opening draft screen...');
+
+  let overlay = document.getElementById('draft-screen');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'draft-screen';
+    document.body.appendChild(overlay);
+  }
+
+  // 매번 innerHTML 갱신 (포기 버튼 포함)
+  overlay.innerHTML = `
+    <div class="draft-inner">
+      <h1 class="draft-title">🃏 선착순 보상 드래프트</h1>
+      <p class="draft-subtitle">보상 카드를 하나 선택하세요! 다른 플레이어가 먼저 가져갈 수 있습니다.</p>
+      <div id="draft-cards" class="draft-cards">
+        <p style="color:#94a3b8;grid-column:1/-1;text-align:center;">⏳ 카드 로딩중...</p>
+      </div>
+      <button id="draft-skip-btn" class="draft-skip-btn">⏭️ 보상 포기하고 진행하기</button>
+    </div>
+  `;
+
+  // 포기 버튼 — 소프트락 방지
+  document.getElementById('draft-skip-btn')?.addEventListener('click', () => {
+    console.log('[Draft] Skip button clicked — closing without reward');
+    closeDraftScreen();
+    afterCombatCleanup(player());
+  });
+
+  overlay.classList.remove('hidden');
+  overlay.style.display = 'flex';
+
+  // 서버에 현재 드래프트 상태 요청
+  emitGetDraft();
+  console.log('[Draft] Requested draft state from server');
+
+  // 10초 안에 응답 없으면 자동 닫기 (안전장치)
+  setTimeout(() => {
+    if (draftScreenOpen && currentDraftCards.length === 0) {
+      console.warn('[Draft] Timeout — no cards received, auto-closing');
+      closeDraftScreen();
+      afterCombatCleanup(player());
+    }
+  }, 10000);
+}
+
+function renderDraftCards() {
+  const container = document.getElementById('draft-cards');
+  if (!container || !draftScreenOpen) return;
+
+  console.log('[Draft] Rendering cards:', currentDraftCards.length, currentDraftCards);
+
+  if (currentDraftCards.length === 0) {
+    container.innerHTML = '<p style="color:#94a3b8;grid-column:1/-1;text-align:center;">⏳ 카드 로딩중...</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+
+  const cardIcons: Record<string, string> = {
+    gold: '💰', reroll: '🔄', hp: '💖', unit: '🎲'
+  };
+  const cardColors: Record<string, string> = {
+    gold: '#fbbf24', reroll: '#60a5fa', hp: '#f472b6', unit: '#a78bfa'
+  };
+
+  for (const card of currentDraftCards) {
+    const isClaimed = card.owner !== null;
+
+    const el = document.createElement('button');
+    el.className = `draft-card ${isClaimed ? 'claimed' : 'available'}`;
+    el.style.setProperty('--card-color', cardColors[card.type] || '#94a3b8');
+
+    el.innerHTML = `
+      <div class="draft-card-icon">${cardIcons[card.type] || '🎲'}</div>
+      <div class="draft-card-text">${card.text}</div>
+      ${isClaimed
+        ? `<div class="draft-card-owner">🔒 ${card.owner} 획득 완료</div>`
+        : '<div class="draft-card-hint">클릭하여 선택</div>'}
+    `;
+
+    if (!isClaimed) {
+      el.addEventListener('click', () => {
+        console.log('[Draft] Claiming card:', card.id, card.text);
+        emitClaimDraft(card.id, multiPlayerNames[0] || 'Player');
+      });
+    }
+
+    container.appendChild(el);
+  }
+
+  // 모든 카드가 이미 선점됐으면 안내
+  if (currentDraftCards.every(c => c.owner !== null)) {
+    const allTaken = document.createElement('p');
+    allTaken.style.cssText = 'color:#ef4444;grid-column:1/-1;text-align:center;font-size:16px;margin-top:12px;';
+    allTaken.textContent = '⚠️ 모든 보상이 선점되었습니다. 아래 버튼으로 진행하세요.';
+    container.appendChild(allTaken);
+  }
+}
+
+function closeDraftScreen() {
+  draftScreenOpen = false;
+  const overlay = document.getElementById('draft-screen');
+  if (overlay) {
+    overlay.classList.add('hidden');
+    overlay.style.display = 'none';
+  }
+}
+
+function applyDraftReward(card: DraftCard) {
+  const p = player();
+  switch (card.type) {
+    case 'gold':
+      p.gold += card.val;
+      log(`🃏 드래프트 보상: +${card.val}G!`, 'gold');
+      break;
+    case 'reroll':
+      p.freeRerolls += card.val;
+      log(`🃏 드래프트 보상: 무료 리롤 +${card.val}회!`, 'gold');
+      break;
+    case 'hp':
+      p.hp = Math.min(p.hp + card.val, 99);
+      log(`🃏 드래프트 보상: HP +${card.val} 회복!`, 'gold');
+      break;
+    case 'unit': {
+      // 4~5코 유닛 랜덤 지급 (벤치에 추가)
+      const highCostUnits = Object.values(UNIT_MAP).filter(u => u.cost >= 4 && u.cost <= 5);
+      if (highCostUnits.length > 0) {
+        const pick = highCostUnits[Math.floor(Math.random() * highCostUnits.length)];
+        const inst: UnitInstance = {
+          instanceId: `draft_${Date.now()}`,
+          unitId: pick.id,
+          star: 1,
+          position: undefined as any,
+        };
+        p.bench.push(inst);
+        log(`🃏 드래프트 보상: ${pick.name} (★) 획득!`, 'gold');
+      }
+      break;
+    }
+  }
+  showFomoToast(`🃏 ${card.text} 획득!`);
+  closeDraftScreen();
+  render();
+  // 게임 재개 — 다음 라운드 진행
+  afterCombatCleanup(p);
+}
+
+// ─── Multiplayer Death / Clear Screens ──────────────────────
+
+let isDeadInMulti = false;
+
+function applyDeathGrayscale() {
+  isDeadInMulti = true;
+  const app = document.getElementById('app');
+  if (app) app.classList.add('multi-dead');
+}
+
+function removeDeathOverlay() {
+  const overlay = document.getElementById('multi-end-overlay');
+  if (overlay) overlay.remove();
+}
+
+function showMultiDeathScreen() {
+  const roundLabel = getStageRound(state.round);
+  const myName = multiPlayerNames[0] || 'Player';
+
+  // 서버에 사망 알림
+  emitPlayerDied(roundLabel, myName);
+
+  // 전투 루프 중단
+  inCombat = false;
+  inCountdown = false;
+
+  // 캔버스+상점 그레이스케일
+  applyDeathGrayscale();
+
+  // 팝업
+  const overlay = document.createElement('div');
+  overlay.id = 'multi-end-overlay';
+  overlay.className = 'multi-end-overlay death';
+  overlay.innerHTML = `
+    <div class="multi-end-inner">
+      <div class="multi-end-icon">💀</div>
+      <h1 class="multi-end-title death">GAME OVER</h1>
+      <p class="multi-end-round">최종 도달 라운드: <strong>${roundLabel}</strong></p>
+      <p class="multi-end-note">※ 최종 순위 및 티어 점수는 매치 종료 후 자동 정산됩니다.</p>
+      <div class="multi-end-buttons">
+        <button id="btn-spectate" class="multi-end-btn spectate">👀 생존자 관전하기</button>
+        <button id="btn-exit-lobby" class="multi-end-btn exit">🏠 로비로 나가기</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  document.getElementById('btn-spectate')?.addEventListener('click', () => {
+    removeDeathOverlay();
+    // 흑백 유지 + 미니맵 관전 가능
+  });
+
+  document.getElementById('btn-exit-lobby')?.addEventListener('click', () => {
+    removeDeathOverlay();
+    isDeadInMulti = false;
+    const app = document.getElementById('app');
+    if (app) app.classList.remove('multi-dead');
+    isMultiMode = false;
+    disconnectSocket();
+    returnToLobby();
+  });
+}
+
+function showMultiClearScreen() {
+  const roundLabel = getStageRound(state.round);
+  const myName = multiPlayerNames[0] || 'Player';
+
+  // 서버에 클리어 알림
+  emitGameCleared(roundLabel, myName);
+
+  // 전투 루프 중단
+  inCombat = false;
+  inCountdown = false;
+
+  // 팝업 (골드 테마)
+  const overlay = document.createElement('div');
+  overlay.id = 'multi-end-overlay';
+  overlay.className = 'multi-end-overlay clear';
+  overlay.innerHTML = `
+    <div class="multi-end-inner">
+      <div class="multi-end-icon">🏆</div>
+      <h1 class="multi-end-title clear">ALL CLEAR!</h1>
+      <p class="multi-end-round">7-7 모든 스테이지 정복!</p>
+      <p class="multi-end-note">※ 최종 순위 및 티어 점수는 매치 종료 후 자동 정산됩니다.</p>
+      <div class="multi-end-buttons">
+        <button id="btn-spectate" class="multi-end-btn spectate">👀 다른 플레이어 관전하기</button>
+        <button id="btn-exit-lobby" class="multi-end-btn exit">🏠 로비로 나가기</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  document.getElementById('btn-spectate')?.addEventListener('click', () => {
+    removeDeathOverlay();
+  });
+
+  document.getElementById('btn-exit-lobby')?.addEventListener('click', () => {
+    removeDeathOverlay();
+    isMultiMode = false;
+    disconnectSocket();
+    returnToLobby();
+  });
+}
+
+// ─── Minimap Panel ───
+function renderMinimapPanel() {
+  const container = document.getElementById('minimap-players');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const names = multiPlayerNames.length === 4
+    ? multiPlayerNames
+    : ['나 (Player 1)'];
+  const avatars = ['🎮', '👑', '🐋', '🚀'];
+  const playerCount = isMultiMode ? state.players.length : 1;
+
+  for (let i = 0; i < playerCount; i++) {
+    const p = state.players[i];
+    if (!p) continue;
+
+    const btn = document.createElement('button');
+    btn.className = `minimap-player-btn ${i === currentViewId ? 'active' : ''} ${p.hp <= 0 ? 'eliminated' : ''}`;
+
+    const hpPct = Math.max(0, (p.hp / 20) * 100);
+
+    // 라운드 정보: 자신=현재 state.round, 상대=remoteRounds
+    let roundText = '';
+    if (i === 0) {
+      roundText = `🚩 ${getStageRound(state.round)}`;
+    } else {
+      const rr = remoteRounds.get(i);
+      roundText = rr ? `🚩 ${rr.label}` : '🚩 -';
+    }
+
+    btn.innerHTML = `
+      <span class="mm-avatar">${avatars[i] || '🎮'}</span>
+      <div class="mm-info">
+        <div class="mm-name">${names[i] || `Player ${i + 1}`}</div>
+        <div class="mm-hp-bar"><div class="mm-hp-fill" style="width:${hpPct}%"></div></div>
+        <div class="mm-hp-text">❤️ ${p.hp} | ⚔️ ${p.board.length}유닛 | ${roundText}</div>
+      </div>
+    `;
+
+    btn.addEventListener('click', () => {
+      currentViewId = i;
+      updateSpectateState();
+      renderMinimapPanel();
+      render();
+    });
+
+    container.appendChild(btn);
+  }
+}
+
+// ─── Spectate State ───
+function updateSpectateState() {
+  const watermark = document.getElementById('spectate-watermark');
+  const nameSpan = document.getElementById('spectate-name');
+  const appElement = document.getElementById('app');
+
+  if (currentViewId === 0) {
+    watermark?.classList.add('hidden');
+    appElement?.classList.remove('spectating');
+  } else {
+    const name = multiPlayerNames[currentViewId] ?? `Player ${currentViewId + 1}`;
+    if (nameSpan) nameSpan.textContent = name;
+    watermark?.classList.remove('hidden');
+    appElement?.classList.add('spectating');
+  }
+}
+
+// ─── Return to Lobby ───
+const origReturnToLobby = returnToLobby;
+
 
 // ─── BGM ──────────────────────────────────────────────────
-const bgm = new Audio('/music/v3song.mp3');
+const bgm = new Audio('/music/deongeon.mp3');
 bgm.loop = true;
 bgm.volume = 0.4;
 
@@ -105,7 +931,7 @@ const player = () => state.players[0];
 
 // 게임 통계 추적
 let totalGoldSpent = 0;
-let gameStartTime = Date.now();
+// (gameStartTime is set in multiplayer block above)
 
 // ── 런 통계 (runFinish stats 전송용) ──
 let runStats = {
@@ -436,10 +1262,20 @@ function renderBench(): void {
   for (let i = 0; i < 9; i++) {
     const slot = document.createElement('div');
     slot.className = 'bench-slot';
+    slot.dataset.benchIdx = String(i);
 
     const unit = p.bench[i];
     if (unit) {
       slot.appendChild(createUnitCard(unit, 'bench'));
+      // 벤치 내부 드래그 가능
+      slot.draggable = true;
+      slot.addEventListener('dragstart', (e) => {
+        e.dataTransfer?.setData('bench-swap-idx', String(i));
+        slot.classList.add('dragging');
+      });
+      slot.addEventListener('dragend', () => {
+        slot.classList.remove('dragging');
+      });
       // Click fallback
       slot.addEventListener('click', () => {
         handleBenchClick(unit);
@@ -448,6 +1284,12 @@ function renderBench(): void {
 
     // Drop target: board→bench or bench→bench reorder
     slot.addEventListener('dragover', (e) => {
+      // 벤치 내부 스왑 허용
+      if (e.dataTransfer?.types.includes('bench-swap-idx')) {
+        e.preventDefault();
+        slot.classList.add('drag-over');
+        return;
+      }
       if (inCombat && draggedUnit?.from === 'board') return;
       e.preventDefault();
       slot.classList.add('drag-over');
@@ -458,17 +1300,37 @@ function renderBench(): void {
     slot.addEventListener('drop', (e) => {
       e.preventDefault();
       slot.classList.remove('drag-over');
-      if (!draggedUnit) return;
 
+      // 벤치 내부 스왑
+      const srcIdxStr = e.dataTransfer?.getData('bench-swap-idx');
+      if (srcIdxStr !== undefined && srcIdxStr !== '') {
+        const srcIdx = parseInt(srcIdxStr);
+        const tgtIdx = i;
+        if (srcIdx !== tgtIdx && srcIdx < p.bench.length) {
+          // 빈 슬롯이면 이동, 유닛 있으면 교환
+          const temp = p.bench[srcIdx];
+          if (tgtIdx < p.bench.length) {
+            p.bench[srcIdx] = p.bench[tgtIdx];
+            p.bench[tgtIdx] = temp;
+          } else {
+            // 타겟이 빈 슬롯 — 이동만
+            p.bench.splice(srcIdx, 1);
+            p.bench.splice(tgtIdx > p.bench.length ? p.bench.length : tgtIdx, 0, temp);
+          }
+          render();
+        }
+        return;
+      }
+
+      // 기존: 보드 → 벤치
+      if (!draggedUnit) return;
       if (draggedUnit.from === 'board') {
-        // 보드 → 벤치
         if (inCombat) return;
         cmd.execute(state, {
           type: 'BENCH_UNIT', playerId: p.id,
           instanceId: draggedUnit.instanceId,
         });
       }
-      // bench→bench는 특별한 처리 없음 (순서는 상관없음)
       draggedUnit = null;
       selectedUnit = null;
       render();
@@ -512,7 +1374,13 @@ function renderShop(): void {
         : canMerge2 ? '<span class="merge-badge">★★</span>' : '';
       slot.innerHTML = `
         ${mergeHint}
-        <span class="unit-emoji">${def.emoji}</span>
+        <div class="unit-img" style="
+          background-image: url('/assets/units/${unitId}.png');
+          background-size: 80%; background-repeat: no-repeat; background-position: center bottom;
+          background-color: transparent;
+          image-rendering: pixelated;
+          width: 36px; height: 36px; margin: 0 auto 2px;
+        "></div>
         <span class="unit-name">${def.name}</span>
         <span class="unit-origin">${toCrypto(def.origin)}</span>
         <span class="unit-cost">💰 ${def.cost}</span>
@@ -546,9 +1414,6 @@ function renderShop(): void {
             <div class="tt-skill-desc">${skill.desc}${skill.cooldown ? ` (${skill.cooldown}초)` : ''}${skill.chance && skill.chance < 1 ? ` [${Math.round(skill.chance * 100)}%]` : ''}</div>
           </div>` : ''}
           ${def.uniqueEffect ? `<div class="tt-effect">${def.uniqueEffect}</div>` : ''}
-          ${def.cost >= 10 ? '<div class="tt-merge-warn">⚠️ 풀 1개 — 합성 불가 (즉시 종결 스펙)</div>'
-            : def.cost >= 7 ? '<div class="tt-merge-warn">⚠️ 풀 2개 — 복제 증강 시 ★★ 가능</div>'
-              : ''}
         `;
         tooltipEl.style.left = `${(e as MouseEvent).clientX + 12}px`;
         tooltipEl.style.top = `${(e as MouseEvent).clientY - 120}px`;
@@ -987,37 +1852,48 @@ function showLevelTooltip(targetEl: HTMLElement): void {
   if (!curLevel) return;
 
   const costLabels = ['1코', '2코', '3코', '4코', '5코'];
+  const costClasses = ['c1', 'c2', 'c3', 'c4', 'c5'];
 
-  let html = `<div style="font-weight:700;margin-bottom:6px">📊 Lv.${p.level} 상점 확률</div>`;
-
+  // 좌측: 현재 레벨 확률
+  let leftHtml = `<div class="xp-tt-header">현재 Lv.${p.level}</div>`;
   for (let i = 0; i < 5; i++) {
     const pct = curLevel.shopOdds[i];
-    html += `
+    leftHtml += `
       <div class="odds-row">
-        <span class="odds-cost c${i + 1}">${costLabels[i]}</span>
-        <div class="odds-bar-bg"><div class="odds-bar-fill c${i + 1}" style="width:${pct}%"></div></div>
+        <span class="odds-cost ${costClasses[i]}">${costLabels[i]}</span>
+        <div class="odds-bar-bg"><div class="odds-bar-fill ${costClasses[i]}" style="width:${pct}%"></div></div>
         <span class="odds-pct">${pct}%</span>
       </div>`;
   }
 
+  // 우측: 다음 레벨 확률 or MAX
+  let rightHtml = '';
   if (nextLevel && p.level < 10) {
-    html += `<div class="tt-next-label">▶ Lv.${nextLevel.level} 확률</div>`;
+    rightHtml = `<div class="xp-tt-header next">다음 Lv.${nextLevel.level}</div>`;
     for (let i = 0; i < 5; i++) {
       const pct = nextLevel.shopOdds[i];
       const diff = pct - curLevel.shopOdds[i];
-      const diffStr = diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '';
-      html += `
+      const diffStr = diff > 0 ? `<span class="odds-diff up">+${diff}</span>` : diff < 0 ? `<span class="odds-diff down">${diff}</span>` : '';
+      rightHtml += `
         <div class="odds-row">
-          <span class="odds-cost c${i + 1}">${costLabels[i]}</span>
-          <div class="odds-bar-bg"><div class="odds-bar-fill c${i + 1}" style="width:${pct}%"></div></div>
-          <span class="odds-pct">${pct}%${diffStr ? ` (${diffStr})` : ''}</span>
+          <span class="odds-cost ${costClasses[i]}">${costLabels[i]}</span>
+          <div class="odds-bar-bg"><div class="odds-bar-fill ${costClasses[i]}" style="width:${pct}%"></div></div>
+          <span class="odds-pct">${pct}%${diffStr}</span>
         </div>`;
     }
+  } else {
+    rightHtml = `<div class="xp-tt-max">🏆<br>MAX LEVEL<br>도달</div>`;
   }
 
   const tip = document.createElement('div');
-  tip.className = 'hud-tooltip level-tooltip';
-  tip.innerHTML = html;
+  tip.className = 'hud-tooltip xp-tooltip';
+  tip.innerHTML = `
+    <div class="xp-tt-layout">
+      <div class="xp-tt-col">${leftHtml}</div>
+      <div class="xp-tt-arrow">➔</div>
+      <div class="xp-tt-col">${rightHtml}</div>
+    </div>
+  `;
   targetEl.appendChild(tip);
 }
 
@@ -1057,8 +1933,8 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
 
   const stars = '⭐'.repeat(unit.star);
 
-  // 스프라이트 또는 이모지 시각 요소
-  const visual = createUnitVisual(def.origin, def.emoji, 32);
+  // 스프라이트 또는 이모지 시각 요소 (유닛 ID 전달)
+  const visual = createUnitVisual(def.origin, def.emoji, 32, unit.unitId);
   visual.classList.add('unit-visual');
 
   card.innerHTML = `
@@ -1270,20 +2146,15 @@ function renderCombatOverlay(cs: CombatState): void {
   }
   overlay.innerHTML = '';
 
-  // 몬스터 렌더 — CSS-pixel 기준 좌표 (getBoundingClientRect 스케일링 문제 회피)
+  // 몬스터 렌더
   const grid = $('board-grid');
-  // CSS inset 값 (style.css: #board-grid { inset: 42px })
-  const GRID_INSET = 42;
-  // wrapper의 CSS 크기 (offsetWidth/Height는 스케일 영향 없음)
-  const wrapperW = mapWrapper.offsetWidth;
-  const wrapperH = mapWrapper.offsetHeight;
-  // grid 영역 = wrapper 안쪽 inset
-  const gridW = wrapperW - GRID_INSET * 2;
-  const gridH = wrapperH - GRID_INSET * 2;
-  const cellW = gridW / 7;
-  const cellH = gridH / 4;
-  const gridOffsetX = GRID_INSET;
-  const gridOffsetY = GRID_INSET;
+  const gridRect = grid.getBoundingClientRect();
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  // grid 내부 좌표 → wrapper 기준 좌표 계산
+  const gridOffsetX = gridRect.left - wrapperRect.left;
+  const gridOffsetY = gridRect.top - wrapperRect.top;
+  const cellW = gridRect.width / 7;
+  const cellH = gridRect.height / 4;
   const nowMs = performance.now();
 
   for (const m of cs.monsters) {
@@ -1884,7 +2755,22 @@ function onCombatComplete(result: CombatResult): void {
 
   // 게임 오버 체크
   if (p.hp <= 0) {
-    showGameOver();
+    if (isMultiMode) {
+      showMultiDeathScreen();
+    } else {
+      showGameOver();
+    }
+    return;
+  }
+
+  // 7-7 최종 클리어 체크 (싱글 + 멀티 공통)
+  if (getStageRound(state.round) === '7-7' && result.won) {
+    if (isMultiMode) {
+      showMultiClearScreen();
+    } else {
+      log('🏆 7-7 ALL CLEAR! 축하합니다!', 'gold');
+      showGameOver();
+    }
     return;
   }
 
@@ -1894,27 +2780,52 @@ function onCombatComplete(result: CombatResult): void {
     // 보스 처치 시 무료 리롤 1회
     p.freeRerolls += 1;
     log('🎁 보스 처치! 무료 리롤 +1', 'gold');
-    handleBossBox(state.round).then(() => {
-      // ★ 캔페인 클리어 체크 (stageId+1의 x-7 도달 시)
-      const targetStage = currentStageId + 1;
-      const targetLabel = `${targetStage}-7`;
-      if (getStage(state.round) >= targetStage && getStageRound(state.round) === targetLabel) {
-        log(`🏆 스테이지 ${targetStage} 클리어! 축하합니다!`, 'gold');
-        showGameOver();
-        return;
+
+    // ⚡ Speedrun Bounty 판정 (멀티 모드에서 2-7 보스 클리어 시)
+    if (isMultiMode && getStageRound(state.round) === SPEEDRUN_TARGET_LABEL && result.won) {
+      const elapsed = (Date.now() - gameStartTime) / 1000;
+      if (elapsed <= SPEEDRUN_TIME_LIMIT) {
+        p.gold += SPEEDRUN_BONUS_GOLD;
+        log(`⚡ SPEEDRUN BONUS! +${SPEEDRUN_BONUS_GOLD}G (${elapsed.toFixed(1)}s)`, 'gold');
+        showSpeedrunFlash();
+        emitTimeAttack({
+          playerName: multiPlayerNames[0] || 'Player',
+          stage: getStage(state.round),
+          elapsed,
+        });
       }
+    }
+    handleBossBox(state.round).then(() => {
+      // ★ 캔페인 클리어 체크 (stageId+1의 x-7 도달 시) — 멀티에서는 스킵
+      if (!isMultiMode) {
+        const targetStage = currentStageId + 1;
+        const targetLabel = `${targetStage}-7`;
+        if (getStage(state.round) >= targetStage && getStageRound(state.round) === targetLabel) {
+          log(`🏆 스테이지 ${targetStage} 클리어! 축하합니다!`, 'gold');
+          showGameOver();
+          return;
+        }
+      }
+      // 🃏 드래프트 룸: 2-7 보스 승리 후 멀티 모드에서 드래프트 오버레이 표시
+      if (isMultiMode && getStageRound(state.round) === '2-7') {
+        showDraftScreen();
+        return; // 드래프트 완료 후 applyDraftReward → afterCombatCleanup 호출됨
+      }
+
       afterCombatCleanup(p);
     });
     return; // chest popup handles the flow
   }
 
-  // ★ 캔페인 클리어 체크 (보스가 아닌 경우에도)
-  const targetStage2 = currentStageId + 1;
-  const targetLabel2 = `${targetStage2}-7`;
-  if (getStage(state.round) >= targetStage2 && getStageRound(state.round) === targetLabel2) {
-    log(`🏆 스테이지 ${targetStage2} 클리어! 축하합니다!`, 'gold');
-    showGameOver();
-    return;
+  // ★ 캔페인 클리어 체크 (보스가 아닌 경우에도) — 멀티에서는 스킵
+  if (!isMultiMode) {
+    const targetStage2 = currentStageId + 1;
+    const targetLabel2 = `${targetStage2}-7`;
+    if (getStage(state.round) >= targetStage2 && getStageRound(state.round) === targetLabel2) {
+      log(`🏆 스테이지 ${targetStage2} 클리어! 축하합니다!`, 'gold');
+      showGameOver();
+      return;
+    }
   }
 
   afterCombatCleanup(p);
@@ -2062,13 +2973,14 @@ function showRangeCircle(cellX: number, cellY: number, unit: UnitInstance): void
   const mapWrapper = document.getElementById('map-wrapper');
   if (!grid || !mapWrapper) return;
 
-  const GRID_INSET = 42;
-  const cellW = (mapWrapper.offsetWidth - GRID_INSET * 2) / 7;
-  const cellH = (mapWrapper.offsetHeight - GRID_INSET * 2) / 4;
+  const gridRect = grid.getBoundingClientRect();
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const cellW = gridRect.width / 7;
+  const cellH = gridRect.height / 4;
 
   // 셀 중심 (wrapper 기준)
-  const centerX = GRID_INSET + (cellX + 0.5) * cellW;
-  const centerY = GRID_INSET + (cellY + 0.5) * cellH;
+  const centerX = (gridRect.left - wrapperRect.left) + (cellX + 0.5) * cellW;
+  const centerY = (gridRect.top - wrapperRect.top) + (cellY + 0.5) * cellH;
 
   // 범위 = range * 셀 평균 크기
   const avgCellSize = (cellW + cellH) / 2;
@@ -2309,12 +3221,12 @@ if (goldHudItem) {
   goldHudItem.addEventListener('mouseleave', removeHudTooltips);
 }
 
-// level hover  
-const levelHudItem = document.getElementById('control-bar') || $('hud-level').closest('.hud-pill');
-if (levelHudItem) {
-  (levelHudItem as HTMLElement).style.position = 'relative';
-  levelHudItem.addEventListener('mouseenter', () => showLevelTooltip(levelHudItem as HTMLElement));
-  levelHudItem.addEventListener('mouseleave', removeHudTooltips);
+// level hover — XP 구매 버튼 전용
+const xpBuyBtn = document.getElementById('btn-buy-xp');
+if (xpBuyBtn) {
+  (xpBuyBtn as HTMLElement).style.position = 'relative';
+  xpBuyBtn.addEventListener('mouseenter', () => showLevelTooltip(xpBuyBtn as HTMLElement));
+  xpBuyBtn.addEventListener('mouseleave', removeHudTooltips);
 }
 
 // ─── 유닛 정보 페이지 ────────────────────────────────────────
@@ -2324,6 +3236,7 @@ $('btn-info').addEventListener('click', () => {
 
 // ─── 게임 속도 토글 ──────────────────────────────────────────
 $('btn-speed').addEventListener('click', () => {
+  if (isMultiMode) return; // 경쟁전에서는 배속 비활성화
   const newSpeed = combat.toggleSpeed();
   const speedIcons = { 1: '▶', 2: '⏩', 3: '⚡' };
   const icon = speedIcons[newSpeed as 1 | 2 | 3] || '▶';
@@ -2412,6 +3325,20 @@ document.addEventListener('keydown', (e) => {
     closeSettings();
     e.stopPropagation();
   }
+});
+
+// ─── 우측 패널 탭 전환 ──────────────────────────────────────
+document.querySelectorAll('.right-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // 탭 버튼 활성화
+    document.querySelectorAll('.right-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // 패널 전환
+    const targetId = (btn as HTMLElement).dataset.tab;
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      (pane as HTMLElement).style.display = pane.id === targetId ? 'block' : 'none';
+    });
+  });
 });
 
 // ─── Dock Shop Bar — expand/collapse ───────────────────────

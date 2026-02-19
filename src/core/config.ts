@@ -50,8 +50,8 @@ export const UNITS: UnitDef[] = [
         dmgType: 'magic' as const,
         baseDmg: 167, attackSpeed: 1.76, attackRange: 4,
         uniqueTrait: UniqueTrait.Mars,
-        uniqueEffect: '3초마다 아군 1명에게 버프 (공속↑ ↔ 사거리+1 번갈아)',
-        skill: { type: 'active', name: '트윗 폭격', desc: '3초마다 아군 1명 버프 (공속↑/사거리+1 번갈아)', cooldown: 3, params: { atkSpdBuff: 0.35, rangeBonus: 1, buffDuration: 3 } }
+        uniqueEffect: '3번째 공격마다 💥광역(45%) + ⏸️짧은 스턴',
+        skill: { type: 'passive', name: '트윗 폭격', desc: '3번째 공격마다 💥광역(45%) + ⏸️스턴', params: { nthHit: 3, splashPct: 0.45, stunDuration: 0.5, bossStunDuration: 0.15 } }
     },
     {
         id: 'trump', name: 'Donald Trump', emoji: '⛏️', cost: 7,
@@ -59,8 +59,8 @@ export const UNITS: UnitDef[] = [
         dmgType: 'physical' as const,
         baseDmg: 167, attackSpeed: 1.66, attackRange: 3,
         uniqueTrait: UniqueTrait.FirstReceiver,
-        uniqueEffect: '라운드 시작: ₿ 유닛 첫 6타 🔫관통 1 (보스 적중 시 🛡️DEF↓)',
-        skill: { type: 'onCombatStart', name: '비축령', desc: '₿ 유닛 첫 6타 🔫관통 1, 보스 적중 시 🛡️DEF↓', params: { btcBonusShots: 6, pierceTargets: 1, bossDefShred: 10 } }
+        uniqueEffect: '4번째 공격마다 💥광역(55%) + ⏸️스턴 + 보스 🛡️DEF↓',
+        skill: { type: 'passive', name: '비축령', desc: '4번째 공격마다 💥광역(55%) + ⏸️스턴, 보스 DEF−10', params: { nthHit: 4, splashPct: 0.55, stunDuration: 0.6, bossStunDuration: 0.2, defShred: 10 } }
     },
     {
         id: 'gensler', name: 'Gensler', emoji: '👨‍⚖️', cost: 7,
@@ -77,7 +77,7 @@ export const UNITS: UnitDef[] = [
         id: 'saylor', name: 'Saylor', emoji: '💎', cost: 5,
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
-        baseDmg: 82, attackSpeed: 1.37, attackRange: 3,
+        baseDmg: 75, attackSpeed: 1.37, attackRange: 3,
         uniqueTrait: UniqueTrait.DiamondHand,
         skill: { type: 'passive', name: '매수벽', desc: '기본 공격 🔫관통 2 (뒤쪽 적 우선)', params: { pierceTargets: 2, piercePct: 0.70 } }
     },
@@ -85,21 +85,21 @@ export const UNITS: UnitDef[] = [
         id: 'coplan', name: 'Shayne Coplan', emoji: '🔮', cost: 5,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
-        baseDmg: 82, attackSpeed: 1.79, attackRange: 3,
+        baseDmg: 75, attackSpeed: 1.79, attackRange: 3,
         skill: { type: 'passive', name: '예측시장', desc: '크리 적중 시 ⏸️스턴', params: { critStunDuration: 0.6, bossCritStunDuration: 0.2 } }
     },
     {
         id: 'armstrong', name: 'Armstrong', emoji: '🏛️', cost: 5,
         origin: Origin.Social,
         dmgType: 'magic' as const,
-        baseDmg: 82, attackSpeed: 1.47, attackRange: 3,
-        skill: { type: 'active', name: '기관 유입', desc: '6초마다 아군 1명 사거리+1(3초)', cooldown: 6, params: { rangeBonus: 1, buffDuration: 3 } }
+        baseDmg: 75, attackSpeed: 1.47, attackRange: 3,
+        skill: { type: 'passive', name: '기관 유입', desc: '기본 공격 🔫관통 1 (뒤쪽 적 우선)', params: { pierceTargets: 1, piercePct: 0.55 } }
     },
     {
         id: 'hayes', name: 'Arthur Hayes', emoji: '🎰', cost: 5,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
-        baseDmg: 82, attackSpeed: 1.71, attackRange: 3,
+        baseDmg: 75, attackSpeed: 1.71, attackRange: 3,
         uniqueTrait: UniqueTrait.Leverage100x,
         skill: { type: 'passive', name: '레버리지', desc: '3번째 공격 = 강타(큰 피해), 다음 공격은 딜레이', params: { nthHit: 3, burstMult: 2.5, delayMs: 500 } }
     },
@@ -107,14 +107,14 @@ export const UNITS: UnitDef[] = [
         id: 'jeff', name: 'Jeff', emoji: '🏎️', cost: 5,
         origin: Origin.VC,
         dmgType: 'physical' as const,
-        baseDmg: 82, attackSpeed: 1.58, attackRange: 3,
+        baseDmg: 75, attackSpeed: 1.58, attackRange: 3,
         skill: { type: 'passive', name: '테일 리스크', desc: '적이 많을수록 🔫관통 증가 (물량 웨이브 특화)', params: { pierceThreshold1: 8, pierceThreshold2: 12 } }
     },
     {
         id: 'dokwon', name: 'Do Kwon', emoji: '💀', cost: 5,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
-        baseDmg: 82, attackSpeed: 1.43, attackRange: 3,
+        baseDmg: 75, attackSpeed: 1.43, attackRange: 3,
         uniqueTrait: UniqueTrait.Depeg,
         skill: { type: 'active', name: '디페그', desc: '6초마다 "디페그": 🔥도트 + 방어무시', cooldown: 6, params: { dotPct: 0.03, dotDuration: 3, armorIgnore: 1.0 } }
     },
@@ -122,7 +122,7 @@ export const UNITS: UnitDef[] = [
         id: 'sbf', name: 'SBF', emoji: '🚩', cost: 5,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
-        baseDmg: 82, attackSpeed: 1.58, attackRange: 3,
+        baseDmg: 75, attackSpeed: 1.58, attackRange: 3,
         uniqueTrait: UniqueTrait.Embezzle,
         skill: { type: 'passive', name: '백도어', desc: '3번째 공격마다 대상 🛡️방깎 + ⏸️짧은 스턴', params: { nthHit: 3, defShred: 12, debuffDuration: 4, stunDuration: 0.5, bossStunDuration: 0.2 } }
     },
@@ -130,7 +130,7 @@ export const UNITS: UnitDef[] = [
         id: 'justinsun', name: 'Justin Sun', emoji: '🌪️', cost: 5,
         origin: Origin.Bear,
         dmgType: 'magic' as const,
-        baseDmg: 82, attackSpeed: 1.36, attackRange: 3,
+        baseDmg: 75, attackSpeed: 1.36, attackRange: 3,
         skill: { type: 'passive', name: '빙결 폭풍', desc: '4번째 공격마다 주변 적 ❄️빙결 (15% 감속)', params: { nthHit: 4, freezeDuration: 1.2, freezeSlow: 0.15, bossFreezeDuration: 0.4 } }
     },
 
@@ -139,56 +139,56 @@ export const UNITS: UnitDef[] = [
         id: 'stani', name: 'Stani Kulechov', emoji: '🔒', cost: 4,
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
-        baseDmg: 52, attackSpeed: 1.11, attackRange: 3,
-        skill: { type: 'passive', name: '렌딩 프로토콜', desc: '주변 ₿ 아군 공속↑ (오라)', params: { atkSpdBuff: 0.20, buffRange: 2 } }
+        baseDmg: 42, attackSpeed: 1.11, attackRange: 3,
+        skill: { type: 'passive', name: '렌딩 프로토콜', desc: '3번째 공격마다 대상 🛡️물방 삭감', params: { nthHit: 3, defShred: 10, debuffDuration: 4 } }
     },
     {
         id: 'gavin', name: 'Gavin Wood', emoji: '🔗', cost: 4,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
-        baseDmg: 52, attackSpeed: 1.36, attackRange: 3,
+        baseDmg: 42, attackSpeed: 1.36, attackRange: 3,
         skill: { type: 'active', name: 'Substrate', desc: '8초마다 적 1기 🛡️MDEF↓', cooldown: 8, params: { mdefShred: 12, debuffDuration: 4 } }
     },
     {
         id: 'hayden', name: 'Hayden Adams', emoji: '🦄', cost: 4,
         origin: Origin.Social,
         dmgType: 'magic' as const,
-        baseDmg: 52, attackSpeed: 1.16, attackRange: 3,
-        skill: { type: 'passive', name: '유동성 풀', desc: '주변 2칸 아군 공속↑ (오라)', params: { atkSpdBuff: 0.15, buffRange: 2 } }
+        baseDmg: 42, attackSpeed: 1.16, attackRange: 3,
+        skill: { type: 'passive', name: '유동성 풀', desc: '4번째 공격마다 ⚡체인 2', params: { nthHit: 4, chainTargets: 2, chainPct: 0.35 } }
     },
     {
         id: 'marc', name: 'Marc Andreessen', emoji: '💰', cost: 4,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
-        baseDmg: 52, attackSpeed: 1.04, attackRange: 3,
-        skill: { type: 'active', name: '투자 라운드', desc: '8초마다 랜덤 아군에게 🔫관통 1 ↔ ⚡체인 1 번갈아', cooldown: 8, params: { pierceTargets: 1, piercePct: 0.60, chainTargets: 1, chainPct: 0.30, buffDuration: 3 } }
+        baseDmg: 42, attackSpeed: 1.04, attackRange: 3,
+        skill: { type: 'passive', name: '투자 라운드', desc: '3번째 공격마다 ⚡체인 1', params: { nthHit: 3, chainTargets: 1, chainPct: 0.45 } }
     },
     {
         id: 'balaji', name: 'Balaji', emoji: '🎯', cost: 4,
         origin: Origin.VC,
         dmgType: 'physical' as const,
-        baseDmg: 52, attackSpeed: 1.21, attackRange: 4,
+        baseDmg: 42, attackSpeed: 1.21, attackRange: 4,
         skill: { type: 'active', name: '100만불 배팅', desc: '8초마다 최대HP 적 저격(큰 피해)', cooldown: 8, params: { burstMult: 3.0 } }
     },
     {
         id: 'lazarus', name: 'Lazarus', emoji: '💀', cost: 4,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
-        baseDmg: 52, attackSpeed: 1.47, attackRange: 3,
+        baseDmg: 42, attackSpeed: 1.47, attackRange: 3,
         skill: { type: 'passive', name: '해킹 드레인', desc: '4번째 공격마다 ⏸️스턴', params: { nthHit: 4, stunDuration: 0.8, bossStunDuration: 0.3 } }
     },
     {
         id: 'zhusu', name: 'Zhu Su', emoji: '📉', cost: 4,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
-        baseDmg: 52, attackSpeed: 1.48, attackRange: 3,
+        baseDmg: 42, attackSpeed: 1.48, attackRange: 3,
         skill: { type: 'active', name: '3AC 청산', desc: '8초마다 최대HP 적 💥광역 폭발', cooldown: 8, params: { splashPct: 0.50, splashTargets: 2 } }
     },
     {
         id: 'anatoly', name: 'Anatoly', emoji: '⚡', cost: 4,
         origin: Origin.Bear,
         dmgType: 'magic' as const,
-        baseDmg: 52, attackSpeed: 1.27, attackRange: 3,
+        baseDmg: 42, attackSpeed: 1.27, attackRange: 3,
         skill: { type: 'passive', name: '네트워크 정지', desc: '3번째 공격마다 ⏸️스턴', params: { nthHit: 3, stunDuration: 0.8, bossStunDuration: 0.3 } }
     },
 
@@ -197,56 +197,56 @@ export const UNITS: UnitDef[] = [
         id: 'rogerver', name: 'Roger Ver', emoji: '⛏️', cost: 3,
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 0.88, attackRange: 3,
+        baseDmg: 28, attackSpeed: 0.88, attackRange: 3,
         skill: { type: 'passive', name: 'BCH 링크', desc: '인접 ₿ 있으면 둘 다 🔫관통 1', params: { pierceTargets: 1, piercePct: 0.50, buffRange: 1 } }
     },
     {
         id: 'andre', name: 'Andre Cronje', emoji: '🧙', cost: 3,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
-        baseDmg: 24, attackSpeed: 0.98, attackRange: 3,
+        baseDmg: 28, attackSpeed: 0.98, attackRange: 3,
         skill: { type: 'passive', name: '플래시론', desc: '3번째 공격마다 ⚡체인 2', params: { nthHit: 3, chainTargets: 2, chainPct: 0.40 } }
     },
     {
         id: 'rekt', name: 'Rekt', emoji: '👤', cost: 3,
         origin: Origin.Social,
         dmgType: 'magic' as const,
-        baseDmg: 24, attackSpeed: 1.12, attackRange: 3,
+        baseDmg: 28, attackSpeed: 1.12, attackRange: 3,
         skill: { type: 'passive', name: '데이터 유출', desc: '공격이 최대HP 비례 추가타 (보스/탱커용)', params: { maxHpPct: 0.02 } }
     },
     {
         id: 'wintermute', name: 'Wintermute', emoji: '🤖', cost: 3,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 0.97, attackRange: 3,
+        baseDmg: 28, attackSpeed: 0.97, attackRange: 3,
         skill: { type: 'passive', name: '알고리즘 매매', desc: '3번째 공격마다 💥광역', params: { nthHit: 3, splashPct: 0.40 } }
     },
     {
         id: 'simon', name: 'Simon', emoji: '🎯', cost: 3,
         origin: Origin.VC,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 1.06, attackRange: 3,
+        baseDmg: 28, attackSpeed: 1.06, attackRange: 3,
         skill: { type: 'passive', name: '정밀 사격', desc: '3번째 공격 크리 확정', params: { nthHit: 3 } }
     },
     {
         id: 'peterschiff', name: 'Peter Schiff', emoji: '🧊', cost: 3,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
-        baseDmg: 24, attackSpeed: 0.94, attackRange: 3,
+        baseDmg: 28, attackSpeed: 0.94, attackRange: 3,
         skill: { type: 'passive', name: '금 본위제', desc: '3번째 공격 ⏸️스턴', params: { nthHit: 3, stunDuration: 0.8, bossStunDuration: 0.3 } }
     },
     {
         id: 'gcr', name: 'GCR', emoji: '🐸', cost: 3,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 1.1, attackRange: 3,
+        baseDmg: 28, attackSpeed: 1.1, attackRange: 3,
         skill: { type: 'passive', name: '역매매 관통', desc: '기본 공격 🔫관통 2 (뒤쪽 적 우선)', params: { pierceTargets: 2, piercePct: 0.70 } }
     },
     {
         id: 'akang', name: 'Andrew Kang', emoji: '🦈', cost: 3,
         origin: Origin.Bear,
         dmgType: 'magic' as const,
-        baseDmg: 24, attackSpeed: 0.77, attackRange: 3,
+        baseDmg: 28, attackSpeed: 0.77, attackRange: 3,
         skill: { type: 'passive', name: '고래 덤핑', desc: '5번째 공격마다 주변 적 ❄️빙결 (15% 감속)', params: { nthHit: 5, freezeDuration: 0.9, freezeSlow: 0.15, bossFreezeDuration: 0.3 } }
     },
 
@@ -389,7 +389,7 @@ export const UNITS: UnitDef[] = [
         id: 'chefnomi', name: 'Chef Nomi', emoji: '🍣', cost: 3,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
-        baseDmg: 24, attackSpeed: 0.92, attackRange: 3,
+        baseDmg: 28, attackSpeed: 0.92, attackRange: 3,
         skill: { type: 'passive', name: '스시 스왑', desc: '3번째 공격마다 ⚡체인 1 + 🔥도트', params: { nthHit: 3, chainTargets: 1, chainPct: 0.35, dotPct: 0.02, dotDuration: 2 } }
     },
 
@@ -405,7 +405,7 @@ export const UNITS: UnitDef[] = [
         id: 'cobie', name: 'Cobie', emoji: '🎩', cost: 3,
         origin: Origin.Social,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 1.05, attackRange: 3,
+        baseDmg: 28, attackSpeed: 1.05, attackRange: 3,
         skill: { type: 'active', name: '알파 콜', desc: '8초마다 아군 1명 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.25, buffDuration: 3 } }
     },
 
@@ -444,7 +444,7 @@ export const UNITS: UnitDef[] = [
         id: 'cathie', name: 'Cathie Wood', emoji: '🏹', cost: 3,
         origin: Origin.VC,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 1.00, attackRange: 4,
+        baseDmg: 28, attackSpeed: 1.00, attackRange: 4,
         skill: { type: 'active', name: 'ARK 리밸런싱', desc: '8초마다 뒤쪽 적 저격(크리 확정)', cooldown: 8, params: {} }
     },
 
@@ -460,7 +460,7 @@ export const UNITS: UnitDef[] = [
         id: 'warren', name: 'Elizabeth Warren', emoji: '⚖️', cost: 3,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
-        baseDmg: 24, attackSpeed: 0.90, attackRange: 3,
+        baseDmg: 28, attackSpeed: 0.90, attackRange: 3,
         skill: { type: 'active', name: '반크립토 법안', desc: '8초마다 적 1기 🔥도트 + 슬로우', cooldown: 8, params: { dotPct: 0.03, dotDuration: 3, slowPct: 0.25, slowDuration: 2 } }
     },
 
@@ -483,7 +483,7 @@ export const UNITS: UnitDef[] = [
         id: 'heart', name: 'Richard Heart', emoji: '💎', cost: 3,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 1.02, attackRange: 3,
+        baseDmg: 28, attackSpeed: 1.02, attackRange: 3,
         skill: { type: 'passive', name: '스테이킹 유혹', desc: '3번째 공격마다 ⚡체인 1', params: { nthHit: 3, chainTargets: 1, chainPct: 0.40 } }
     },
 
@@ -506,7 +506,7 @@ export const UNITS: UnitDef[] = [
         id: 'burry', name: 'Michael Burry', emoji: '🔍', cost: 3,
         origin: Origin.Bear,
         dmgType: 'physical' as const,
-        baseDmg: 24, attackSpeed: 0.95, attackRange: 4,
+        baseDmg: 28, attackSpeed: 0.95, attackRange: 4,
         skill: { type: 'passive', name: '빅숏', desc: 'HP 낮은 적 우선 + 마무리 피해 증가 (피니셔)', params: { hpThreshold: 0.50, dmgMult: 1.8 } }
     },
 ];
@@ -548,7 +548,7 @@ export const LEVELS: LevelDef[] = [
     { level: 7, requiredXp: 48, naturalRound: 24, slots: 7, shopOdds: [20, 25, 30, 18, 7] },
     { level: 8, requiredXp: 72, naturalRound: 33, slots: 8, shopOdds: [15, 20, 25, 25, 15] },
     { level: 9, requiredXp: 80, naturalRound: 38, slots: 9, shopOdds: [10, 15, 25, 30, 20] },
-    { level: 10, requiredXp: 150, naturalRound: 45, slots: 10, shopOdds: [5, 10, 20, 30, 35] },
+    { level: 10, requiredXp: 100, naturalRound: 45, slots: 10, shopOdds: [5, 10, 20, 30, 35] },
 ];
 
 
@@ -559,7 +559,7 @@ export const STAGE_DEFENSE: Record<number, { def: number; mdef: number }> = {
     2: { def: 5, mdef: 5 },      // 균등
     3: { def: 20, mdef: 5 },     // 물방↑ → 마돀 필요
     4: { def: 5, mdef: 20 },     // 마방↑ → 물돀 필요
-    5: { def: 25, mdef: 25 },    // 양쪽 균등
+    5: { def: 20, mdef: 20 },    // 양쪽 균등 (하향)
     6: { def: 15, mdef: 40 },    // 마방↑↑
     7: { def: 40, mdef: 15 },    // 물방↑↑
 };
@@ -594,7 +594,7 @@ export const SYNERGIES: SynergyDef[] = [
         id: 'origin_defi', type: 'origin', cryptoName: 'DeFi', fantasyName: '추방자',
         emoji: '🔓', totalUnits: 8,
         breakpoints: [
-            { count: 2, effect: '[전체] DMG+10%' },
+            { count: 2, effect: '[전체] DMG+15%, 공속+5%' },
             { count: 4, effect: '[전체] DMG+25%, 스킬CDR-20%' },
             { count: 6, effect: '[전체] DMG+40%, 스킬CDR-35%, 스킬DMG+30%' },
             { count: 8, effect: '[전체] DMG+60%, 스킬CDR-50%, 스킬DMG+60%' },
@@ -604,7 +604,7 @@ export const SYNERGIES: SynergyDef[] = [
         id: 'origin_social', type: 'origin', cryptoName: '소셜', fantasyName: '음유시인',
         emoji: '📱', totalUnits: 8,
         breakpoints: [
-            { count: 2, effect: '[전체] 공속+10%' },
+            { count: 2, effect: '[전체] 공속+15%' },
             { count: 4, effect: '[전체] 공속+25%' },
             { count: 6, effect: '[전체] 공속+40%, DMG+15%' },
             { count: 8, effect: '[전체] 공속+60%, DMG+30%, 라운드골드+2' },

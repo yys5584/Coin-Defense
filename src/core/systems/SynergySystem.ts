@@ -129,14 +129,15 @@ export class SynergySystem {
 
                 // ── DeFi: DMG + SkillCDR + SkillDMG ──
                 case 'origin_defi':
-                    buffs.dmgMultiplier += [0.10, 0.25, 0.40, 0.60][level] ?? 0.60;
+                    buffs.dmgMultiplier += [0.15, 0.25, 0.40, 0.60][level] ?? 0.60;
+                    buffs.atkSpeedMultiplier += [0.05, 0.05, 0.05, 0.05][level] ?? 0.05;  // 2세트부터 공속+5%
                     if (level >= 1) buffs.skillCooldownReduction = [0, 0.20, 0.35, 0.50][level] ?? 0.50;
                     if (level >= 2) buffs.skillDmgMultiplier += [0, 0, 0.30, 0.60][level] ?? 0.60;
                     break;
 
                 // ── Social: AtkSpd + DMG + RoundGold ──
                 case 'origin_social':
-                    buffs.atkSpeedMultiplier += [0.10, 0.25, 0.40, 0.60][level] ?? 0.60;
+                    buffs.atkSpeedMultiplier += [0.15, 0.25, 0.40, 0.60][level] ?? 0.60;
                     if (level >= 2) buffs.dmgMultiplier += [0, 0, 0.15, 0.30][level] ?? 0.30;
                     if (level >= 3) buffs.bonusRoundGold += 2;
                     break;

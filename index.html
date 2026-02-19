@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1440, initial-scale=1, user-scalable=no">
-  <title>CoinRandomDefense v3.5</title>
+  <title>COIN DEFENSE v3.5</title>
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <!-- 네오둥근모 한글 픽셀 폰트 -->
@@ -15,116 +15,233 @@
 
 <body>
   <div id="game-scale-wrapper">
-    <!-- PRO Lobby (동적 렌더링) -->
-    <div id="lobby-pro" class="lobby-pro-root"></div>
 
-    <!-- 결과 화면 -->
-    <div id="result-view" class="result-view hidden"></div>
-
-    <div id="app" class="hidden">
-
-      <!-- ═══ Column 1: Bench Sidebar ═══ -->
-      <aside id="bench-panel">
-        <div class="bench-header">
-          <span>📦 벤치</span>
-          <span class="bench-count" id="bench-count">0/9</span>
-        </div>
-        <div id="bench-slots"></div>
-      </aside>
-
-      <!-- ═══ Column 2: Main Column ═══ -->
-      <div id="main-column">
-        <!-- Top HUD Bar -->
-        <header id="hud">
-          <div class="hud-left">
-            <div class="hud-pill">
-              <span class="hud-label">ROUND</span>
-              <span class="hud-value num" id="hud-round">0</span>
-            </div>
-            <div class="hud-hp-bar">
-              <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
-              <span class="hud-hp-text">❤️ <span id="hud-hp" class="num">30</span></span>
-            </div>
-          </div>
-          <div class="hud-right">
-            <div class="hud-pill gold-pill">
-              <span class="hud-gold-icon">💰</span>
-              <span class="hud-value num" id="hud-gold">10</span>
-            </div>
-            <div class="hud-pill">
-              <span class="hud-label">DPS</span>
-              <span class="hud-value num" id="hud-dps">0</span>
-            </div>
-            <button id="btn-info" class="hud-icon-btn" title="유닛 정보">📋</button>
-            <button id="btn-speed" class="hud-icon-btn speed-btn" title="게임 속도">▶ 1x</button>
-            <button id="btn-settings" class="hud-icon-btn" title="설정">⚙️</button>
-          </div>
-        </header>
-
-        <!-- Board Area -->
-        <section id="board-section">
-          <div id="map-wrapper">
-            <!-- Monster outer path (rectangular loop) -->
-            <div id="monster-path">
-              <div id="path-start">▶ START</div>
-            </div>
-            <!-- Board grid (inside the path) -->
-            <div id="board-grid"></div>
-            <!-- Board count badge -->
-            <div id="board-badge">
-              <span>🗺️</span>
-              <span id="board-count">0/1</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Control Bar -->
-        <div id="control-bar">
-          <div class="cb-left">
-            <div class="cb-level">
-              <span class="cb-level-label">Lv</span>
-              <span class="cb-level-value num" id="hud-level">1</span>
-            </div>
-            <div class="cb-xp">
-              <div class="cb-xp-bar">
-                <div class="cb-xp-fill" id="dock-xp-fill" style="width:0%"></div>
-              </div>
-              <span class="cb-xp-text num" id="hud-xp">0/2 XP</span>
-            </div>
-            <button id="btn-buy-xp" class="cb-btn cb-btn-xp">
-              📈 XP 구매 <span class="cb-cost">4G</span>
-            </button>
-            <button id="btn-reroll" class="cb-btn">🔄 리롤 <span class="cb-cost">2G</span></button>
-            <button id="btn-lock" class="cb-btn cb-btn-lock">🔒 잠금</button>
-          </div>
-          <div class="cb-right">
-            <button id="btn-next-round" class="cb-btn cb-btn-combat">⚔️ 전투 시작</button>
-          </div>
-        </div>
-
-        <!-- Shop Card Bar -->
-        <div id="shop-bar">
-          <div id="shop-slots" class="shop-card-row"></div>
-        </div>
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- SCREEN 1: LOBBY                                  -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="lobby-screen" class="screen lobby-screen">
+      <div class="lobby-bg-overlay"></div>
+      <!-- 우측 상단 유틸리티 버튼 -->
+      <div class="lobby-top-right">
+        <button class="lobby-util-btn" id="btn-lobby-home">
+          <img src="/assets/icons/icon_home.png" alt="Home" class="lobby-util-icon" />
+        </button>
+        <button class="lobby-util-btn" id="btn-lobby-settings">
+          <img src="/assets/icons/icon_settings.png" alt="Settings" class="lobby-util-icon" />
+        </button>
       </div>
+      <div class="lobby-content">
+        <div class="lobby-logo">
+          <div class="lobby-logo-icon"><img src="/assets/icons/logo_main.png" alt="Main Logo" class="lobby-logo-img" />
+          </div>
+          <h1 class="lobby-title">COIN DEFENSE</h1>
+          <div class="lobby-subtitle">크립토 타워 디펜스</div>
+        </div>
 
-      <!-- ═══ Column 3: Right Panel ═══ -->
-      <aside id="right-panel">
-        <div id="synergy-section">
-          <div class="panel-title">🧬 시너지</div>
-          <div style="font-size:11px;color:#f59e0b;padding:2px 8px;opacity:0.8">⚠️ 직업 시너지: 비활성화 (업데이트 중)</div>
-          <div id="synergy-list"></div>
+        <div class="lobby-modes" id="lobby-modes">
+          <button class="lobby-mode-btn campaign-btn" id="btn-campaign">
+            <span class="mode-btn-icon"><img src="/assets/icons/icon_campaign.png" alt="Campaign"
+                class="lobby-btn-img" /></span>
+            <span class="mode-btn-label">캠페인 <span class="mode-btn-sub">《튜토리얼》</span></span>
+          </button>
+          <button class="lobby-mode-btn normal-btn" id="btn-normal">
+            <span class="mode-btn-icon"><img src="/assets/icons/icon_battle.png" alt="Battle"
+                class="lobby-btn-img" /></span>
+            <span class="mode-btn-label">일반전</span>
+          </button>
         </div>
-        <div id="dps-section">
-          <div class="dps-header">⚔️ DPS</div>
-          <div id="dps-list"></div>
+
+        <!-- 일반전 하위 모드 (숨김 상태) -->
+        <div class="lobby-submodes hidden" id="lobby-submodes">
+          <div class="submodes-title">모드 선택</div>
+          <button class="lobby-submode-btn" id="btn-solo">
+            <span class="mode-btn-icon">👤</span>
+            <span class="mode-btn-label">싱글 모드</span>
+          </button>
+          <button class="lobby-submode-btn" id="btn-4player">
+            <span class="mode-btn-icon">🌐</span>
+            <span class="mode-btn-label">4인 경쟁 모드</span>
+          </button>
+          <button class="lobby-back-btn" id="btn-back-lobby">← 뒤로</button>
         </div>
-        <div id="log-panel">
-          <div class="panel-title">📜 로그</div>
-          <div id="log-content"></div>
-        </div>
-      </aside>
+
+        <div class="lobby-version">v3.5 — Pixel Edition</div>
+      </div>
     </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- SCREEN 2: MATCHMAKING                             -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="match-screen" class="screen match-screen hidden">
+      <div class="match-bg-overlay"></div>
+      <div class="match-content">
+        <div class="match-title">⚔️ 실시간 매칭 중...</div>
+        <div class="match-status" id="match-status">1/4 대기중...</div>
+        <div class="match-players" id="match-players">
+          <div class="match-player-slot" id="mp-slot-0">
+            <div class="mp-avatar">🎮</div>
+            <div class="mp-name">나</div>
+            <div class="mp-status ready">✔ 준비됨</div>
+          </div>
+          <div class="match-player-slot waiting" id="mp-slot-1">
+            <div class="mp-avatar">❓</div>
+            <div class="mp-name">대기중...</div>
+            <div class="mp-status"></div>
+          </div>
+          <div class="match-player-slot waiting" id="mp-slot-2">
+            <div class="mp-avatar">❓</div>
+            <div class="mp-name">대기중...</div>
+            <div class="mp-status"></div>
+          </div>
+          <div class="match-player-slot waiting" id="mp-slot-3">
+            <div class="mp-avatar">❓</div>
+            <div class="mp-name">대기중...</div>
+            <div class="mp-status"></div>
+          </div>
+        </div>
+        <div class="match-loading hidden" id="match-loading">
+          <div class="match-loading-text">🎮 게임 로딩 중...</div>
+          <div class="match-loading-bar">
+            <div class="match-loading-fill" id="match-loading-fill"></div>
+          </div>
+        </div>
+        <button class="match-start-btn hidden" id="btn-start-bots">🤖 봇 채우고 이대로 시작하기</button>
+        <button class="match-cancel-btn" id="btn-cancel-match">✖ 취소</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- SCREEN 3: GAME (기존 #app)                       -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="game-screen" class="screen hidden">
+
+      <!-- PRO Lobby (동적 렌더링 — 기존 호환) -->
+      <div id="lobby-pro" class="lobby-pro-root hidden"></div>
+
+      <!-- 결과 화면 -->
+      <div id="result-view" class="result-view hidden"></div>
+
+      <div id="app">
+
+        <!-- ═══ Column 1: Bench Sidebar ═══ -->
+        <aside id="bench-panel">
+          <div class="bench-header">
+            <span>📦 벤치</span>
+            <span class="bench-count" id="bench-count">0/9</span>
+          </div>
+          <div id="bench-slots"></div>
+        </aside>
+
+        <!-- ═══ Column 2: Main Column ═══ -->
+        <div id="main-column">
+          <!-- Top HUD Bar -->
+          <header id="hud">
+            <div class="hud-left">
+              <div class="hud-pill">
+                <span class="hud-label">ROUND</span>
+                <span class="hud-value num" id="hud-round">0</span>
+              </div>
+              <div class="hud-hp-bar">
+                <div class="hud-hp-fill" id="hud-hp-fill" style="width:100%"></div>
+                <span class="hud-hp-text">❤️ <span id="hud-hp" class="num">30</span></span>
+              </div>
+            </div>
+            <div class="hud-right">
+              <div class="hud-pill gold-pill">
+                <span class="hud-gold-icon">💰</span>
+                <span class="hud-value num" id="hud-gold">10</span>
+              </div>
+              <div class="hud-pill">
+                <span class="hud-label">DPS</span>
+                <span class="hud-value num" id="hud-dps">0</span>
+              </div>
+              <button id="btn-info" class="hud-icon-btn" title="유닛 정보">📋</button>
+              <button id="btn-speed" class="hud-icon-btn speed-btn" title="게임 속도">▶ 1x</button>
+              <button id="btn-settings" class="hud-icon-btn" title="설정">⚙️</button>
+            </div>
+          </header>
+
+          <!-- Board Area -->
+          <section id="board-section">
+            <div id="map-wrapper">
+              <!-- Monster outer path (rectangular loop) -->
+              <div id="monster-path">
+                <div id="path-start">▶ START</div>
+              </div>
+              <!-- Board grid (inside the path) -->
+              <div id="board-grid"></div>
+              <!-- Board count badge -->
+              <div id="board-badge">
+                <span>🗺️</span>
+                <span id="board-count">0/1</span>
+              </div>
+            </div>
+            <!-- 관전 워터마크 -->
+            <div id="spectate-watermark" class="spectate-watermark hidden">
+              👀 관전 중: <span id="spectate-name">Player 2</span>
+            </div>
+          </section>
+
+          <!-- Control Bar -->
+          <div id="control-bar">
+            <div class="cb-left">
+              <div class="cb-level">
+                <span class="cb-level-label">Lv</span>
+                <span class="cb-level-value num" id="hud-level">1</span>
+              </div>
+              <div class="cb-xp">
+                <div class="cb-xp-bar">
+                  <div class="cb-xp-fill" id="dock-xp-fill" style="width:0%"></div>
+                </div>
+                <span class="cb-xp-text num" id="hud-xp">0/2 XP</span>
+              </div>
+              <button id="btn-buy-xp" class="cb-btn cb-btn-xp">
+                📈 XP 구매 <span class="cb-cost">4G</span>
+              </button>
+              <button id="btn-reroll" class="cb-btn">🔄 리롤 <span class="cb-cost">2G</span></button>
+              <button id="btn-lock" class="cb-btn cb-btn-lock">🔒 잠금</button>
+            </div>
+            <div class="cb-right">
+              <button id="btn-next-round" class="cb-btn cb-btn-combat">⚔️ 전투 시작</button>
+            </div>
+          </div>
+
+          <!-- Shop Card Bar -->
+          <div id="shop-bar">
+            <div id="shop-slots" class="shop-card-row"></div>
+          </div>
+        </div>
+
+        <!-- ═══ Column 3: Right Panel ═══ -->
+        <aside id="right-panel">
+          <!-- Tab Buttons -->
+          <div class="right-tabs">
+            <button class="right-tab active" data-tab="synergy-section">🧬 시너지</button>
+            <button class="right-tab" data-tab="dps-section">⚔️ DPS</button>
+            <button class="right-tab" data-tab="log-panel">📜 로그</button>
+          </div>
+          <!-- Tab Content -->
+          <div class="right-tab-content">
+            <div id="synergy-section" class="tab-pane active">
+              <div style="font-size:11px;color:#f59e0b;padding:2px 8px;opacity:0.8">⚠️ 직업 시너지: 비활성화 (업데이트 중)</div>
+              <div id="synergy-list"></div>
+            </div>
+            <div id="dps-section" class="tab-pane" style="display:none">
+              <div id="dps-list"></div>
+            </div>
+            <div id="log-panel" class="tab-pane" style="display:none">
+              <div id="log-content"></div>
+            </div>
+          </div>
+          <!-- 미니맵: 탭 바깥 하단 고정 -->
+          <div id="minimap-panel" class="minimap-panel">
+            <div class="panel-title">👥 플레이어</div>
+            <div id="minimap-players"></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
 
     <!-- Settings Modal -->

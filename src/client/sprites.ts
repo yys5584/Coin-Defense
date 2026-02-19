@@ -1,14 +1,11 @@
 // ============================================================
-// Sprite System — Origin-based sprite mapping with cost-tier effects
-// 이미지가 없으면 이모지로 폴백
+// Sprite System — Unit-ID + Origin-based sprite mapping
+// 우선순위: /assets/units/{unitId}.png > /sprites/{origin}.png > emoji
 // ============================================================
 
 import { Origin } from '../core/types';
 
-// ─── Origin별 스프라이트 경로 ─────────────────────────────────
-// public/sprites/ 폴더에 이미지를 넣으면 자동 적용됩니다
-// 파일 형식: PNG (투명 배경 권장), 64×64 이상
-
+// ─── Origin별 스프라이트 경로 (Legacy fallback) ───────────────
 const ORIGIN_SPRITES: Record<string, string> = {
     [Origin.Bitcoin]: '/sprites/bitcoin.png',
     [Origin.DeFi]: '/sprites/defi.png',
@@ -90,11 +87,38 @@ export function getOriginSprite(origin: string): HTMLImageElement | null {
 }
 
 /**
+ * 유닛 ID에 해당하는 스프라이트를 반환합니다.
+ * 우선순위: /assets/units/{unitId}.png → /sprites/{origin}.png → null
+ */
+export function getUnitSprite(unitId: string, origin: string): HTMLImageElement | null {
+    // 1) 유닛 ID 전용 이미지 체크
+    const unitSrc = `/assets/units/${unitId}.png`;
+    if (spriteCache.has(unitSrc)) {
+        const cached = spriteCache.get(unitSrc);
+        if (cached) return cached;
+    } else {
+        preloadSprite(unitSrc);
+    }
+
+    // 2) Origin 스프라이트 폴백
+    return getOriginSprite(origin);
+}
+
+/**
  * 캐시된 스프라이트가 있는지 확인합니다.
  */
 export function hasSpriteFor(origin: string): boolean {
     const src = ORIGIN_SPRITES[origin];
     if (!src) return false;
+    const cached = spriteCache.get(src);
+    return cached !== undefined && cached !== null;
+}
+
+/**
+ * 유닛 ID 기반 스프라이트가 있는지 확인합니다.
+ */
+export function hasUnitSprite(unitId: string): boolean {
+    const src = `/assets/units/${unitId}.png`;
     const cached = spriteCache.get(src);
     return cached !== undefined && cached !== null;
 }
@@ -120,15 +144,17 @@ export function getMonsterSprite(isBoss: boolean): HTMLImageElement | null {
 }
 
 /**
- * 유닛 카드용 HTML 요소를 생성합니다 (이미지 또는 이모지).
+ * 유닛 카드용 HTML 요소를 생성합니다.
+ * 우선순위: /assets/units/{unitId}.png → /sprites/{origin}.png → emoji 폴백
  */
-export function createUnitVisual(origin: string, emoji: string, size: number = 32): HTMLElement {
-    const sprite = getOriginSprite(origin);
+export function createUnitVisual(origin: string, emoji: string, size: number = 32, unitId?: string): HTMLElement {
+    // 유닛 ID 우선 → Origin 폴백
+    const sprite = unitId ? getUnitSprite(unitId, origin) : getOriginSprite(origin);
 
     if (sprite) {
         const img = document.createElement('img');
         img.src = sprite.src;
-        img.alt = origin;
+        img.alt = unitId || origin;
         img.width = size;
         img.height = size;
         img.style.cssText = 'image-rendering: pixelated; object-fit: contain; pointer-events: none;';
@@ -136,12 +162,19 @@ export function createUnitVisual(origin: string, emoji: string, size: number = 3
         return img;
     }
 
-    // 폴백: 이모지
-    const span = document.createElement('span');
-    span.className = 'emoji';
-    span.textContent = emoji;
-    span.style.fontSize = `${size * 0.7}px`;
-    return span;
+    // 폴백: CSS background-image (이미지 로드 후 자동 반영, 없으면 투명)
+    const wrapper = document.createElement('div');
+    wrapper.className = 'unit-img-fallback';
+    wrapper.style.cssText = `
+        width: ${size}px; height: ${size}px;
+        background-image: url('/assets/units/${unitId || 'unknown'}.png');
+        background-size: 80%; background-repeat: no-repeat; background-position: center bottom;
+        background-color: transparent;
+        image-rendering: pixelated;
+        display: flex; align-items: center; justify-content: center;
+        font-size: ${size * 0.7}px; line-height: 1;
+    `;
+    return wrapper;
 }
 
 /**
@@ -154,8 +187,9 @@ export function drawUnitSprite(
     x: number, y: number,
     size: number,
     cost: number = 1,
+    unitId?: string,
 ): void {
-    const sprite = getOriginSprite(origin);
+    const sprite = unitId ? getUnitSprite(unitId, origin) : getOriginSprite(origin);
 
     // 코스트별 글로우 효과
     const glowColor = COST_GLOW[cost] || COST_GLOW[1];
