@@ -2327,112 +2327,31 @@ body {
 
 /* ── Combat Effects (Unity: type → VFX Prefab) ── */
 
-/* 플로팅 데미지 — 위로 튀어오르며 사라지는 애니메이션 */
-@keyframes float-up {
-    0% {
-        transform: translate(-50%, -50%) translateY(0) scale(1);
-        opacity: 1;
-    }
-
-    30% {
-        transform: translate(-50%, -50%) translateY(-15px) scale(1.15);
-        opacity: 1;
-    }
-
-    100% {
-        transform: translate(-50%, -50%) translateY(-40px) scale(0.9);
-        opacity: 0;
-    }
-}
-
-/* 크리티컬 — 더 극적으로 튀어오름 */
-@keyframes float-up-crit {
-    0% {
-        transform: translate(-50%, -50%) translateY(0) scale(1);
-        opacity: 1;
-    }
-
-    20% {
-        transform: translate(-50%, -50%) translateY(-10px) scale(1.5);
-        opacity: 1;
-    }
-
-    50% {
-        transform: translate(-50%, -50%) translateY(-25px) scale(1.2);
-        opacity: 0.9;
-    }
-
-    100% {
-        transform: translate(-50%, -50%) translateY(-50px) scale(1);
-        opacity: 0;
-    }
-}
-
-/* 카메라 쉐이크 */
-@keyframes shake {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    10% {
-        transform: translate(-3px, 2px);
-    }
-
-    30% {
-        transform: translate(3px, -3px);
-    }
-
-    50% {
-        transform: translate(-2px, 3px);
-    }
-
-    70% {
-        transform: translate(3px, -2px);
-    }
-
-    90% {
-        transform: translate(-3px, -3px);
-    }
-}
-
-.camera-shake {
-    animation: shake 0.2s ease-in-out !important;
-}
-
-/* 데미지 숫자 — CSS 애니메이션 기반 */
+/* 데미지 숫자 — 위로 떠오르며 사라짐 */
 .fx-damage {
     position: absolute;
-    font-size: 14px;
+    transform: translate(-50%, -50%);
+    font-size: 13px;
     font-weight: 800;
-    color: #ffd700;
-    text-shadow:
-        0 1px 3px rgba(0, 0, 0, .9),
-        0 0 8px rgba(250, 204, 21, .5);
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .8), 0 0 6px rgba(250, 204, 21, .4);
     pointer-events: none;
     z-index: 20;
     font-family: 'neodgm', monospace;
-    animation: float-up 0.6s ease-out forwards;
-    will-change: transform, opacity;
 }
 
-/* 크리티컬 숫자 — 빨간색 #ff4757 + 1.5배 + 극적 애니메이션 */
+/* 크리티컬 숫자 — 더 크고 빨간색 */
 .fx-crit {
     position: absolute;
-    font-size: 22px;
+    transform: translate(-50%, -50%) scale(1.3);
+    font-size: 18px;
     font-weight: 900;
-    color: #ff4757;
-    text-shadow:
-        0 0 10px rgba(255, 71, 87, .9),
-        0 0 20px rgba(255, 200, 50, .6),
-        0 2px 4px rgba(0, 0, 0, .9);
+    color: #ff4444;
+    text-shadow: 0 0 8px rgba(255, 68, 68, .8), 0 0 16px rgba(255, 200, 50, .5), 0 2px 4px rgba(0, 0, 0, .9);
     pointer-events: none;
     z-index: 21;
     font-family: 'neodgm', monospace;
     letter-spacing: 1px;
-    animation: float-up-crit 0.9s ease-out forwards;
-    will-change: transform, opacity;
 }
 
 /* 크리티컬 스프라이트 버스트 */

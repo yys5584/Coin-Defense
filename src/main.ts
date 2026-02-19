@@ -2314,53 +2314,34 @@ function renderCombatOverlay(cs: CombatState): void {
     if (progress >= 1) continue;
 
     const el = document.createElement('div');
-    // fx.x/y = 외곽 트랙 좌표 → 몬스터와 동일한 toPixelX/Y 사용
-    const fxX = toPixelX(fx.x);
-    const fxY = toPixelY(fx.y);
+    const fxX = gridOffsetX + (fx.x + 0.5) * cellW;
+    const fxY = gridOffsetY + (fx.y + 0.5) * cellH;
 
     if (fx.type === 'damage' || fx.type === 'crit') {
-      // CSS 애니메이션 기반 플로팅 데미지
-      // 이미 렌더된 이펙트는 건너뜀 (CSS가 애니메이션 처리)
-      if ((fx as any)._rendered) continue;
-      (fx as any)._rendered = true;
-
+      // 데미지 숫자 — 위로 떠오르며 사라짐
       el.className = fx.type === 'crit' ? 'fx-crit' : 'fx-damage';
       el.textContent = fx.value?.toString() ?? '';
-      // 약간의 랜덤 X 오프셋으로 겹침 방지
-      const randomOffsetX = (Math.random() - 0.5) * 20;
-      el.style.left = `${fxX + randomOffsetX}px`;
-      el.style.top = `${fxY}px`;
+      const floatY = fxY - progress * 30; // 위로 30px 이동
+      el.style.left = `${fxX}px`;
+      el.style.top = `${floatY}px`;
+      el.style.opacity = `${1 - progress * 0.8}`;
       overlay.appendChild(el);
 
-      // 애니메이션 끝나면 DOM 제거
-      const duration = fx.type === 'crit' ? 900 : 600;
-      setTimeout(() => el.remove(), duration);
-
-      // 크리티컬 스프라이트 버스트
+      // 크리티컬에만 스프라이트 버스트
       if (fx.type === 'crit') {
         const sprite = document.createElement('div');
         sprite.className = 'fx-sprite-burst';
-        const spriteSize = 56;
+        const spriteSize = 48 + progress * 16;
         sprite.style.left = `${fxX}px`;
         sprite.style.top = `${fxY}px`;
         sprite.style.width = `${spriteSize}px`;
         sprite.style.height = `${spriteSize}px`;
-        sprite.style.opacity = '1';
+        sprite.style.opacity = `${1 - progress}`;
+        // 스프라이트 시트 프레임 선택 (6열 × 8행 기준, 프레임 64×64)
         const col = (fx.frameIndex ?? 0) % 6;
         const row = Math.floor((fx.frameIndex ?? 0) / 6);
         sprite.style.backgroundPosition = `-${col * 64}px -${row * 64}px`;
         overlay.appendChild(sprite);
-        setTimeout(() => sprite.remove(), 900);
-
-        // 🔥 카메라 쉐이크
-        const scaleWrapper = document.getElementById('game-scale-wrapper');
-        if (scaleWrapper) {
-          scaleWrapper.classList.remove('camera-shake');
-          // force reflow to restart animation
-          void scaleWrapper.offsetWidth;
-          scaleWrapper.classList.add('camera-shake');
-          setTimeout(() => scaleWrapper.classList.remove('camera-shake'), 200);
-        }
       }
     } else if (fx.type === 'death') {
       // 사망 폭발 — 스프라이트 시트 애니메이션
