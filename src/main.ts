@@ -2199,13 +2199,13 @@ function renderCombatOverlay(cs: CombatState): void {
   const grid = $('board-grid');
   const gridRect = grid.getBoundingClientRect();
   const wrapperRect = mapWrapper.getBoundingClientRect();
-  // 외곽 트랙 좌표 (0~8, 0~5) → 픽셀 (wrapper 기준, 36×24 타일 그리드)
-  // CSS: monster-path = tiles 1-34 (x), 1-22 (y) out of 36×24
-  // 외곽 coord 0 → tile 1, coord 8 → tile 34 (x), coord 5 → tile 22 (y)
-  const wW = wrapperRect.width;
-  const wH = wrapperRect.height;
-  const toPixelX = (lx: number) => (1 + (lx + 0.5) * (33 / 9)) / 36 * wW;
-  const toPixelY = (ly: number) => (1 + (ly + 0.5) * (21 / 6)) / 24 * wH;
+  const gridOffsetX = gridRect.left - wrapperRect.left;
+  const gridOffsetY = gridRect.top - wrapperRect.top;
+  const cellW = gridRect.width / 7;
+  const cellH = gridRect.height / 4;
+  // 논리좌표 (0~8, 0~5) → 픽셀: grid 기준 오프셋 + 수동 보정
+  const toPixelX = (lx: number) => gridOffsetX + (-0.7 + lx * 0.9375) * cellW;
+  const toPixelY = (ly: number) => gridOffsetY + (ly - 1.0) * cellH;
   const nowMs = performance.now();
 
   for (const m of cs.monsters) {
@@ -2293,11 +2293,6 @@ function renderCombatOverlay(cs: CombatState): void {
   }
 
   // ── 투사체 렌더 ──
-  // 보드 좌표 → 픽셀 (board-grid 기준)
-  const gridOffsetX = gridRect.left - wrapperRect.left;
-  const gridOffsetY = gridRect.top - wrapperRect.top;
-  const cellW = gridRect.width / 7;
-  const cellH = gridRect.height / 4;
   for (const proj of cs.projectiles) {
     const t = Math.min((nowMs - proj.startTime) / proj.duration, 1.0);
     // fromX/Y = 보드 좌표 (0~6, 0~3), toX/Y = 외곽 그리드 좌표 (0~8, 0~5)
@@ -2320,9 +2315,8 @@ function renderCombatOverlay(cs: CombatState): void {
     if (progress >= 1) continue;
 
     const el = document.createElement('div');
-    // fx.x/y = 외곽 그리드 좌표 → toPixelX/Y 사용
-    const fxX = toPixelX(fx.x);
-    const fxY = toPixelY(fx.y);
+    const fxX = gridOffsetX + (fx.x + 0.5) * cellW;
+    const fxY = gridOffsetY + (fx.y + 0.5) * cellH;
 
     if (fx.type === 'damage' || fx.type === 'crit') {
       // 데미지 숫자 — 위로 떠오르며 사라짐
