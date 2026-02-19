@@ -573,25 +573,13 @@ body {
     }
 }
 
-/* Board section fills remaining space in main column */
+/* Board section = game-wrapper (센터 정렬 + 레터박스) */
 #board-section {
     min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-}
-
-#board-section #map-wrapper {
-    max-width: 100%;
-    max-height: 100%;
-    background:
-        url('/assets/map/board_bg.png') center / 100% 100% no-repeat,
-        radial-gradient(ellipse at 50% 20%, rgba(60, 40, 15, 0.6) 0%, transparent 60%),
-        radial-gradient(ellipse at 20% 80%, rgba(30, 20, 8, 0.4) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 70%, rgba(40, 25, 10, 0.3) 0%, transparent 50%),
-        linear-gradient(180deg, #1a120a 0%, #0d0906 40%, #080604 100%) !important;
-    image-rendering: pixelated;
 }
 
 #bench-panel {
@@ -679,14 +667,14 @@ body {
 
 
 
+/* 🌟 고정 해상도 게임 보드 (720×480 CSS px) — transform:scale()로 반응형 */
 #map-wrapper {
-    width: 100%;
-    height: 100%;
-    max-width: 720px;
-    max-height: 480px;
+    width: 720px;
+    height: 480px;
     position: relative;
     border-radius: 4px;
     overflow: visible;
+    transform-origin: center center;
     /* Dungeon map: board_bg.png on top, CSS dungeon gradient fallback */
     background:
         url('/assets/map/board_bg.png') center / 100% 100% no-repeat,

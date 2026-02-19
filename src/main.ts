@@ -943,6 +943,31 @@ const cmd = new CommandProcessor(events);
 const combat = new CombatSystem(events);
 preloadAllSprites(); // 스프라이트 미리 로드
 
+// ─── 🌟 고정 해상도 오토 스케일 (720×480) ─────────────────────
+// map-wrapper는 항상 720×480 CSS px. board-section 크기에 맞춰 transform:scale() 적용
+const MAP_W = 720, MAP_H = 480;
+function autoScaleBoard(): void {
+  const section = document.getElementById('board-section');
+  const wrapper = document.getElementById('map-wrapper');
+  if (!section || !wrapper) return;
+
+  const availW = section.clientWidth - 32; // padding 16px * 2
+  const availH = section.clientHeight - 16;
+  const scale = Math.min(availW / MAP_W, availH / MAP_H, 1); // 1 이상은 안 함
+  wrapper.style.transform = `scale(${scale})`;
+}
+
+// 초기 + 리사이즈 시 자동 스케일
+if (typeof ResizeObserver !== 'undefined') {
+  const boardSection = document.getElementById('board-section');
+  if (boardSection) {
+    new ResizeObserver(() => autoScaleBoard()).observe(boardSection);
+  }
+}
+window.addEventListener('resize', autoScaleBoard);
+// DOM 로드 후 첫 스케일
+requestAnimationFrame(autoScaleBoard);
+
 // idle 애니메이션은 CSS @keyframes로 처리 (JS setInterval 제거됨)
 
 // ─── 공격 애니메이션 동기화 루프 ───
