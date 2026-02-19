@@ -943,22 +943,6 @@ const cmd = new CommandProcessor(events);
 const combat = new CombatSystem(events);
 preloadAllSprites(); // 스프라이트 미리 로드
 
-// ─── 🌟 고정 해상도 오토 스케일 (720×480) ─────────────────────
-const MAP_W = 720, MAP_H = 480;
-function autoScaleBoard(): void {
-  const wrapper = document.getElementById('map-wrapper');
-  if (!wrapper) return;
-
-  const scale = Math.min(
-    window.innerWidth / MAP_W,
-    window.innerHeight / MAP_H
-  );
-  wrapper.style.transform = `scale(${scale})`;
-}
-
-window.addEventListener('resize', autoScaleBoard);
-autoScaleBoard(); // 처음 게임을 켤 때 1회 실행
-
 // idle 애니메이션은 CSS @keyframes로 처리 (JS setInterval 제거됨)
 
 // ─── 공격 애니메이션 동기화 루프 ───
@@ -2334,7 +2318,6 @@ function renderCombatOverlay(cs: CombatState): void {
     const fxY = gridOffsetY + (fx.y + 0.5) * cellH;
 
     if (fx.type === 'damage' || fx.type === 'crit') {
-      continue; // 데미지 텍스트 비활성화
       // 데미지 숫자 — 위로 떠오르며 사라짐
       el.className = fx.type === 'crit' ? 'fx-crit' : 'fx-damage';
       el.textContent = fx.value?.toString() ?? '';
