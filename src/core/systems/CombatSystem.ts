@@ -670,8 +670,8 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - unit.position.x;
-                    const dy = pos.py - unit.position.y;
+                    const dx = pos.px - (unit.position.x + 1);
+                    const dy = pos.py - (unit.position.y + 1);
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist <= range && m.pathProgress < worstProgress) {
                         target = m;
@@ -684,8 +684,8 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - unit.position.x;
-                    const dy = pos.py - unit.position.y;
+                    const dx = pos.px - (unit.position.x + 1);
+                    const dy = pos.py - (unit.position.y + 1);
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist <= range && m.hp > bestHp) {
                         target = m;
@@ -698,8 +698,8 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - unit.position.x;
-                    const dy = pos.py - unit.position.y;
+                    const dx = pos.px - (unit.position.x + 1);
+                    const dy = pos.py - (unit.position.y + 1);
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist <= range && m.pathProgress > bestProgress) {
                         target = m;

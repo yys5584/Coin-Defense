@@ -1599,36 +1599,37 @@ function getRangeCoverage(unit: UnitInstance): number {
   const range = def.attackRange ?? 2.5;
   if (!unit.position) return 0;
 
-  const ux = unit.position.x;
-  const uy = unit.position.y;
+  // 보드 좌표 → 외곽 좌표로 변환 (+1 오프셋)
+  const ux = unit.position.x + 1;
+  const uy = unit.position.y + 1;
   const BOARD_W = 7, BOARD_H = 4;
-  const PERIM = 2 * (BOARD_W + BOARD_H); // ~22칸 둘레
 
   // 둘레 노드를 순회하며 사거리 내 노드 수 카운트
+  // 외곽 트랙: 9×6 그리드의 테두리 (0~8, 0~5)
   let inRange = 0;
   let total = 0;
 
-  // 좌측 (x=-0.7, y=-0.5 ~ 3.5)
-  for (let y = 0; y <= BOARD_H; y++) {
-    const dx = ux - (-0.7), dy = uy - (y - 0.5);
+  // 좌측 (x=0, y=0~5)
+  for (let y = 0; y <= BOARD_H + 1; y++) {
+    const dx = ux - 0, dy = uy - y;
     if (Math.sqrt(dx * dx + dy * dy) <= range) inRange++;
     total++;
   }
-  // 하단 (x=-0.5~6.5, y=3.7)
-  for (let x = 0; x <= BOARD_W; x++) {
-    const dx = ux - (x - 0.5), dy = uy - (BOARD_H - 0.3);
+  // 하단 (x=0~8, y=5)
+  for (let x = 1; x <= BOARD_W + 1; x++) {
+    const dx = ux - x, dy = uy - (BOARD_H + 1);
     if (Math.sqrt(dx * dx + dy * dy) <= range) inRange++;
     total++;
   }
-  // 우측 (x=6.7, y=3.5~-0.5)
+  // 우측 (x=8, y=5~0)
   for (let y = BOARD_H; y >= 0; y--) {
-    const dx = ux - (BOARD_W - 0.3), dy = uy - (y - 0.5);
+    const dx = ux - (BOARD_W + 1), dy = uy - y;
     if (Math.sqrt(dx * dx + dy * dy) <= range) inRange++;
     total++;
   }
-  // 상단 (x=6.5~-0.5, y=-0.7)
-  for (let x = BOARD_W; x >= 0; x--) {
-    const dx = ux - (x - 0.5), dy = uy - (-0.7);
+  // 상단 (x=8~0, y=0)
+  for (let x = BOARD_W; x >= 1; x--) {
+    const dx = ux - x, dy = uy - 0;
     if (Math.sqrt(dx * dx + dy * dy) <= range) inRange++;
     total++;
   }
@@ -2196,9 +2197,9 @@ function renderCombatOverlay(cs: CombatState): void {
   const gridOffsetY = gridRect.top - wrapperRect.top;
   const cellW = gridRect.width / 7;
   const cellH = gridRect.height / 4;
-  // 논리좌표 (0~8, 0~5) → 픽셀: grid 기준 오프셋 + 수동 보정 (좌 2칸, 상 1칸)
-  const toPixelX = (lx: number) => gridOffsetX + (-0.7 + lx * 0.9375) * cellW;
-  const toPixelY = (ly: number) => gridOffsetY + (ly - 1.0) * cellH;
+  // 논리좌표 (0~8, 0~5) → 픽셀: 외곽(1,1)=보드(0,0)셀 중심
+  const toPixelX = (lx: number) => gridOffsetX + (lx - 1 + 0.5) * cellW;
+  const toPixelY = (ly: number) => gridOffsetY + (ly - 1 + 0.5) * cellH;
   const nowMs = performance.now();
 
   for (const m of cs.monsters) {

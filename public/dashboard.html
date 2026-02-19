@@ -1343,159 +1343,126 @@
     </div>
 
     <!-- ═════════════════════════════════════════════════════════
-         게임정보 (경제/유닛/해금/전투/증강)
+<!-- ═════════════════════════════════════════════════════════
+         게임정보 (서브탭 5개)
          ═════════════════════════════════════════════════════════ -->
     <div class="page" id="page-gameinfo">
         <div style="height:60px"></div>
         <div class="sub-tab-bar" id="subTabBar">
-            <button class="sub-tab active" data-sub="economy">경제</button>
-            <button class="sub-tab" data-sub="units">유닛</button>
-            <button class="sub-tab" data-sub="unlock">해금</button>
-            <button class="sub-tab" data-sub="combat">전투</button>
-            <button class="sub-tab" data-sub="augments">증강</button>
+            <button class="sub-tab active" data-sub="economy">💰 경제</button>
+            <button class="sub-tab" data-sub="synergy">🧬 시너지</button>
+            <button class="sub-tab" data-sub="units">⚔️ 유닛</button>
+            <button class="sub-tab" data-sub="combat">⏱️ 전투</button>
+            <button class="sub-tab" data-sub="unlock">🔑 해금·증강</button>
         </div>
 
-        <!-- ─── 경제 ─── -->
+        <!-- ══════ 경제 ══════ -->
         <div class="sub-section active" id="sub-economy">
             <div class="content-section">
                 <div class="cs-header fade-up">
-                    <div class="cs-title">경험치 / 골드</div>
-                    <div class="cs-sub">레벨업 요구 경험치와 골드 수입 구조</div>
+                    <div class="cs-title">💰 경제 시스템</div>
+                    <div class="cs-sub">7-라운드 스테이지 · 이자 · 연승/패 · XP</div>
                     <div class="cs-line"></div>
                 </div>
-
-                <div class="card fade-up">
-                    <div class="card-head">레벨 업 필요 경험치</div>
-                    <div class="note">매 라운드 자동 +2 XP · 수동 구매: 4G = 4XP</div>
-                    <table>
-                        <tr>
-                            <th>Lv2</th>
-                            <th>Lv3</th>
-                            <th>Lv4</th>
-                            <th>Lv5</th>
-                            <th>Lv6</th>
-                            <th>Lv7</th>
-                            <th>Lv8</th>
-                            <th>Lv9</th>
-                            <th>Lv10</th>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>4</td>
-                            <td>10</td>
-                            <td>20</td>
-                            <td>36</td>
-                            <td>56</td>
-                            <td>80</td>
-                            <td>100</td>
-                            <td>—</td>
-                        </tr>
-                    </table>
-                </div>
-
                 <div class="g3 fade-up">
                     <div class="card">
-                        <div class="card-head">라운드 수입</div>
+                        <div class="card-head">스테이지별 수입</div>
                         <table>
                             <tr>
+                                <th>스테이지</th>
                                 <th>라운드</th>
-                                <th>골드</th>
+                                <th>수입</th>
                             </tr>
                             <tr>
-                                <td>R2~3</td>
-                                <td>+2</td>
+                                <td>1</td>
+                                <td>1-1~1-3</td>
+                                <td>+0G</td>
                             </tr>
                             <tr>
-                                <td>R4~10</td>
-                                <td>+3~5</td>
+                                <td>2</td>
+                                <td>2-1~2-7</td>
+                                <td>+1G</td>
                             </tr>
                             <tr>
-                                <td>R11~20</td>
-                                <td>+6</td>
+                                <td>3</td>
+                                <td>3-1~3-7</td>
+                                <td>+3G</td>
                             </tr>
                             <tr>
-                                <td>R21~30</td>
-                                <td>+7</td>
+                                <td>4</td>
+                                <td>4-1~4-7</td>
+                                <td>+4G</td>
                             </tr>
                             <tr>
-                                <td>R31~40</td>
-                                <td>+8</td>
+                                <td>5</td>
+                                <td>5-1~5-7</td>
+                                <td>+6G</td>
                             </tr>
                             <tr>
-                                <td>R41~50</td>
-                                <td>+9</td>
+                                <td>6</td>
+                                <td>6-1~6-7</td>
+                                <td>+7G</td>
                             </tr>
-                            <tr>
-                                <td>R51+</td>
-                                <td>+10</td>
+                            <tr class="hl">
+                                <td>7</td>
+                                <td>7-1~7-7</td>
+                                <td>+8G</td>
                             </tr>
                         </table>
                     </div>
                     <div class="card">
-                        <div class="card-head">이자</div>
+                        <div class="card-head">이자 (최대 3G)</div>
                         <table>
                             <tr>
-                                <th>보유 골드</th>
+                                <th>보유</th>
                                 <th>이자</th>
                             </tr>
                             <tr>
-                                <td>10~19</td>
+                                <td>10~19G</td>
                                 <td>+1</td>
                             </tr>
                             <tr>
-                                <td>20~29</td>
+                                <td>20~29G</td>
                                 <td>+2</td>
                             </tr>
-                            <tr>
-                                <td>30~39</td>
-                                <td>+3</td>
-                            </tr>
-                            <tr>
-                                <td>40~49</td>
-                                <td>+4</td>
-                            </tr>
-                            <tr>
-                                <td>50+</td>
-                                <td>+5</td>
+                            <tr class="hl">
+                                <td>30G+</td>
+                                <td>+3 (MAX)</td>
                             </tr>
                         </table>
+                        <div class="note" style="margin-top:8px">10G당 +1 · 상한 3G</div>
                     </div>
                     <div class="card">
-                        <div class="card-head">연승/연패</div>
+                        <div class="card-head">연승/연패 보너스</div>
                         <table>
                             <tr>
-                                <th>연승/패</th>
+                                <th>연속</th>
                                 <th>골드</th>
                             </tr>
                             <tr>
-                                <td>2~3</td>
+                                <td>2~4</td>
                                 <td>+1</td>
                             </tr>
                             <tr>
-                                <td>4~5</td>
+                                <td>5</td>
                                 <td>+2</td>
                             </tr>
-                            <tr>
-                                <td>6~7</td>
+                            <tr class="hl">
+                                <td>6+</td>
                                 <td>+3</td>
-                            </tr>
-                            <tr>
-                                <td>8+</td>
-                                <td>+4</td>
                             </tr>
                         </table>
                     </div>
                 </div>
-
-                <div class="note fade-up" style="border-left-color:#c75050">⚠️ 수입 = 기본급 + 이자 + 연승/연패만. 킬 골드 없음.</div>
-
-                <div class="g2 fade-up">
+                <div class="g2 fade-up" style="margin-top:16px">
                     <div class="card">
-                        <div class="card-head">레벨별 상점 확률</div>
+                        <div class="card-head">레벨 & 상점 확률</div>
+                        <div class="note">자동XP: S1-2=+2, S3=+4, S4=+6, S5+=+8 · 수동: 4G=4XP · 리롤: 2G</div>
                         <table>
                             <tr>
                                 <th>Lv</th>
-                                <th>슬롯</th>
+                                <th>XP</th>
+                                <th>슬</th>
                                 <th>1코</th>
                                 <th>2코</th>
                                 <th>3코</th>
@@ -1504,8 +1471,9 @@
                             </tr>
                             <tr>
                                 <td>1</td>
+                                <td>2</td>
                                 <td>1</td>
-                                <td>100%</td>
+                                <td>100</td>
                                 <td>—</td>
                                 <td>—</td>
                                 <td>—</td>
@@ -1514,7 +1482,8 @@
                             <tr>
                                 <td>2</td>
                                 <td>2</td>
-                                <td>100%</td>
+                                <td>2</td>
+                                <td>100</td>
                                 <td>—</td>
                                 <td>—</td>
                                 <td>—</td>
@@ -1522,113 +1491,143 @@
                             </tr>
                             <tr>
                                 <td>3</td>
+                                <td>6</td>
                                 <td>3</td>
-                                <td>75%</td>
-                                <td>25%</td>
+                                <td>75</td>
+                                <td>25</td>
                                 <td>—</td>
                                 <td>—</td>
                                 <td>—</td>
                             </tr>
                             <tr>
                                 <td>4</td>
+                                <td>10</td>
                                 <td>4</td>
-                                <td>55%</td>
-                                <td>30%</td>
-                                <td>15%</td>
+                                <td>55</td>
+                                <td>30</td>
+                                <td>15</td>
                                 <td>—</td>
                                 <td>—</td>
                             </tr>
                             <tr>
                                 <td>5</td>
+                                <td>20</td>
                                 <td>5</td>
-                                <td>45%</td>
-                                <td>33%</td>
-                                <td>20%</td>
-                                <td>2%</td>
+                                <td>40</td>
+                                <td>30</td>
+                                <td>25</td>
+                                <td>5</td>
                                 <td>—</td>
                             </tr>
                             <tr>
                                 <td>6</td>
+                                <td>36</td>
                                 <td>6</td>
-                                <td>30%</td>
-                                <td>40%</td>
-                                <td>25%</td>
-                                <td>5%</td>
-                                <td>—</td>
+                                <td>25</td>
+                                <td>30</td>
+                                <td>30</td>
+                                <td>12</td>
+                                <td>3</td>
                             </tr>
                             <tr>
                                 <td>7</td>
+                                <td>48</td>
                                 <td>7</td>
-                                <td>16%</td>
-                                <td>30%</td>
-                                <td>43%</td>
-                                <td>10%</td>
-                                <td>1%</td>
+                                <td>20</td>
+                                <td>25</td>
+                                <td>30</td>
+                                <td>18</td>
+                                <td>7</td>
                             </tr>
                             <tr>
                                 <td>8</td>
+                                <td>72</td>
                                 <td>8</td>
-                                <td>15%</td>
-                                <td>20%</td>
-                                <td>32%</td>
-                                <td>30%</td>
-                                <td>3%</td>
+                                <td>15</td>
+                                <td>20</td>
+                                <td>25</td>
+                                <td>25</td>
+                                <td>15</td>
                             </tr>
                             <tr>
                                 <td>9</td>
+                                <td>80</td>
                                 <td>9</td>
-                                <td>10%</td>
-                                <td>17%</td>
-                                <td>25%</td>
-                                <td>33%</td>
-                                <td>15%</td>
+                                <td>10</td>
+                                <td>15</td>
+                                <td>25</td>
+                                <td>30</td>
+                                <td>20</td>
                             </tr>
                             <tr class="hl">
                                 <td><b>10</b></td>
+                                <td>100</td>
                                 <td>10</td>
-                                <td>5%</td>
-                                <td>10%</td>
-                                <td>20%</td>
-                                <td>38%</td>
-                                <td>27%</td>
+                                <td>5</td>
+                                <td>10</td>
+                                <td>20</td>
+                                <td>30</td>
+                                <td>35</td>
                             </tr>
                         </table>
                     </div>
                     <div class="card">
-                        <div class="card-head">코스트별 유닛 수</div>
-                        <div class="note">같은 유닛 3개 → ★★ (×1.8) · ★★ 3개 → ★★★ (×3.25)</div>
+                        <div class="card-head">합성 & 풀</div>
+                        <table>
+                            <tr>
+                                <th>등급</th>
+                                <th>배수</th>
+                                <th>조건</th>
+                            </tr>
+                            <tr>
+                                <td>★1</td>
+                                <td>×1</td>
+                                <td>기본</td>
+                            </tr>
+                            <tr>
+                                <td>★2</td>
+                                <td style="color:#c8a64e;font-weight:700">×3</td>
+                                <td>동일★1 × 3</td>
+                            </tr>
+                            <tr class="hl">
+                                <td>★3</td>
+                                <td style="font-weight:700">×9</td>
+                                <td>동일★2 × 3</td>
+                            </tr>
+                        </table>
+                        <div style="height:8px"></div>
                         <table>
                             <tr>
                                 <th>코스트</th>
-                                <th>유닛 수</th>
+                                <th>풀</th>
                             </tr>
                             <tr>
                                 <td>1코</td>
-                                <td style="color:#c8a64e;font-weight:700">15</td>
+                                <td>29</td>
                             </tr>
                             <tr>
                                 <td>2코</td>
-                                <td style="color:#c8a64e;font-weight:700">13</td>
+                                <td>22</td>
                             </tr>
                             <tr>
                                 <td>3코</td>
-                                <td style="color:#c8a64e;font-weight:700">14</td>
+                                <td>18</td>
                             </tr>
                             <tr>
                                 <td>4코</td>
-                                <td style="color:#c8a64e;font-weight:700">8</td>
+                                <td>12</td>
                             </tr>
                             <tr>
                                 <td>5코</td>
-                                <td style="color:#c8a64e;font-weight:700">8</td>
+                                <td>10</td>
                             </tr>
                             <tr class="hl">
                                 <td>7코</td>
-                                <td style="font-weight:700">1</td>
+                                <td>2</td>
                             </tr>
                             <tr class="hl">
                                 <td>10코</td>
-                                <td style="font-weight:700">1</td>
+                                <td>1</td>
                             </tr>
                         </table>
                     </div>
@@ -1636,1056 +1635,1160 @@
             </div>
         </div>
 
-        <!-- ─── 유닛 ─── -->
-        <div class="sub-section" id="sub-units">
-            <div class="sub-tab-bar-2" id="unitSubTabs">
-                <button class="sub-tab-2 active" data-unit-sub="synergy">특성 & 시너지</button>
-                <button class="sub-tab-2" data-unit-sub="unitlist">유닛목록</button>
-            </div>
-            <div class="unit-sub-section active" id="unit-sub-synergy">
-                <div class="content-section">
-                    <div class="cs-header fade-up">
-                        <div class="cs-title">유닛 & 시너지</div>
-                        <div class="cs-sub">64종 유닛과 14종 특성 시너지 조합</div>
-                        <div class="cs-line"></div>
-                    </div>
-                    <div class="g2 fade-up">
-                        <div class="card">
-                            <div class="card-head">특성 (14종)</div>
-                            <table>
-                                <tr>
-                                    <th></th>
-                                    <th>이름</th>
-                                    <th>단계</th>
-                                    <th>효과</th>
-                                </tr>
-                                <tr>
-                                    <td>💀</td>
-                                    <td>FUD</td>
-                                    <td>2/4/6</td>
-                                    <td>방어무시 50/75/100%</td>
-                                </tr>
-                                <tr>
-                                    <td>💼</td>
-                                    <td>VC</td>
-                                    <td>3/6/9</td>
-                                    <td>DMG+15/30/50%</td>
-                                </tr>
-                                <tr>
-                                    <td>📱</td>
-                                    <td>소셜</td>
-                                    <td>2/4/6/8</td>
-                                    <td>공속+10/25/40/60%</td>
-                                </tr>
-                                <tr>
-                                    <td>🧠</td>
-                                    <td>AI</td>
-                                    <td>2/4</td>
-                                    <td>공속+30%/DMG+40%</td>
-                                </tr>
-                                <tr>
-                                    <td>📉</td>
-                                    <td>베어</td>
-                                    <td>2/4</td>
-                                    <td>스턴 25/45%</td>
-                                </tr>
-                                <tr>
-                                    <td>🚩</td>
-                                    <td>러그풀</td>
-                                    <td>2/4</td>
-                                    <td>방삭 40/80%</td>
-                                </tr>
-                                <tr>
-                                    <td>🐸</td>
-                                    <td>밈코인</td>
-                                    <td>2/4</td>
-                                    <td>공속+80/150%</td>
-                                </tr>
-                                <tr>
-                                    <td>🖼️</td>
-                                    <td>NFT</td>
-                                    <td>2/4/6</td>
-                                    <td>미스 25/50/75%</td>
-                                </tr>
-                                <tr>
-                                    <td>₿</td>
-                                    <td>BTC</td>
-                                    <td>2/4/7</td>
-                                    <td>고정DMG+50/100/200</td>
-                                </tr>
-                                <tr>
-                                    <td>👻</td>
-                                    <td>고스트</td>
-                                    <td>2</td>
-                                    <td>적1명 HP→100</td>
-                                </tr>
-                                <tr>
-                                    <td>🏦</td>
-                                    <td>거래소</td>
-                                    <td>2/4/7</td>
-                                    <td>DMG 2×/전체/3×</td>
-                                </tr>
-                                <tr>
-                                    <td>🔓</td>
-                                    <td>DeFi</td>
-                                    <td>2/4/6</td>
-                                    <td>CDR-20%/DMG+20/40%</td>
-                                </tr>
-                                <tr>
-                                    <td>💻</td>
-                                    <td>해커</td>
-                                    <td>2</td>
-                                    <td>킬시 골드+2~4</td>
-                                </tr>
-                                <tr>
-                                    <td>🥷</td>
-                                    <td>익명</td>
-                                    <td>1/3</td>
-                                    <td>1명+60%/3명+25%</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div><!-- /g2 -->
-                </div><!-- /content-section -->
-            </div><!-- end unit-sub-synergy -->
-            <div class="unit-sub-section" id="unit-sub-unitlist">
-                <div class="card fade-up" style="margin-top:16px">
-                    <div class="card-head">전체 유닛 목록 (64종)</div>
-                    <div class="cost-filter-bar" id="costFilterBar">
-                        <button class="cost-filter active" data-cost="all">전체</button>
-                        <button class="cost-filter" data-cost="1">1코</button>
-                        <button class="cost-filter" data-cost="2">2코</button>
-                        <button class="cost-filter" data-cost="3">3코</button>
-                        <button class="cost-filter" data-cost="4">4코</button>
-                        <button class="cost-filter" data-cost="5">5코</button>
-                        <button class="cost-filter" data-cost="7">7코</button>
-                        <button class="cost-filter" data-cost="10">10코</button>
-                    </div>
-                    <style>
-                        #unitListTable th:nth-child(5),
-                        #unitListTable td:nth-child(5) {
-                            display: none;
-                        }
-                    </style>
-                    <table id="unitListTable" class="compact-unit-table">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>이름</th>
-                                <th>코스트</th>
-                                <th>특성</th>
-                                <th style="display:none">직업</th>
-                                <th>스킬</th>
-                            </tr>
-                        </thead>
-                        <tbody data-cost="1">
-                            <tr>
-                                <td>🛡️</td>
-                                <td>HODLer</td>
-                                <td>1</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">다이아몬드 핸즈 — [자신] DMG+10%, ★당 +5%</td>
-                            </tr>
-                            <tr>
-                                <td>🧊</td>
-                                <td>Gareth Soloway</td>
-                                <td>1</td>
-                                <td>베어</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">숏 포지션 — 15% 확률 이속-20%(2초)</td>
-                            </tr>
-                            <tr>
-                                <td>🏦</td>
-                                <td>PerpDEX</td>
-                                <td>1</td>
-                                <td>거래소</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">레버리지 — 20% 확률 DMG×1.5</td>
-                            </tr>
-                            <tr>
-                                <td>🚩</td>
-                                <td>스캠 개발자</td>
-                                <td>1</td>
-                                <td>러그풀</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">Exit Scam — 킬 시 25% 확률 골드+1</td>
-                            </tr>
-                            <tr>
-                                <td>💀</td>
-                                <td>FUD 유포자</td>
-                                <td>1</td>
-                                <td>FUD</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">가짜 뉴스 — 이속-15%(1.5초)</td>
-                            </tr>
-                            <tr>
-                                <td>📱</td>
-                                <td>PI User</td>
-                                <td>1</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">에어드랍 대기 — 킬 시 20% 확률 골드+1</td>
-                            </tr>
-                            <tr>
-                                <td>⛏️</td>
-                                <td>PC방 채굴자</td>
-                                <td>1</td>
-                                <td>BTC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">채굴 보상 — 라운드 종료 시 골드+1 (DMG 반토막)</td>
-                            </tr>
-                            <tr>
-                                <td>🦊</td>
-                                <td>메타마스크 유저</td>
-                                <td>1</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">가스비 최적화 — [자신] 공속+15%</td>
-                            </tr>
-                            <tr>
-                                <td>🔄</td>
-                                <td>Curve Finance</td>
-                                <td>1</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">유동성 풀 — [DeFi] 공속+8%</td>
-                            </tr>
-                            <tr>
-                                <td>📢</td>
-                                <td>CT KOL</td>
-                                <td>1</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">인플루언서 — 킬 시 [주변] DMG+5%(3초)</td>
-                            </tr>
-                            <tr>
-                                <td>⚙️</td>
-                                <td>거래봇</td>
-                                <td>1</td>
-                                <td>거래소</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">자동매매 — [자신] 공속+20%, DMG-10%</td>
-                            </tr>
-                            <tr>
-                                <td>👔</td>
-                                <td>a16z 인턴</td>
-                                <td>1</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">리서치 — [VC] DMG+5%</td>
-                            </tr>
-                            <tr>
-                                <td>🐻</td>
-                                <td>Roubini</td>
-                                <td>1</td>
-                                <td>베어</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">비관론 — 공격 적 방어-10%(2초)</td>
-                            </tr>
-                            <tr>
-                                <td>🐕</td>
-                                <td>밈코인 발행자</td>
-                                <td>1</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">밈 파워 — 킬 시 공속+10%(4초) 누적</td>
-                            </tr>
-                            <tr>
-                                <td>📺</td>
-                                <td>Jim Cramer</td>
-                                <td>1</td>
-                                <td>FUD</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">역지표 — 35% miss 대신 다음 공격 ×2</td>
-                            </tr>
-                        </tbody>
-                        <!-- 2코 -->
-                        <tbody data-cost="2">
-                            <tr>
-                                <td>⚡</td>
-                                <td>Jack Dorsey</td>
-                                <td>2</td>
-                                <td>BTC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">⚡결제 — [자신] 공속+25%, DMG-10%</td>
-                            </tr>
-                            <tr>
-                                <td>🌐</td>
-                                <td>Jesse Pollak</td>
-                                <td>2</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">Base Chain — [DeFi] 공속+8%</td>
-                            </tr>
-                            <tr>
-                                <td>🥷</td>
-                                <td>워뇨띠</td>
-                                <td>2</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">풀매수 — 8초마다 [자신] 공속↑(3초)</td>
-                            </tr>
-                            <tr>
-                                <td>🛡️</td>
-                                <td>Jesse Powell</td>
-                                <td>2</td>
-                                <td>거래소</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">거래 수수료 — 적중 시 [팀] DMG+1 누적(최대20)</td>
-                            </tr>
-                            <tr>
-                                <td>🔍</td>
-                                <td>OpenSea</td>
-                                <td>2</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">로열티 — 킬 시 [주변 2칸] DMG+5</td>
-                            </tr>
-                            <tr>
-                                <td>💀</td>
-                                <td>Craig Wright</td>
-                                <td>2</td>
-                                <td>FUD</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">사기꾼 — 25% miss 대신 다음 공격 ×2</td>
-                            </tr>
-                            <tr>
-                                <td>👻</td>
-                                <td>Daniele Sesta</td>
-                                <td>2</td>
-                                <td>러그풀</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">유령 공격 — 25% 확률 방어 무시</td>
-                            </tr>
-                            <tr>
-                                <td>📉</td>
-                                <td>Hsaka</td>
-                                <td>2</td>
-                                <td>베어</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">공매도 — 적 HP 50%↓ 시 DMG 1.5배</td>
-                            </tr>
-                            <tr>
-                                <td>🔑</td>
-                                <td>Hal Finney</td>
-                                <td>2</td>
-                                <td>BTC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">첫 번째 수신자 — [BTC] DMG+10%</td>
-                            </tr>
-                            <tr>
-                                <td>💳</td>
-                                <td>Kris Marszalek</td>
-                                <td>2</td>
-                                <td>거래소</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">카드 결제 — 킬 시 25% 확률 골드+1</td>
-                            </tr>
-                            <tr>
-                                <td>📖</td>
-                                <td>Chris Dixon</td>
-                                <td>2</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">Read Write Own — [VC] 공속+10%</td>
-                            </tr>
-                            <tr>
-                                <td>🏛️</td>
-                                <td>Kashkari</td>
-                                <td>2</td>
-                                <td>FUD</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">금리 인상 — 적 이속-15%(2초)</td>
-                            </tr>
-                            <tr>
-                                <td>👸</td>
-                                <td>Ruja Ignatova</td>
-                                <td>2</td>
-                                <td>러그풀</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">원코인 — 킬 시 30% 골드+1, DMG-15%</td>
-                            </tr>
-                        </tbody>
-                        <!-- 3코 -->
-                        <tbody data-cost="3">
-                            <tr>
-                                <td>⛏️</td>
-                                <td>Roger Ver</td>
-                                <td>3</td>
-                                <td>BTC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">비트코인 캐시 — [인접 BTC] 서로 DMG+15%</td>
-                            </tr>
-                            <tr>
-                                <td>🧙</td>
-                                <td>Andre Cronje</td>
-                                <td>3</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">Flash Loan — 3번째 공격마다 💥광역</td>
-                            </tr>
-                            <tr>
-                                <td>👤</td>
-                                <td>Rekt</td>
-                                <td>3</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">해킹 — 적 최대HP 2% 추가타</td>
-                            </tr>
-                            <tr>
-                                <td>🤖</td>
-                                <td>Wintermute</td>
-                                <td>3</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">알고리즘 매매 — 3번째 공격마다 💥광역</td>
-                            </tr>
-                            <tr>
-                                <td>🎯</td>
-                                <td>Simon</td>
-                                <td>3</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">정밀 사격 — 크리확률+20%, 크리DMG+50%</td>
-                            </tr>
-                            <tr>
-                                <td>🧊</td>
-                                <td>Peter Schiff</td>
-                                <td>3</td>
-                                <td>베어</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">금 본위제 — 전투시작 시 [팀] DMG+10%</td>
-                            </tr>
-                            <tr>
-                                <td>🐸</td>
-                                <td>GCR</td>
-                                <td>3</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">역매매 — 가장 뒤 적 타겟, DMG+30%</td>
-                            </tr>
-                            <tr>
-                                <td>🦈</td>
-                                <td>Andrew Kang</td>
-                                <td>3</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">고래 덤핑 — 5번째 공격마다 ❄️빙결</td>
-                            </tr>
-                            <tr>
-                                <td>🍣</td>
-                                <td>Chef Nomi</td>
-                                <td>3</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">스시스왑 — 킬 시 [주변] 공속+15%(3초)</td>
-                            </tr>
-                            <tr>
-                                <td>🎩</td>
-                                <td>Cobie</td>
-                                <td>3</td>
-                                <td>소셜</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">알파 리크 — HP 높은 적 우선, DMG+20%</td>
-                            </tr>
-                            <tr>
-                                <td>🏹</td>
-                                <td>Cathie Wood</td>
-                                <td>3</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">혁신 투자 — 보유 골드÷10만큼 DMG+%</td>
-                            </tr>
-                            <tr>
-                                <td>🐻</td>
-                                <td>Roubini</td>
-                                <td>3</td>
-                                <td>베어</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">(참고: 1코와 동명이인)</td>
-                            </tr>
-                            <tr>
-                                <td>⚖️</td>
-                                <td>Elizabeth Warren</td>
-                                <td>3</td>
-                                <td>FUD</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">규제 — 적 이속-20%(2초)</td>
-                            </tr>
-                            <tr>
-                                <td>🔍</td>
-                                <td>Michael Burry</td>
-                                <td>3</td>
-                                <td>베어</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">빅쇼트 — 보스에게 DMG+40%</td>
-                            </tr>
-                        </tbody>
-                        <!-- 4코 -->
-                        <tbody data-cost="4">
-                            <tr>
-                                <td>🔒</td>
-                                <td>Stani Kulechov</td>
-                                <td>4</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">렌딩 프로토콜 — 주변 ₿ 아군 공속↑ (오라)</td>
-                            </tr>
-                            <tr>
-                                <td>🔗</td>
-                                <td>Gavin Wood</td>
-                                <td>4</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">Substrate — [DeFi] 방어무시+15%</td>
-                            </tr>
-                            <tr>
-                                <td>🦄</td>
-                                <td>Hayden Adams</td>
-                                <td>4</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">유동성 풀 — 6초마다 [주변 2칸] 공속+20%(3초)</td>
-                            </tr>
-                            <tr>
-                                <td>💰</td>
-                                <td>Marc Andreessen</td>
-                                <td>4</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">VC 투자 — 8초마다 랜덤 아군에게 버프</td>
-                            </tr>
-                            <tr>
-                                <td>🎯</td>
-                                <td>Balaji</td>
-                                <td>4</td>
-                                <td>VC</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">100만불 배팅 — 보유 골드÷10만큼 DMG+%</td>
-                            </tr>
-                            <tr>
-                                <td>💀</td>
-                                <td>Lazarus</td>
-                                <td>4</td>
-                                <td>FUD</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">해킹 드레인 — 킬 시 DMG+8% 영구(최대50%)</td>
-                            </tr>
-                            <tr>
-                                <td>📉</td>
-                                <td>Zhu Su</td>
-                                <td>4</td>
-                                <td>베어</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">3AC 청산 — 적 HP 비례 3% 추가 DMG</td>
-                            </tr>
-                            <tr>
-                                <td>⚡</td>
-                                <td>Anatoly</td>
-                                <td>4</td>
-                                <td>DeFi</td>
-                                <td>-</td>
-                                <td style="color:#aaa;font-size:12px">초고속 TPS — 3번째 공격마다 ⏸️스턴</td>
-                            </tr>
-                        </tbody>
-                        <!-- 5코 -->
-                        <tbody data-cost="5">
-                            <tr>
-                                <td>💀</td>
-                                <td>Do Kwon</td>
-                                <td>5</td>
-                                <td>고스트</td>
-                                <td>디젠</td>
-                                <td style="color:#aaa;font-size:12px">디페깅 — 방어 100% 무시 + 이속-10%</td>
-                            </tr>
-                            <tr>
-                                <td>🚩</td>
-                                <td>SBF</td>
-                                <td>5</td>
-                                <td>러그풀</td>
-                                <td>트레이더</td>
-                                <td style="color:#aaa;font-size:12px">횡령 — 킬 시 골드+3</td>
-                            </tr>
-                            <tr>
-                                <td>💎</td>
-                                <td>Saylor</td>
-                                <td>5</td>
-                                <td>BTC</td>
-                                <td>트레이더</td>
-                                <td style="color:#aaa;font-size:12px">무한 매수 — 5초마다 [자신] DMG+10% 영구</td>
-                            </tr>
-                            <tr>
-                                <td>🎰</td>
-                                <td>Arthur Hayes</td>
-                                <td>5</td>
-                                <td>거래소</td>
-                                <td>디젠</td>
-                                <td style="color:#aaa;font-size:12px">100배 레버리지 — 크리 시 DMG×3, 25% miss</td>
-                            </tr>
-                            <tr>
-                                <td>🏛️</td>
-                                <td>Armstrong</td>
-                                <td>5</td>
-                                <td>거래소</td>
-                                <td>감사관</td>
-                                <td style="color:#aaa;font-size:12px">기관 투자 — [팀] DMG+15%, [거래소] DMG+25%</td>
-                            </tr>
-                            <tr>
-                                <td>🌪️</td>
-                                <td>Justin Sun</td>
-                                <td>5</td>
-                                <td>러그풀</td>
-                                <td>고래</td>
-                                <td style="color:#aaa;font-size:12px">펌핑 — 6초마다 랜덤 3적 HP-5%</td>
-                            </tr>
-                            <tr>
-                                <td>🏎️</td>
-                                <td>Jeff</td>
-                                <td>5</td>
-                                <td>거래소</td>
-                                <td>트레이더</td>
-                                <td style="color:#aaa;font-size:12px">테일 리스크 — 적 수 많을수록 DMG+(적수×5%)</td>
-                            </tr>
-                            <tr>
-                                <td>🔮</td>
-                                <td>Shayne Coplan</td>
-                                <td>5</td>
-                                <td>DeFi</td>
-                                <td>스나이퍼</td>
-                                <td style="color:#aaa;font-size:12px">예측시장 — 크리확률+30%, 크리 시 2초 스턴</td>
-                            </tr>
-                        </tbody>
-                        <!-- 7코 -->
-                        <tbody data-cost="7">
-                            <tr>
-                                <td>🌟</td>
-                                <td>Vitalik</td>
-                                <td>7</td>
-                                <td>DeFi</td>
-                                <td>—</td>
-                                <td style="color:#aaa;font-size:12px">이더리움 업그레이드 — 5초마다 [팀] DMG+15% 누적(최대3)</td>
-                            </tr>
-                            <tr>
-                                <td>🐋</td>
-                                <td>CZ</td>
-                                <td>7</td>
-                                <td>거래소</td>
-                                <td>—</td>
-                                <td style="color:#aaa;font-size:12px">SAFU 펀드 — [거래소] DMG+30%</td>
-                            </tr>
-                            <tr>
-                                <td>🐸</td>
-                                <td>Elon</td>
-                                <td>7</td>
-                                <td>밈코인</td>
-                                <td>—</td>
-                                <td style="color:#aaa;font-size:12px">트윗 폭격 — 10초마다 [랜덤 아군] 공속×2(5초)</td>
-                            </tr>
-                            <tr>
-                                <td>⛏️</td>
-                                <td>Donald Trump</td>
-                                <td>7</td>
-                                <td>BTC</td>
-                                <td>—</td>
-                                <td style="color:#aaa;font-size:12px">비트코인 비축령 — [팀] 공속+15%, [BTC] DMG+25%</td>
-                            </tr>
-                            <tr>
-                                <td>👨‍⚖️</td>
-                                <td>Gensler</td>
-                                <td>7</td>
-                                <td>FUD</td>
-                                <td>—</td>
-                                <td style="color:#aaa;font-size:12px">규제 폭풍 — [적 전체] 이속-25%, 보스 5초 스턴</td>
-                            </tr>
-                        </tbody>
-                        <!-- 10코 -->
-                        <tbody data-cost="10">
-                            <tr>
-                                <td>🌟</td>
-                                <td>나카모토 사토시</td>
-                                <td>10</td>
-                                <td>BTC</td>
-                                <td>—</td>
-                                <td style="color:#aaa;font-size:12px">제네시스 블록 — [팀] 전체 DMG+25%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div><!-- /card -->
-            </div><!-- end unit-sub-unitlist -->
-        </div><!-- end sub-units -->
-
-        <!-- ─── 해금 ─── -->
-        <div class="sub-section" id="sub-unlock">
-            <div class="content-section">
+        <!-- ══════ 시너지 (카드 1개 통합) ══════ -->
+        <div class="sub-section" id="sub-synergy">
+            <div class="content-section" style="max-width:1200px">
                 <div class="cs-header fade-up">
-                    <div class="cs-title">해금 시스템</div>
-                    <div class="cs-sub">7코/10코 유닛은 보스 열쇠로만 해금</div>
+                    <div class="cs-title">🧬 시너지 (8진영)</div>
+                    <div class="cs-sub">각 진영 8유닛 · 2/4/6/8 브레이크포인트</div>
                     <div class="cs-line"></div>
                 </div>
-                <div class="g2 fade-up">
-                    <div class="card">
-                        <div class="card-head">7코 유닛 해금</div>
-                        <table>
-                            <tr>
-                                <th>유닛</th>
-                                <th>필요 열쇠</th>
-                            </tr>
-                            <tr>
-                                <td>🌟 Vitalik</td>
-                                <td>🔑 이더리움 키</td>
-                            </tr>
-                            <tr>
-                                <td>🐋 CZ</td>
-                                <td>🔑 바이난스 키</td>
-                            </tr>
-                            <tr>
-                                <td>🐸 Elon</td>
-                                <td>🔑 테슬라 키</td>
-                            </tr>
-                            <tr>
-                                <td>⛏️ Trump</td>
-                                <td>🔑 #1 블록 키</td>
-                            </tr>
-                            <tr>
-                                <td>👨‍⚖️ Gensler</td>
-                                <td>🔑 SEC 소환장</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="card">
-                        <div class="card-head">10코 유닛 해금</div>
-                        <table>
-                            <tr>
-                                <th>유닛</th>
-                                <th>조건</th>
-                            </tr>
-                            <tr class="hl">
-                                <td>🌟 사토시</td>
-                                <td>🔑 사토시 유산 + 7코 1마리 보유</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="card fade-up" style="margin-top:16px">
-                    <div class="card-head">보스 상자 드랍 (30% 열쇠)</div>
+                <div class="card fade-up">
                     <table>
                         <tr>
-                            <th>라운드</th>
-                            <th>상자</th>
-                            <th>열쇠 가중치</th>
+                            <th></th>
+                            <th>진영</th>
+                            <th>2시너지</th>
+                            <th>4시너지</th>
+                            <th>6시너지</th>
+                            <th>8시너지</th>
                         </tr>
                         <tr>
-                            <td>R10</td>
-                            <td>슬라임</td>
-                            <td>이더(40) 바이(40) 테슬(10) #1(10)</td>
+                            <td>₿</td>
+                            <td>비트코인</td>
+                            <td>DMG+15%</td>
+                            <td>DMG+30% 보스+20%</td>
+                            <td>DMG+50% 보스+40%</td>
+                            <td style="color:#c8a64e">DMG+80% 보스+60% 크리+20%</td>
                         </tr>
                         <tr>
-                            <td>R20</td>
-                            <td>언데드</td>
-                            <td>이더(35) 바이(35) 테슬(15) #1(15)</td>
+                            <td>🔓</td>
+                            <td>DeFi</td>
+                            <td>DMG+15% 공속+5%</td>
+                            <td>DMG+25% CDR-20%</td>
+                            <td>DMG+40% CDR-35% 스킬+30%</td>
+                            <td style="color:#c8a64e">DMG+60% CDR-50% 스킬+60%</td>
                         </tr>
                         <tr>
-                            <td>R30</td>
-                            <td>화산</td>
-                            <td>이더(25) 바이(25) 테슬(20) #1(20) SEC(10)</td>
+                            <td>📱</td>
+                            <td>소셜</td>
+                            <td>공속+15%</td>
+                            <td>공속+25%</td>
+                            <td>공속+40% DMG+15%</td>
+                            <td style="color:#c8a64e">공속+60% DMG+30% 골드+2</td>
                         </tr>
                         <tr>
-                            <td>R40</td>
-                            <td>심해</td>
-                            <td>테슬(25) #1(25) SEC(40) 사토시(10)</td>
+                            <td>🏦</td>
+                            <td>거래소</td>
+                            <td>DMG+15% 공속+5%</td>
+                            <td>DMG+30% 공속+15%</td>
+                            <td>DMG+45% 공속+25% 킬골드+1</td>
+                            <td style="color:#c8a64e">DMG+65% 공속+35% 킬골드+2</td>
                         </tr>
                         <tr>
-                            <td>R50</td>
-                            <td>마왕</td>
-                            <td>SEC(50) 사토시(50)</td>
+                            <td>💼</td>
+                            <td>VC</td>
+                            <td>크리+10% 공속+10%</td>
+                            <td>크리+20% 공속+25% 크리DMG+30%</td>
+                            <td>크리+30% 공속+40% 크리DMG+60%</td>
+                            <td style="color:#c8a64e">크리+40% 공속+60% 크리DMG+100%</td>
                         </tr>
                         <tr>
-                            <td>R60</td>
-                            <td>용</td>
-                            <td>사토시(100)</td>
+                            <td>💀</td>
+                            <td>FUD</td>
+                            <td>방무30%</td>
+                            <td>방무60% DMG+15%</td>
+                            <td>방무100% DMG+30%</td>
+                            <td style="color:#c8a64e">방무100% DMG+50% 즉사5%</td>
+                        </tr>
+                        <tr>
+                            <td>🚩</td>
+                            <td>러그풀</td>
+                            <td>방삭25% DMG+10%</td>
+                            <td>방삭45% DMG+20%</td>
+                            <td>방삭65% DMG+35% 킬골드+1</td>
+                            <td style="color:#c8a64e">방삭85% DMG+50% 킬골드+2</td>
+                        </tr>
+                        <tr>
+                            <td>📉</td>
+                            <td>베어</td>
+                            <td>이속-15%</td>
+                            <td>이속-30% 스턴10%</td>
+                            <td>이속-45% 스턴20% DMG+20%</td>
+                            <td style="color:#c8a64e">이속-60% 스턴30% DMG+40%</td>
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════
-         전투
-         ═══════════════════════════════════════════════════════ -->
+        <!-- ══════ 유닛 ══════ -->
+        <div class="sub-section" id="sub-units">
+            <div class="content-section">
+                <div class="cs-header fade-up">
+                    <div class="cs-title">⚔️ 유닛 (56종)</div>
+                    <div class="cs-sub">코스트별 필터</div>
+                    <div class="cs-line"></div>
+                </div>
+                <div class="cost-filter-bar fade-up" id="costFilterBar">
+                    <button class="cost-filter active" data-cost="all">전체</button>
+                    <button class="cost-filter" data-cost="1">1코</button>
+                    <button class="cost-filter" data-cost="2">2코</button>
+                    <button class="cost-filter" data-cost="3">3코</button>
+                    <button class="cost-filter" data-cost="4">4코</button>
+                    <button class="cost-filter" data-cost="5">5코</button>
+                    <button class="cost-filter" data-cost="7">7코</button>
+                    <button class="cost-filter" data-cost="10">10코</button>
+                </div>
+                <div class="card fade-up" style="overflow-x:auto">
+                    <table class="compact-unit-table" id="unitTable">
+                        <tr>
+                            <th>🎭</th>
+                            <th>이름</th>
+                            <th>$</th>
+                            <th>진영</th>
+                            <th>타입</th>
+                            <th>DMG</th>
+                            <th>AS</th>
+                            <th>R</th>
+                            <th>스킬</th>
+                        </tr>
+                        <tr data-cost="10">
+                            <td>🌟</td>
+                            <td>나카모토 사토시</td>
+                            <td style="color:#c8a64e;font-weight:700">10</td>
+                            <td>₿</td>
+                            <td>물리</td>
+                            <td>233</td>
+                            <td>3.64</td>
+                            <td>4</td>
+                            <td>8초 ⚡체인3</td>
+                        </tr>
+                        <tr data-cost="7">
+                            <td>🐋</td>
+                            <td>CZ</td>
+                            <td style="color:#c8a64e">7</td>
+                            <td>🏦</td>
+                            <td>물리</td>
+                            <td>167</td>
+                            <td>1.63</td>
+                            <td>3</td>
+                            <td>3타 💥광역+⏸스턴</td>
+                        </tr>
+                        <tr data-cost="7">
+                            <td>⛏️</td>
+                            <td>Trump</td>
+                            <td style="color:#c8a64e">7</td>
+                            <td>₿</td>
+                            <td>물리</td>
+                            <td>167</td>
+                            <td>1.66</td>
+                            <td>3</td>
+                            <td>8초 전체슬로우</td>
+                        </tr>
+                        <tr data-cost="7">
+                            <td>🚀</td>
+                            <td>Elon Musk</td>
+                            <td style="color:#c8a64e">7</td>
+                            <td>📱</td>
+                            <td>물리</td>
+                            <td>167</td>
+                            <td>1.73</td>
+                            <td>3</td>
+                            <td>3타 💥광역+⏸스턴</td>
+                        </tr>
+                        <tr data-cost="7">
+                            <td>⚡</td>
+                            <td>Vitalik</td>
+                            <td style="color:#c8a64e">7</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>167</td>
+                            <td>1.92</td>
+                            <td>4</td>
+                            <td>8초 ⚡체인3</td>
+                        </tr>
+                        <tr data-cost="7">
+                            <td>⚖️</td>
+                            <td>Gensler</td>
+                            <td style="color:#c8a64e">7</td>
+                            <td>💀</td>
+                            <td>마법</td>
+                            <td>167</td>
+                            <td>1.58</td>
+                            <td>3</td>
+                            <td>4타 💥+⏸+방깎</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>💎</td>
+                            <td>Saylor</td>
+                            <td>5</td>
+                            <td>₿</td>
+                            <td>물리</td>
+                            <td>75</td>
+                            <td>1.37</td>
+                            <td>3</td>
+                            <td>4타 💥+⏸스턴</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>🦄</td>
+                            <td>Stani</td>
+                            <td>5</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>75</td>
+                            <td>1.47</td>
+                            <td>3</td>
+                            <td>🔫관통1</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>🎰</td>
+                            <td>Hayes</td>
+                            <td>5</td>
+                            <td>🏦</td>
+                            <td>물리</td>
+                            <td>75</td>
+                            <td>1.71</td>
+                            <td>3</td>
+                            <td>크리⏸스턴</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>🌙</td>
+                            <td>Do Kwon</td>
+                            <td>5</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>75</td>
+                            <td>1.52</td>
+                            <td>3</td>
+                            <td>6초 🔥+방무</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>🚩</td>
+                            <td>SBF</td>
+                            <td>5</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>75</td>
+                            <td>1.58</td>
+                            <td>3</td>
+                            <td>3타 방깎+⏸</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>🔥</td>
+                            <td>Sam Altman</td>
+                            <td>5</td>
+                            <td>📱</td>
+                            <td>마법</td>
+                            <td>75</td>
+                            <td>1.42</td>
+                            <td>4</td>
+                            <td>4타 ⚡체인2</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>🎲</td>
+                            <td>Su Zhu(5)</td>
+                            <td>5</td>
+                            <td>📉</td>
+                            <td>물리</td>
+                            <td>75</td>
+                            <td>1.33</td>
+                            <td>3</td>
+                            <td>4타 ❄빙결</td>
+                        </tr>
+                        <tr data-cost="5">
+                            <td>🏹</td>
+                            <td>Raoul Pal</td>
+                            <td>5</td>
+                            <td>💼</td>
+                            <td>물리</td>
+                            <td>75</td>
+                            <td>1.45</td>
+                            <td>3</td>
+                            <td>3타 🛡방깎</td>
+                        </tr>
+                        <tr data-cost="4">
+                            <td>🔗</td>
+                            <td>Gavin Wood</td>
+                            <td>4</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>42</td>
+                            <td>1.36</td>
+                            <td>3</td>
+                            <td>5타 ⚡체인2</td>
+                        </tr>
+                        <tr data-cost="4">
+                            <td>🦄</td>
+                            <td>Hayden</td>
+                            <td>4</td>
+                            <td>📱</td>
+                            <td>마법</td>
+                            <td>42</td>
+                            <td>1.16</td>
+                            <td>3</td>
+                            <td>4타 ⚡체인2</td>
+                        </tr>
+                        <tr data-cost="4">
+                            <td>💰</td>
+                            <td>Marc</td>
+                            <td>4</td>
+                            <td>🏦</td>
+                            <td>물리</td>
+                            <td>42</td>
+                            <td>1.04</td>
+                            <td>3</td>
+                            <td>3타 ⚡체인1</td>
+                        </tr>
+                        <tr data-cost="4">
+                            <td>🎯</td>
+                            <td>Balaji</td>
+                            <td>4</td>
+                            <td>💼</td>
+                            <td>물리</td>
+                            <td>42</td>
+                            <td>1.21</td>
+                            <td>4</td>
+                            <td>8초 HP저격</td>
+                        </tr>
+                        <tr data-cost="4">
+                            <td>💀</td>
+                            <td>Lazarus</td>
+                            <td>4</td>
+                            <td>💀</td>
+                            <td>마법</td>
+                            <td>42</td>
+                            <td>1.47</td>
+                            <td>3</td>
+                            <td>4타 ⏸스턴</td>
+                        </tr>
+                        <tr data-cost="4">
+                            <td>📉</td>
+                            <td>Zhu Su</td>
+                            <td>4</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>42</td>
+                            <td>1.48</td>
+                            <td>3</td>
+                            <td>8초 💥폭발</td>
+                        </tr>
+                        <tr data-cost="4">
+                            <td>⚡</td>
+                            <td>Anatoly</td>
+                            <td>4</td>
+                            <td>📉</td>
+                            <td>마법</td>
+                            <td>42</td>
+                            <td>1.27</td>
+                            <td>3</td>
+                            <td>3타 ⏸스턴</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>⛏️</td>
+                            <td>Roger Ver</td>
+                            <td>3</td>
+                            <td>₿</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>0.88</td>
+                            <td>3</td>
+                            <td>₿ 🔫관통</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🧙</td>
+                            <td>Andre</td>
+                            <td>3</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>28</td>
+                            <td>0.98</td>
+                            <td>3</td>
+                            <td>3타 ⚡체인2</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>👤</td>
+                            <td>Rekt</td>
+                            <td>3</td>
+                            <td>📱</td>
+                            <td>마법</td>
+                            <td>28</td>
+                            <td>1.12</td>
+                            <td>3</td>
+                            <td>HP비례</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🤖</td>
+                            <td>Wintermute</td>
+                            <td>3</td>
+                            <td>🏦</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>0.97</td>
+                            <td>3</td>
+                            <td>3타 💥광역</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🎯</td>
+                            <td>Simon</td>
+                            <td>3</td>
+                            <td>💼</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>1.06</td>
+                            <td>3</td>
+                            <td>3타크리확정</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🧊</td>
+                            <td>P.Schiff</td>
+                            <td>3</td>
+                            <td>💀</td>
+                            <td>마법</td>
+                            <td>28</td>
+                            <td>0.94</td>
+                            <td>3</td>
+                            <td>3타 ⏸스턴</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🐸</td>
+                            <td>GCR</td>
+                            <td>3</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>1.10</td>
+                            <td>3</td>
+                            <td>🔫관통2</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🦈</td>
+                            <td>A.Kang</td>
+                            <td>3</td>
+                            <td>📉</td>
+                            <td>마법</td>
+                            <td>28</td>
+                            <td>0.77</td>
+                            <td>3</td>
+                            <td>5타 ❄빙결</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🍣</td>
+                            <td>Nomi</td>
+                            <td>3</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>28</td>
+                            <td>0.92</td>
+                            <td>3</td>
+                            <td>⚡+🔥</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🎩</td>
+                            <td>Cobie</td>
+                            <td>3</td>
+                            <td>📱</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>1.05</td>
+                            <td>3</td>
+                            <td>공속버프</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🏹</td>
+                            <td>Cathie</td>
+                            <td>3</td>
+                            <td>💼</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>1.00</td>
+                            <td>4</td>
+                            <td>뒤쪽저격</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>⚖️</td>
+                            <td>Warren</td>
+                            <td>3</td>
+                            <td>💀</td>
+                            <td>마법</td>
+                            <td>28</td>
+                            <td>0.90</td>
+                            <td>3</td>
+                            <td>🔥+슬로우</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>💎</td>
+                            <td>R.Heart</td>
+                            <td>3</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>1.02</td>
+                            <td>3</td>
+                            <td>⚡체인1</td>
+                        </tr>
+                        <tr data-cost="3">
+                            <td>🔍</td>
+                            <td>M.Burry</td>
+                            <td>3</td>
+                            <td>📉</td>
+                            <td>물리</td>
+                            <td>28</td>
+                            <td>0.95</td>
+                            <td>4</td>
+                            <td>피니셔</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>⚡</td>
+                            <td>J.Dorsey</td>
+                            <td>2</td>
+                            <td>₿</td>
+                            <td>물리</td>
+                            <td>16</td>
+                            <td>0.90</td>
+                            <td>3</td>
+                            <td>4타 ⚡체인1</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>🌐</td>
+                            <td>J.Pollak</td>
+                            <td>2</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.91</td>
+                            <td>3</td>
+                            <td>4타 ⚡체인1</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>🥷</td>
+                            <td>워뇨띠</td>
+                            <td>2</td>
+                            <td>📱</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.98</td>
+                            <td>3</td>
+                            <td>공속↑</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>🛡️</td>
+                            <td>J.Powell</td>
+                            <td>2</td>
+                            <td>🏦</td>
+                            <td>물리</td>
+                            <td>16</td>
+                            <td>0.95</td>
+                            <td>3</td>
+                            <td>4킬 💰+1</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>🔍</td>
+                            <td>OpenSea</td>
+                            <td>2</td>
+                            <td>💼</td>
+                            <td>물리</td>
+                            <td>16</td>
+                            <td>0.91</td>
+                            <td>3</td>
+                            <td>강화탄</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>💀</td>
+                            <td>C.Wright</td>
+                            <td>2</td>
+                            <td>💀</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.89</td>
+                            <td>3</td>
+                            <td>🔥도트</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>👻</td>
+                            <td>Daniele</td>
+                            <td>2</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>16</td>
+                            <td>0.90</td>
+                            <td>3</td>
+                            <td>🔫관통1</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>📉</td>
+                            <td>Hsaka</td>
+                            <td>2</td>
+                            <td>📉</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.95</td>
+                            <td>3</td>
+                            <td>❄빙결</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>🔑</td>
+                            <td>Hal Finney</td>
+                            <td>2</td>
+                            <td>₿</td>
+                            <td>물리</td>
+                            <td>16</td>
+                            <td>0.93</td>
+                            <td>3</td>
+                            <td>₿사거리+1</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>💳</td>
+                            <td>Kris</td>
+                            <td>2</td>
+                            <td>🏦</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.88</td>
+                            <td>3</td>
+                            <td>3킬 💰+1</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>📖</td>
+                            <td>C.Dixon</td>
+                            <td>2</td>
+                            <td>💼</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.92</td>
+                            <td>3</td>
+                            <td>크리↑누적</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>👸</td>
+                            <td>Ruja</td>
+                            <td>2</td>
+                            <td>🚩</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.91</td>
+                            <td>3</td>
+                            <td>🔫관통1</td>
+                        </tr>
+                        <tr data-cost="2">
+                            <td>🏛️</td>
+                            <td>Kashkari</td>
+                            <td>2</td>
+                            <td>📉</td>
+                            <td>마법</td>
+                            <td>16</td>
+                            <td>0.87</td>
+                            <td>3</td>
+                            <td>슬로우</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>⛏️</td>
+                            <td>PC방</td>
+                            <td>1</td>
+                            <td>₿</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.65</td>
+                            <td>2</td>
+                            <td>₿공속↑</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🦊</td>
+                            <td>메타마스크</td>
+                            <td>1</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>9</td>
+                            <td>0.78</td>
+                            <td>3</td>
+                            <td>공속↑</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🚩</td>
+                            <td>스캠</td>
+                            <td>1</td>
+                            <td>📱</td>
+                            <td>마법</td>
+                            <td>9</td>
+                            <td>0.78</td>
+                            <td>3</td>
+                            <td>⚡+슬로우</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🏦</td>
+                            <td>PerpDEX</td>
+                            <td>1</td>
+                            <td>🏦</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.86</td>
+                            <td>3</td>
+                            <td>🔫관통1</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🛡️</td>
+                            <td>HODLer</td>
+                            <td>1</td>
+                            <td>💼</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.86</td>
+                            <td>3</td>
+                            <td>5타크리</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>💀</td>
+                            <td>FUD유포</td>
+                            <td>1</td>
+                            <td>💀</td>
+                            <td>마법</td>
+                            <td>9</td>
+                            <td>0.89</td>
+                            <td>3</td>
+                            <td>🔥도트</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>📱</td>
+                            <td>PI User</td>
+                            <td>1</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.87</td>
+                            <td>3</td>
+                            <td>강타×2</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🧊</td>
+                            <td>Gareth</td>
+                            <td>1</td>
+                            <td>📉</td>
+                            <td>마법</td>
+                            <td>9</td>
+                            <td>0.77</td>
+                            <td>3</td>
+                            <td>슬로우</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🔄</td>
+                            <td>Curve</td>
+                            <td>1</td>
+                            <td>🔓</td>
+                            <td>마법</td>
+                            <td>9</td>
+                            <td>0.82</td>
+                            <td>3</td>
+                            <td>💥광역</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>📢</td>
+                            <td>CT KOL</td>
+                            <td>1</td>
+                            <td>📱</td>
+                            <td>마법</td>
+                            <td>9</td>
+                            <td>0.85</td>
+                            <td>4</td>
+                            <td>공속버프</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>⚙️</td>
+                            <td>거래봇</td>
+                            <td>1</td>
+                            <td>🏦</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.90</td>
+                            <td>3</td>
+                            <td>공속↑</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>👔</td>
+                            <td>a16z</td>
+                            <td>1</td>
+                            <td>💼</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.80</td>
+                            <td>3</td>
+                            <td>VC크리↑</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🐻</td>
+                            <td>Roubini</td>
+                            <td>1</td>
+                            <td>💀</td>
+                            <td>마법</td>
+                            <td>9</td>
+                            <td>0.83</td>
+                            <td>3</td>
+                            <td>🔥도트</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>🐕</td>
+                            <td>밈코인</td>
+                            <td>1</td>
+                            <td>🚩</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.88</td>
+                            <td>3</td>
+                            <td>⚡체인1</td>
+                        </tr>
+                        <tr data-cost="1">
+                            <td>📺</td>
+                            <td>Cramer</td>
+                            <td>1</td>
+                            <td>📉</td>
+                            <td>물리</td>
+                            <td>9</td>
+                            <td>0.84</td>
+                            <td>4</td>
+                            <td>❄빙결</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════ 전투 ══════ -->
         <div class="sub-section" id="sub-combat">
             <div class="content-section">
                 <div class="cs-header fade-up">
-                    <div class="cs-title">전투 공식</div>
-                    <div class="cs-sub">몬스터 HP 스케일링과 전투 규칙</div>
+                    <div class="cs-title">⏱️ 전투 & 등급</div>
+                    <div class="cs-sub">클리어 시간 기반 등급 · 타임아웃 페널티 · 스테이지 방어력</div>
                     <div class="cs-line"></div>
                 </div>
-                <div class="formula-row fade-up">
-                    <div class="formula-box">
-                        <div class="formula-eq">0.28r² + 17r + 48</div>
-                        <div class="formula-lbl">일반 몬스터 HP</div>
+                <div class="g3 fade-up">
+                    <div class="card">
+                        <div class="card-head">일반 라운드</div>
+                        <table>
+                            <tr>
+                                <th>등급</th>
+                                <th>시간</th>
+                                <th>보너스</th>
+                            </tr>
+                            <tr style="color:#ffd700">
+                                <td><b>S</b></td>
+                                <td>≤10초</td>
+                                <td>+4G</td>
+                            </tr>
+                            <tr style="color:#43e97b">
+                                <td><b>A</b></td>
+                                <td>≤20초</td>
+                                <td>+2G</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td><b>B</b></td>
+                                <td>≤30초</td>
+                                <td>+1G</td>
+                            </tr>
+                            <tr style="color:#888">
+                                <td>F</td>
+                                <td>>30초</td>
+                                <td>+0G</td>
+                            </tr>
+                        </table>
+                        <div class="note" style="border-left-color:#ef4444">60초 초과: HP-1, 이후 5초마다 HP-1</div>
                     </div>
-                    <div class="formula-box">
-                        <div class="formula-eq">0.75r² + 68r + 480</div>
-                        <div class="formula-lbl">보스 HP</div>
+                    <div class="card">
+                        <div class="card-head">보스 라운드</div>
+                        <table>
+                            <tr>
+                                <th>등급</th>
+                                <th>시간</th>
+                                <th>보너스</th>
+                            </tr>
+                            <tr style="color:#ffd700">
+                                <td><b>S</b></td>
+                                <td>≤10초</td>
+                                <td>+5G</td>
+                            </tr>
+                            <tr style="color:#43e97b">
+                                <td><b>A</b></td>
+                                <td>≤20초</td>
+                                <td>+3G</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td><b>B</b></td>
+                                <td>≤35초</td>
+                                <td>+2G</td>
+                            </tr>
+                            <tr style="color:#888">
+                                <td>F</td>
+                                <td>>35초</td>
+                                <td>+0G</td>
+                            </tr>
+                        </table>
+                        <div class="note" style="border-left-color:#ef4444">120초 초과: HP-5, 이후 5초마다 HP-3</div>
                     </div>
-                </div>
-                <div class="card fade-up">
-                    <div class="card-head">라운드별 HP</div>
-                    <table>
-                        <tr>
-                            <th>R</th>
-                            <th>HP</th>
-                            <th>×몬수</th>
-                            <th>총HP</th>
-                            <th>보스HP</th>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>139</td>
-                            <td>×5</td>
-                            <td>695</td>
-                            <td>—</td>
-                        </tr>
-                        <tr>
-                            <td>10</td>
-                            <td>246</td>
-                            <td>×5</td>
-                            <td>1,230</td>
-                            <td>1,235</td>
-                        </tr>
-                        <tr>
-                            <td>20</td>
-                            <td>540</td>
-                            <td>×10</td>
-                            <td>5,400</td>
-                            <td>1,960</td>
-                        </tr>
-                        <tr>
-                            <td>30</td>
-                            <td>810</td>
-                            <td>×10</td>
-                            <td>8,100</td>
-                            <td>3,540</td>
-                        </tr>
-                        <tr class="hl">
-                            <td>40</td>
-                            <td>1,176</td>
-                            <td>×10</td>
-                            <td>11,760</td>
-                            <td>5,920</td>
-                        </tr>
-                        <tr>
-                            <td>50</td>
-                            <td>1,598</td>
-                            <td>×10</td>
-                            <td>15,980</td>
-                            <td>9,280</td>
-                        </tr>
-                        <tr>
-                            <td>60</td>
-                            <td>2,076</td>
-                            <td>×10</td>
-                            <td>20,760</td>
-                            <td>13,560</td>
-                        </tr>
-                        <tr>
-                            <td>70</td>
-                            <td>2,610</td>
-                            <td>×10</td>
-                            <td>26,100</td>
-                            <td>18,720</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="card fade-up">
-                    <div class="card-head">전투 규칙</div>
-                    <table>
-                        <tr>
-                            <td>몬스터 이동</td>
-                            <td>보드 외곽 반시계 방향</td>
-                        </tr>
-                        <tr>
-                            <td>타겟팅</td>
-                            <td>사거리 내 가장 진행된 적</td>
-                        </tr>
-                        <tr>
-                            <td>통과 피해</td>
-                            <td>일반 -2 HP · 보스 -15 HP</td>
-                        </tr>
-                        <tr>
-                            <td>이동속도</td>
-                            <td>1.2 + r × 0.012</td>
-                        </tr>
-                        <tr>
-                            <td>전투 중 상점</td>
-                            <td>벤치 유닛 구매/판매/리롤 가능</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="card fade-up">
-                    <div class="card-head">시뮬레이션 (티어별 100게임)</div>
-                    <table>
-                        <tr>
-                            <th>티어</th>
-                            <th>평균R</th>
-                            <th>R20</th>
-                            <th>R30</th>
-                            <th>R40</th>
-                            <th>R50</th>
-                            <th>R70</th>
-                        </tr>
-                        <tr>
-                            <td>🥉 브론즈</td>
-                            <td>14.9</td>
-                            <td>5%</td>
-                            <td>2%</td>
-                            <td>0%</td>
-                            <td>0%</td>
-                            <td>0%</td>
-                        </tr>
-                        <tr>
-                            <td>🥈 플래티넘</td>
-                            <td>17.6</td>
-                            <td>13%</td>
-                            <td>4%</td>
-                            <td>3%</td>
-                            <td>1%</td>
-                            <td>0%</td>
-                        </tr>
-                        <tr>
-                            <td>💎 다이아</td>
-                            <td>36.5</td>
-                            <td>51%</td>
-                            <td>40%</td>
-                            <td>37%</td>
-                            <td>37%</td>
-                            <td>13%</td>
-                        </tr>
-                        <tr class="hl">
-                            <td>🏆 챌린저</td>
-                            <td>46.1</td>
-                            <td>70%</td>
-                            <td>67%</td>
-                            <td><b>59%</b></td>
-                            <td>52%</td>
-                            <td>26%</td>
-                        </tr>
-                    </table>
+                    <div class="card">
+                        <div class="card-head">스테이지 방어력</div>
+                        <table>
+                            <tr>
+                                <th>S</th>
+                                <th>물방</th>
+                                <th>마방</th>
+                                <th>힌트</th>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>튜토리얼</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>5</td>
+                                <td>5</td>
+                                <td>균등</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td style="color:#ef4444">20</td>
+                                <td>5</td>
+                                <td>🔮 마법추천</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>5</td>
+                                <td style="color:#ef4444">20</td>
+                                <td>⚔ 물리추천</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td style="color:#ef4444">20</td>
+                                <td style="color:#ef4444">20</td>
+                                <td>💀 혼합</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>15</td>
+                                <td style="color:#ef4444">40</td>
+                                <td>⚔⚔ 물리필수</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td style="color:#ef4444">40</td>
+                                <td>15</td>
+                                <td>🔮🔮 마법필수</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════
-         증강
-         ═══════════════════════════════════════════════════════ -->
-        <div class="sub-section" id="sub-augments">
+        <!-- ══════ 해금 & 증강 ══════ -->
+        <div class="sub-section" id="sub-unlock">
             <div class="content-section">
                 <div class="cs-header fade-up">
-                    <div class="cs-title">증강</div>
-                    <div class="cs-sub">보스 클리어/라운드별 선택 가능한 18종</div>
+                    <div class="cs-title">🔑 해금 & 🧪 증강</div>
+                    <div class="cs-sub">7코/10코 열쇠 해금 · 보스 증강 20종</div>
                     <div class="cs-line"></div>
                 </div>
                 <div class="g2 fade-up">
                     <div class="card">
-                        <div class="card-head">경제 증강</div>
+                        <div class="card-head">🔑 히든 유닛</div>
+                        <div class="note">보스 처치 → 30% 열쇠</div>
                         <table>
                             <tr>
-                                <th>이름</th>
-                                <th>효과</th>
+                                <th>유닛</th>
+                                <th>$</th>
+                                <th>열쇠</th>
                             </tr>
                             <tr>
-                                <td>🏦 이자왕</td>
-                                <td>이자 +1 추가</td>
+                                <td>⚡ Vitalik</td>
+                                <td>7</td>
+                                <td>ethereum</td>
                             </tr>
                             <tr>
-                                <td>🔄 리롤마스터</td>
-                                <td>리롤 비용 1G</td>
+                                <td>🐋 CZ</td>
+                                <td>7</td>
+                                <td>binance</td>
                             </tr>
                             <tr>
-                                <td>💰 골드러시</td>
-                                <td>기본 수입 +2G</td>
+                                <td>🚀 Elon</td>
+                                <td>7</td>
+                                <td>tesla</td>
                             </tr>
                             <tr>
-                                <td>💸 되팔이</td>
-                                <td>판매 시 100% 환불</td>
+                                <td>⛏️ Trump</td>
+                                <td>7</td>
+                                <td>block1</td>
                             </tr>
                             <tr>
-                                <td>📈 빠른성장</td>
-                                <td>자연 XP +2 추가</td>
+                                <td>⚖️ Gensler</td>
+                                <td>7</td>
+                                <td>sec</td>
+                            </tr>
+                            <tr class="hl">
+                                <td>🌟 사토시</td>
+                                <td>10</td>
+                                <td>satoshi+7코</td>
+                            </tr>
+                        </table>
+                        <div style="height:8px"></div>
+                        <div class="card-head">📦 보스 드롭</div>
+                        <table>
+                            <tr>
+                                <th>보스</th>
+                                <th>드롭 풀</th>
                             </tr>
                             <tr>
-                                <td>🎰 행운의주사위</td>
-                                <td>+1코 유닛 확률 UP</td>
+                                <td>2-7</td>
+                                <td>eth40 bnb40 tesla10 block10</td>
+                            </tr>
+                            <tr>
+                                <td>3-7</td>
+                                <td>eth35 bnb35 tesla15 block15</td>
+                            </tr>
+                            <tr>
+                                <td>4-7</td>
+                                <td>eth25 bnb25 tesla20 block20 sec10</td>
+                            </tr>
+                            <tr>
+                                <td>5-7</td>
+                                <td>tesla25 block25 sec40 satoshi10</td>
+                            </tr>
+                            <tr>
+                                <td>6-7</td>
+                                <td>sec50 satoshi50</td>
                             </tr>
                         </table>
                     </div>
                     <div class="card">
-                        <div class="card-head">전투 증강</div>
+                        <div class="card-head">🧪 증강 (20종)</div>
+                        <div class="note">보스 후 3택 1</div>
                         <table>
                             <tr>
+                                <th></th>
                                 <th>이름</th>
+                                <th>R</th>
                                 <th>효과</th>
                             </tr>
                             <tr>
-                                <td>⚔️ 광전사</td>
-                                <td>전체 공속 +25%</td>
+                                <td>🎯</td>
+                                <td>크리마스터</td>
+                                <td>10</td>
+                                <td>크리+15% DMG+30%</td>
                             </tr>
                             <tr>
-                                <td>🎯 크리마스터</td>
-                                <td>크리+20%, 크리DMG+50%</td>
+                                <td>💥</td>
+                                <td>폭발의손</td>
+                                <td>10</td>
+                                <td>스플래시25%</td>
                             </tr>
                             <tr>
-                                <td>💥 폭발의룬</td>
-                                <td>스플래시 DMG 30%</td>
+                                <td>🔥</td>
+                                <td>광전사</td>
+                                <td>20</td>
+                                <td>공속+20% DMG+15%</td>
                             </tr>
                             <tr>
-                                <td>🔫 관통탄</td>
-                                <td>방어력 50% 무시</td>
+                                <td>🔱</td>
+                                <td>관통탄</td>
+                                <td>20</td>
+                                <td>방어무시30%</td>
                             </tr>
                             <tr>
-                                <td>🐉 보스슬레이어</td>
-                                <td>보스 DMG +50%</td>
+                                <td>👑</td>
+                                <td>보스슬레이어</td>
+                                <td>30</td>
+                                <td>보스DMG×2.5</td>
                             </tr>
                             <tr>
-                                <td>❄️ 동토의저주</td>
-                                <td>전 적 이속 -20%</td>
+                                <td>⚡</td>
+                                <td>체인라이트닝</td>
+                                <td>30</td>
+                                <td>30%체인2 50%</td>
                             </tr>
-                            <tr>
-                                <td>⚡ 체인라이트닝</td>
-                                <td>연쇄 번개 3명</td>
+                            <tr style="color:#43e97b">
+                                <td>💰</td>
+                                <td>이자왕</td>
+                                <td>10</td>
+                                <td>이자+3 8G당</td>
+                            </tr>
+                            <tr style="color:#43e97b">
+                                <td>🎲</td>
+                                <td>리롤마스터</td>
+                                <td>10</td>
+                                <td>리롤1G 상점+1</td>
+                            </tr>
+                            <tr style="color:#43e97b">
+                                <td>📈</td>
+                                <td>빠른성장</td>
+                                <td>10</td>
+                                <td>XP+2 구매+3</td>
+                            </tr>
+                            <tr style="color:#43e97b">
+                                <td>💚</td>
+                                <td>재생오라</td>
+                                <td>20</td>
+                                <td>HP+5 최대+20</td>
+                            </tr>
+                            <tr style="color:#43e97b">
+                                <td>🏆</td>
+                                <td>골드러시</td>
+                                <td>20</td>
+                                <td>킬골드+1 수입+3</td>
+                            </tr>
+                            <tr style="color:#43e97b">
+                                <td>🍀</td>
+                                <td>행운주사위</td>
+                                <td>30</td>
+                                <td>코스트+15%</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td>🌀</td>
+                                <td>차원의문</td>
+                                <td>20</td>
+                                <td>1칸 2마리</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td>📶</td>
+                                <td>진격력</td>
+                                <td>20</td>
+                                <td>슬롯+1</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td>🪑</td>
+                                <td>대기석확장</td>
+                                <td>10</td>
+                                <td>벤치+3</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td>🔊</td>
+                                <td>시너지증폭</td>
+                                <td>30</td>
+                                <td>시너지+1</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td>💸</td>
+                                <td>환매왕</td>
+                                <td>10</td>
+                                <td>판매+1G</td>
+                            </tr>
+                            <tr style="color:#42a5f5">
+                                <td>⏳</td>
+                                <td>모래시계</td>
+                                <td>30</td>
+                                <td>이속-20%</td>
+                            </tr>
+                            <tr style="color:#c8a64e">
+                                <td>🔮</td>
+                                <td>적응형관통</td>
+                                <td>20</td>
+                                <td>낮은방어적용</td>
+                            </tr>
+                            <tr style="color:#c8a64e">
+                                <td>📋</td>
+                                <td>스마트복제</td>
+                                <td>20</td>
+                                <td>7/10코 복제</td>
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div class="card fade-up" style="margin-top:16px">
-                    <div class="card-head">유틸 증강</div>
-                    <table>
-                        <tr>
-                            <th>이름</th>
-                            <th>효과</th>
-                        </tr>
-                        <tr>
-                            <td>🛡️ 재생의오라</td>
-                            <td>라운드 시작 HP +3</td>
-                        </tr>
-                        <tr>
-                            <td>🪑 대기실확장</td>
-                            <td>벤치 슬롯 +3</td>
-                        </tr>
-                        <tr>
-                            <td>🧲 시너지증폭기</td>
-                            <td>시너지 단계 +1</td>
-                        </tr>
-                        <tr>
-                            <td>🌀 차원의틈</td>
-                            <td>필드 슬롯 +1</td>
-                        </tr>
-                        <tr>
-                            <td>📜 징병령</td>
-                            <td>무료 유닛 1개/라운드</td>
-                        </tr>
-                    </table>
                 </div>
             </div>
         </div>
@@ -2699,33 +2802,44 @@
         <div class="content-section">
             <div class="cs-header fade-up">
                 <div class="cs-title">개발 로드맵</div>
-                <div class="cs-sub">Phase 1 완료 — 프로덕션 준비 중</div>
+                <div class="cs-sub">Phase 1 완료 — Phase 2 진행 중</div>
                 <div class="cs-line"></div>
             </div>
             <div class="timeline fade-up">
                 <div class="tl-item done">
-                    <h4>Phase 1 — 코어 게임 <span class="badge b-done">완료</span></h4>
-                    <p>유닛 64종, 시너지 14종, 증강 18종, 전투/경제/합성/해금/스킬 시스템</p>
+                    <h4>🚀 Phase 1 — MVP 런칭 및 실행력 증명 <span class="badge b-done">완료</span></h4>
+                    <ul style="margin:8px 0 0 18px;color:#aaa;font-size:13px;line-height:1.8">
+                        <li style="color:#43e97b">✅ 100% AI Vibe-Coding 파이프라인 구축 (Anti-Gravity, Gemini 등 교차 검증)</li>
+                        <li style="color:#43e97b">✅ 오토체스형 디펜스 코어 로직 및 하드코어 경제 시스템(30골드 이자) 구현</li>
+                        <li style="color:#43e97b">✅ Web-Native 실시간 멀티플레이(Socket.io) 환경 배포</li>
+                        <li style="color:#43e97b">✅ 자율 AI QA 에이전트 구축 및 코어 밸런싱 (목표 클리어율 3% 컷)</li>
+                        <li style="color:#43e97b">✅ 글로벌 VC (Hashed VibeLabs) MVP 제출 완료 (개발 착수 1주일 컷)</li>
+                    </ul>
                 </div>
-                <div class="tl-item done">
-                    <h4>Phase 1.5 — 밸런스 <span class="badge b-done">완료</span></h4>
-                    <p>HP=20, 몬스터 HP 조정, 킬 골드 제거, 4티어 시뮬 검증 (챌린저 R40=59%)</p>
-                </div>
-                <div class="tl-item done">
-                    <h4>Phase 2 — 프로덕션 인프라 <span class="badge b-done">완료</span></h4>
-                    <p>로비 UI(3열 레이아웃), 계정/닉네임 시스템, Express API, 퀘스트, 라이선스 해금, 스프라이트 렌더링</p>
-                </div>
-                <div class="tl-item">
-                    <h4>Phase 3 — 온라인 <span class="badge b-plan">계획</span></h4>
-                    <p>티어제, 업적, 시즌 리더보드</p>
-                </div>
-                <div class="tl-item">
-                    <h4>Phase 4 — BM <span class="badge b-plan">계획</span></h4>
-                    <p>코스메틱, 배틀패스, 보상형 광고</p>
+                <div class="tl-item wip">
+                    <h4>🛠️ Phase 2 — 시각적 타격감(Juice) 및 밸런스 폴리싱 <span class="badge b-wip">진행중</span></h4>
+                    <ul style="margin:8px 0 0 18px;color:#aaa;font-size:13px;line-height:1.8">
+                        <li>⬜ 데미지 텍스트 팝업, 크리티컬 카메라 흔들림 등 전투 타격감 강화</li>
+                        <li>⬜ 모바일/PC 반응형 UI/UX 및 드래그 앤 드롭 자석(Snap) 효과 최적화</li>
+                        <li>⬜ QA 에이전트 대규모 시뮬레이션(100판+) 확장 및 로그 데이터 기반 메타 세밀 조정</li>
+                    </ul>
                 </div>
                 <div class="tl-item">
-                    <h4>Phase 5 — 크로스플랫폼 <span class="badge b-plan">계획</span></h4>
-                    <p>PWA → Capacitor, 하드모드</p>
+                    <h4>📖 Phase 3 — Web3 내러티브 콘텐츠 (Web2 온보딩) <span class="badge b-plan">계획</span></h4>
+                    <ul style="margin:8px 0 0 18px;color:#aaa;font-size:13px;line-height:1.8">
+                        <li>⬜ PvE 캠페인 챕터 1: 알고리즘의 붕괴 (루나/테라 사태 모티브 보스전)</li>
+                        <li>⬜ PvE 캠페인 챕터 2: 거래소의 배신 (FTX 뱅크런 사태 모티브 보스전)</li>
+                        <li>⬜ 크립토 도감(Encyclopedia) 시스템 추가 (유닛/밈에 얽힌 실제 역사 교육)</li>
+                        <li>⬜ Devlog 연재로 초기 커뮤니티 빌딩</li>
+                    </ul>
+                </div>
+                <div class="tl-item">
+                    <h4>💎 Phase 4 — 글로벌 스케일업 및 Web3 인프라 통합 <span class="badge b-plan">계획</span></h4>
+                    <ul style="margin:8px 0 0 18px;color:#aaa;font-size:13px;line-height:1.8">
+                        <li>⬜ 스팀(Steam) 및 모바일 웹뷰(WebView) 패키징을 통한 글로벌 트랙션 확보</li>
+                        <li>⬜ 트랙션 확보 후 소셜 로그인 기반 지갑 연동(AA 지갑) 지원</li>
+                        <li>⬜ DAO 기반 유저 거버넌스 (시즌별 밸런스 패치 및 신규 유닛 투표) 도입</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -2861,22 +2975,6 @@
             btn.addEventListener('click', () => switchSubTab(btn.dataset.sub));
         });
 
-        // Unit secondary sub-tabs (특성&시너지 / 유닛목록)
-        function switchUnitSub(usub) {
-            document.querySelectorAll('#unitSubTabs .sub-tab-2').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll(`#unitSubTabs .sub-tab-2[data-unit-sub="${usub}"]`).forEach(b => b.classList.add('active'));
-            document.querySelectorAll('.unit-sub-section').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById('unit-sub-' + usub);
-            if (target) {
-                target.classList.add('active');
-                target.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
-            }
-        }
-
-        document.querySelectorAll('#unitSubTabs .sub-tab-2').forEach(btn => {
-            btn.addEventListener('click', () => switchUnitSub(btn.dataset.unitSub));
-        });
-
         // Hamburger
         document.getElementById('hamburger').addEventListener('click', () => {
             document.getElementById('mobileMenu').classList.toggle('open');
@@ -2898,8 +2996,8 @@
         function filterUnitsByCost(cost) {
             document.querySelectorAll('#costFilterBar .cost-filter').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('#costFilterBar .cost-filter[data-cost="' + cost + '"]').forEach(b => b.classList.add('active'));
-            document.querySelectorAll('#unitListTable tbody[data-cost]').forEach(tb => {
-                tb.style.display = (cost === 'all' || tb.dataset.cost === cost) ? '' : 'none';
+            document.querySelectorAll('#unitTable tr[data-cost]').forEach(tr => {
+                tr.style.display = (cost === 'all' || tr.dataset.cost === cost) ? '' : 'none';
             });
         }
 
