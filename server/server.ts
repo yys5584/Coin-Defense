@@ -61,7 +61,7 @@ setupMultiplayer(httpServer);
 // ── Production: serve Vite build ──
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.join(__dirname, '..', 'dist');
-app.use(express.static(distPath));
+app.use(express.static(distPath, { index: false }));
 
 // Landing page: dashboard
 app.get('/', (_req, res) => {
