@@ -2195,14 +2195,13 @@ function renderCombatOverlay(cs: CombatState): void {
   }
   overlay.innerHTML = '';
 
-  // 몬스터 렌더 — 외곽 트랙 중심선 직접 계산
-  const grid = $('board-grid');
-  const gridRect = grid.getBoundingClientRect();
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const gridOffsetX = gridRect.left - wrapperRect.left;
-  const gridOffsetY = gridRect.top - wrapperRect.top;
-  const cellW = gridRect.width / 7;
-  const cellH = gridRect.height / 4;
+  // 몬스터 렌더 — CSS px 기반 (viewport zoom 무관)
+  const grid = $('board-grid') as HTMLElement;
+  // offset 기반: map-wrapper(position:relative) 기준 CSS 픽셀
+  const gridOffsetX = grid.offsetLeft;
+  const gridOffsetY = grid.offsetTop;
+  const cellW = grid.offsetWidth / 7;
+  const cellH = grid.offsetHeight / 4;
   // 논리좌표 (0~8, 0~5) → 픽셀: grid 기준 오프셋 + 수동 보정
   const toPixelX = (lx: number) => gridOffsetX + (-0.7 + lx * 0.9375) * cellW;
   const toPixelY = (ly: number) => gridOffsetY + (ly - 1.0) * cellH;
@@ -3098,18 +3097,17 @@ function showRangeCircle(cellX: number, cellY: number, unit: UnitInstance): void
     range += def.skill.params.rangeBonus;
   }
 
-  const grid = $('board-grid');
+  const grid = $('board-grid') as HTMLElement;
   const mapWrapper = document.getElementById('map-wrapper');
   if (!grid || !mapWrapper) return;
 
-  const gridRect = grid.getBoundingClientRect();
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const cellW = gridRect.width / 7;
-  const cellH = gridRect.height / 4;
+  // offset 기반: CSS px (viewport zoom 무관)
+  const cellW = grid.offsetWidth / 7;
+  const cellH = grid.offsetHeight / 4;
 
-  // 셀 중심 (wrapper 기준)
-  const centerX = (gridRect.left - wrapperRect.left) + (cellX + 0.5) * cellW;
-  const centerY = (gridRect.top - wrapperRect.top) + (cellY + 0.5) * cellH;
+  // 셀 중심 (map-wrapper 기준)
+  const centerX = grid.offsetLeft + (cellX + 0.5) * cellW;
+  const centerY = grid.offsetTop + (cellY + 0.5) * cellH;
 
   // 범위 = range * 셀 평균 크기
   const avgCellSize = (cellW + cellH) / 2;
