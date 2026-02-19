@@ -2334,6 +2334,7 @@ function renderCombatOverlay(cs: CombatState): void {
     const fxY = gridOffsetY + (fx.y + 0.5) * cellH;
 
     if (fx.type === 'damage' || fx.type === 'crit') {
+      continue; // 데미지 텍스트 비활성화
       // 데미지 숫자 — 위로 떠오르며 사라짐
       el.className = fx.type === 'crit' ? 'fx-crit' : 'fx-damage';
       el.textContent = fx.value?.toString() ?? '';
