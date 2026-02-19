@@ -585,6 +585,13 @@ body {
 #board-section #map-wrapper {
     max-width: 100%;
     max-height: 100%;
+    background:
+        url('/assets/map/board_bg.png') center / 100% 100% no-repeat,
+        radial-gradient(ellipse at 50% 20%, rgba(60, 40, 15, 0.6) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(30, 20, 8, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(40, 25, 10, 0.3) 0%, transparent 50%),
+        linear-gradient(180deg, #1a120a 0%, #0d0906 40%, #080604 100%) !important;
+    image-rendering: pixelated;
 }
 
 #bench-panel {
@@ -663,10 +670,11 @@ body {
     padding: 8px 16px;
     position: relative;
     overflow: hidden;
+    /* Opaque dark base — blocks parent stone texture */
+    background-color: #0a0806;
     background-image: url('/assets/map/bg_dungeon.png');
     background-size: cover;
     background-position: center;
-    background-color: rgba(12, 10, 6, .5);
 }
 
 
@@ -679,8 +687,14 @@ body {
     position: relative;
     border-radius: 4px;
     overflow: visible;
-    /* Arena background — dungeon stone */
-    background: url('/textures/arena_bg.png') center/cover no-repeat;
+    /* Dungeon map: board_bg.png on top, CSS dungeon gradient fallback */
+    background:
+        url('/assets/map/board_bg.png') center / 100% 100% no-repeat,
+        radial-gradient(ellipse at 50% 20%, rgba(60, 40, 15, 0.6) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(30, 20, 8, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(40, 25, 10, 0.3) 0%, transparent 50%),
+        linear-gradient(180deg, #1a120a 0%, #0d0906 40%, #080604 100%);
+    image-rendering: pixelated;
     border: 3px solid var(--stone-border);
     box-shadow:
         inset 0 0 30px rgba(0, 0, 0, .4),
@@ -688,15 +702,112 @@ body {
         0 0 60px rgba(240, 178, 50, .05);
 }
 
-/* Monster Path - visible rectangular outer loop */
+/* ── Torch Flickering Light Overlay ── */
+#map-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 4px;
+    background:
+        /* Torch 1 — left */
+        radial-gradient(ellipse 80px 120px at 7% 5%, rgba(255, 160, 40, 0.25) 0%, transparent 70%),
+        /* Torch 2 — left-center */
+        radial-gradient(ellipse 80px 120px at 30% 5%, rgba(255, 140, 30, 0.22) 0%, transparent 70%),
+        /* Torch 3 — center */
+        radial-gradient(ellipse 80px 120px at 52% 5%, rgba(255, 160, 40, 0.25) 0%, transparent 70%),
+        /* Torch 4 — right-center */
+        radial-gradient(ellipse 80px 120px at 75% 5%, rgba(255, 140, 30, 0.22) 0%, transparent 70%),
+        /* Torch 5 — right */
+        radial-gradient(ellipse 80px 120px at 94% 5%, rgba(255, 160, 40, 0.25) 0%, transparent 70%);
+    animation: torchFlicker 2s ease-in-out infinite alternate;
+}
+
+/* Second layer — ambient warm glow that pulses at different rate */
+#map-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 4px;
+    background:
+        /* Warm ambient from top */
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255, 120, 20, 0.08) 0%, transparent 100%),
+        /* Vignette darken edges */
+        radial-gradient(ellipse 90% 80% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
+    animation: torchAmbient 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes torchFlicker {
+    0% {
+        opacity: 0.7;
+    }
+
+    15% {
+        opacity: 1.0;
+    }
+
+    30% {
+        opacity: 0.55;
+    }
+
+    45% {
+        opacity: 0.9;
+    }
+
+    60% {
+        opacity: 0.65;
+    }
+
+    75% {
+        opacity: 1.0;
+    }
+
+    85% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0.85;
+    }
+}
+
+@keyframes torchAmbient {
+    0% {
+        opacity: 0.6;
+    }
+
+    30% {
+        opacity: 1.0;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    70% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+/* Monster Path — 보라색 경로 영역 (cols 1-34, rows 1-22 of 36×24 타일) */
 #monster-path {
     position: absolute;
-    inset: 10px;
-    border: 3px solid var(--path-border);
-    border-radius: 4px;
-    background: url('/textures/stone_track.png') repeat;
-    background-size: 64px 64px;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, .5);
+    /* 2.8%=1/36, 4.2%=1/24, 94.4%=34/36, 91.6%=22/24 */
+    left: 2.8%;
+    top: 4.2%;
+    right: 2.8%;
+    bottom: 8.3%;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     z-index: 0;
 }
 
@@ -730,27 +841,30 @@ body {
 }
 
 /* Board Grid — inside the path */
+/* Board Grid — 청록 유닛 배치 영역 (cols 5-31, rows 5-19 of 36×24 타일) */
 #board-grid {
     position: absolute;
-    inset: 42px;
+    /* 13.9%=5/36, 20.8%=5/24, 13.9%=(36-31)/36, 20.8%=(24-19)/24 */
+    left: 13.9%;
+    top: 20.8%;
+    right: 13.9%;
+    bottom: 20.8%;
     z-index: 1;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 3px;
-    background-image: url('/assets/map/board_bg.png');
-    background-size: cover;
-    background-position: center;
-    background-color: rgba(10, 8, 4, .6);
-    border-radius: 3px;
-    padding: 3px;
-    border: 1px solid rgba(90, 74, 46, .3);
+    gap: 2px;
+    /* 투명 — 배경 이미지가 비쳐보임 */
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border: none;
 }
 
 .board-cell {
-    background-color: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.08);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -759,13 +873,14 @@ body {
 }
 
 .board-cell:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(240, 178, 50, 0.2);
+    border: 1px solid rgba(240, 178, 50, 0.6) !important;
+    z-index: 10;
 }
 
 .board-cell.occupied {
-    border: 1px solid rgba(240, 178, 50, .3);
-    background-color: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(240, 178, 50, .2);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Board count badge */
@@ -1526,7 +1641,7 @@ body {
 .shop-slot {
     flex: 1;
     min-height: 100px;
-    background: rgba(10, 8, 4, .7);
+    background-color: rgba(0, 0, 0, 0.6);
     border: 2px solid rgba(90, 74, 46, .5);
     border-radius: 4px;
     display: flex;
@@ -1535,10 +1650,95 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all .2s;
-    padding: 6px;
+    padding: 6px 4px;
     position: relative;
     overflow: hidden;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, .3), 0 2px 6px rgba(0, 0, 0, .3);
+}
+
+/* ─── 스프라이트 렌더링 전용 정사각형 아이콘 ─── */
+.unit-sprite-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 4px auto;
+    /* background-size는 인라인으로 시트별 동적 적용 */
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+/* 보드 위 유닛: 셀 꽉 채움 + 대기 = Row 0 첫 4프레임만 순환 */
+.unit-sprite-icon.board-icon {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    position: absolute;
+    inset: 0;
+    /* Idle: Row 0, 프레임 0~3만 순환 */
+    background-position-y: 0%;
+    animation: sprite-idle-4 0.8s steps(4) infinite;
+}
+
+/* 공격 모션: Row 1, 0.3초 1회 재생 (10프레임) */
+.unit-sprite-icon.board-icon.is-attacking {
+    background-position-y: 14.29%;
+    animation: sprite-anim 0.3s steps(9) 1 forwards !important;
+}
+
+@keyframes sprite-idle-4 {
+    from {
+        background-position-x: 0%;
+    }
+
+    to {
+        background-position-x: 44.44%;
+    }
+}
+
+@keyframes sprite-anim {
+    from {
+        background-position-x: 0%;
+    }
+
+    to {
+        background-position-x: 100%;
+    }
+}
+
+/* 하단 정보 오버레이 */
+.shop-slot-info {
+    width: 100%;
+    padding: 4px 6px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.shop-slot-info .unit-name {
+    font-family: 'neodgm', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 2px 2px 4px rgba(0, 0, 0, .9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.shop-slot-info .unit-origin {
+    font-size: 9px;
+    color: rgba(255, 255, 255, .7);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, .8);
+}
+
+.shop-slot-info .unit-cost {
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--gold);
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 2px 2px 4px rgba(0, 0, 0, .9);
 }
 
 .shop-slot::before {
@@ -1565,23 +1765,23 @@ body {
 
 /* Shop tier colors — always visible border + top bar */
 .shop-slot.cost-1 {
-    border-color: rgba(148, 163, 184, .25);
+    border: 2px solid rgba(156, 163, 175, .5);
 }
 
 .shop-slot.cost-1::before {
-    background: #94a3b8;
+    background: #9ca3af;
 }
 
 .shop-slot.cost-2 {
-    border-color: rgba(34, 197, 94, .25);
+    border: 2px solid rgba(16, 185, 129, .5);
 }
 
 .shop-slot.cost-2::before {
-    background: #22c55e;
+    background: #10b981;
 }
 
 .shop-slot.cost-3 {
-    border-color: rgba(59, 130, 246, .3);
+    border: 2px solid rgba(59, 130, 246, .6);
 }
 
 .shop-slot.cost-3::before {
@@ -1589,35 +1789,39 @@ body {
 }
 
 .shop-slot.cost-4 {
-    border-color: rgba(168, 85, 247, .3);
+    border: 2px solid rgba(139, 92, 246, .6);
 }
 
 .shop-slot.cost-4::before {
-    background: #a855f7;
+    background: #8b5cf6;
 }
 
 .shop-slot.cost-5 {
-    border-color: rgba(249, 115, 34, .35);
+    border: 2px solid rgba(245, 158, 11, .6);
 }
 
 .shop-slot.cost-5::before {
-    background: #f97316;
+    background: #f59e0b;
 }
 
 .shop-slot.cost-7 {
-    border-color: rgba(234, 179, 8, .4);
+    border: 2px solid rgba(239, 68, 68, .7);
+    box-shadow: 0 0 12px rgba(239, 68, 68, .3);
 }
 
 .shop-slot.cost-7::before {
-    background: #eab308;
+    background: #ef4444;
 }
 
 .shop-slot.cost-10 {
-    border-color: rgba(239, 68, 68, .4);
+    border: 2px solid rgba(239, 68, 68, .7);
+    animation: rainbow-border 2s linear infinite;
 }
 
 .shop-slot.cost-10::before {
-    background: #ef4444;
+    background: linear-gradient(90deg, #ef4444, #f59e0b, #3b82f6, #8b5cf6, #ef4444);
+    background-size: 200%;
+    animation: rainbow-slide 2s linear infinite;
 }
 
 /* Hover intensifies */
@@ -1785,6 +1989,27 @@ body {
     position: relative;
 }
 
+/* 보드 위 유닛: 스프라이트가 셀 꽉 채움 */
+.unit-card.on-board {
+    padding: 0;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 1000% 1000%;
+    image-rendering: pixelated;
+    justify-content: flex-end;
+}
+
+.unit-card.on-board .board-star {
+    font-size: 10px;
+    position: absolute;
+    bottom: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 6px rgba(0, 0, 0, .9);
+    white-space: nowrap;
+}
+
 .unit-card:hover {
     transform: scale(1.08);
 }
@@ -1869,39 +2094,65 @@ body {
 
 /* Cost color tiers */
 .unit-card.cost-1 {
-    background: rgba(148, 163, 184, .1);
-    border: 1px solid rgba(148, 163, 184, .15);
+    border: 2px solid rgba(156, 163, 175, .4);
 }
 
 .unit-card.cost-2 {
-    background: rgba(34, 197, 94, .1);
-    border: 1px solid rgba(34, 197, 94, .2);
+    border: 2px solid rgba(16, 185, 129, .5);
 }
 
 .unit-card.cost-3 {
-    background: rgba(59, 130, 246, .1);
-    border: 1px solid rgba(59, 130, 246, .2);
+    border: 2px solid rgba(59, 130, 246, .5);
 }
 
 .unit-card.cost-4 {
-    background: rgba(168, 85, 247, .1);
-    border: 1px solid rgba(168, 85, 247, .2);
+    border: 2px solid rgba(139, 92, 246, .6);
 }
 
 .unit-card.cost-5 {
-    background: rgba(249, 115, 22, .1);
-    border: 1px solid rgba(249, 115, 22, .2);
+    border: 2px solid rgba(245, 158, 11, .6);
 }
 
 .unit-card.cost-7 {
-    background: rgba(234, 179, 8, .08);
-    border: 1px solid rgba(234, 179, 8, .2);
+    border: 2px solid rgba(239, 68, 68, .7);
+    box-shadow: 0 0 12px rgba(239, 68, 68, .3);
 }
 
 .unit-card.cost-10 {
-    background: rgba(239, 68, 68, .08);
-    border: 1px solid rgba(239, 68, 68, .2);
+    border: 2px solid rgba(239, 68, 68, .7);
     animation: legendary-glow 2s ease-in-out infinite;
+}
+
+@keyframes rainbow-border {
+    0% {
+        border-color: #ef4444;
+    }
+
+    25% {
+        border-color: #f59e0b;
+    }
+
+    50% {
+        border-color: #3b82f6;
+    }
+
+    75% {
+        border-color: #8b5cf6;
+    }
+
+    100% {
+        border-color: #ef4444;
+    }
+}
+
+@keyframes rainbow-slide {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
 }
 
 @keyframes legendary-glow {
@@ -1955,6 +2206,31 @@ body {
     filter: drop-shadow(0 0 4px rgba(0, 0, 0, .5));
     pointer-events: none;
     overflow: hidden;
+}
+
+/* 몬스터 사망 애니메이션 */
+.monster-sprite.is-dead {
+    filter: brightness(1.5) drop-shadow(0 0 8px rgba(255, 100, 100, .8));
+    pointer-events: none;
+    opacity: 0;
+    animation: monster-death 0.5s ease-out forwards !important;
+}
+
+@keyframes monster-death {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
 }
 
 .monster.boss .monster-emoji {
@@ -3432,26 +3708,49 @@ body {
     filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.4));
 }
 
-.lobby-logo-img {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.5));
+.lobby-logo-img,
+.mode-hub-logo {
+    font-size: 72px;
+    text-align: center;
+    filter: drop-shadow(0 4px 16px rgba(255, 215, 0, 0.5));
+    animation: lobbyPulse 2.5s ease-in-out infinite;
 }
 
-.lobby-btn-img {
-    width: 48px;
-    height: 48px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+.mode-card-icon {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
     transition: transform 0.2s ease;
 }
 
-.lobby-mode-btn:hover .lobby-btn-img,
-.mode-card:hover .lobby-btn-img {
-    transform: scale(1.1);
+.mode-card:hover .mode-card-icon {
+    transform: scale(1.15);
+}
+
+.mode-hub-text {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.3));
+}
+
+.mode-hub-sub {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.mode-version {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
 }
 
 @keyframes lobbyPulse {

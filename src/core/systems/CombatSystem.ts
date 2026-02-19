@@ -24,33 +24,26 @@ const SPAWN_INTERVAL = 0.6;           // 몬스터 스폰 간격 (초)
 const MONSTER_BASE_SPEED = 1.2;       // 초당 이동 칸
 const LAP_DAMAGE = 1;                 // 몬스터 1바퀴당 플레이어 HP 피해
 
-// ─── 경로 계산 ──────────────────────────────────────────────
+// ─── 경로 계산 (9×6 외곽 트랙, 반시계 방향) ─────────────────
 //
-// 반시계: (0,0)→(0,3)→(6,3)→(6,0)→(0,0)
-// 경로 = 테두리 셀 좌표들 (총 둘레 = 2*(7+4)-4 = 18칸)
+// 전체 그리드: 9×6 (중앙 7×4 보드 + 1칸 두께 외곽 트랙)
+// 반시계: 좌상(0,0) → 좌하(0,5) → 우하(8,5) → 우상(8,0) → 좌상(0,0)
+//
+// 렌더 시: pos를 외곽 그리드 셀 좌표로 사용,
+// 타일 정중앙까지 +0.5 오프셋은 렌더 코드에서 처리
 //
 
-/** 반시계 방향 테두리 경로 (그리드 셀 좌표, 바깥 링) */
+/** 반시계 방향 4코너 웨이포인트 (외곽 트랙 셀 좌표) */
 function buildPerimeterPath(): PathPoint[] {
     const path: PathPoint[] = [];
-
-    // 1) 좌측: 아래로 — 트랙 중앙(inset 26px ≈ gridOffset - 16px ≈ -0.68 cell)
-    for (let y = 0; y <= BOARD_H; y++) {
-        path.push({ px: -0.7, py: y - 0.5 });
-    }
-    // 2) 하단: 오른쪽 — 트랙 중앙
-    for (let x = 0; x <= BOARD_W; x++) {
-        path.push({ px: x - 0.5, py: BOARD_H - 0.3 });
-    }
-    // 3) 우측: 위로 — 트랙 중앙
-    for (let y = BOARD_H; y >= 0; y--) {
-        path.push({ px: BOARD_W - 0.3, py: y - 0.5 });
-    }
-    // 4) 상단: 왼쪽 — 트랙 중앙
-    for (let x = BOARD_W; x >= 0; x--) {
-        path.push({ px: x - 0.5, py: -0.7 });
-    }
-
+    // 좌상 → 좌하 (좌측변, x=0, 아래로)
+    for (let y = 0; y <= 5; y++) path.push({ px: 0, py: y });
+    // 좌하 → 우하 (하단변, y=5, 오른쪽)
+    for (let x = 1; x <= 8; x++) path.push({ px: x, py: 5 });
+    // 우하 → 우상 (우측변, x=8, 위로)
+    for (let y = 4; y >= 0; y--) path.push({ px: 8, py: y });
+    // 우상 → 좌상 (상단변, y=0, 왼쪽)
+    for (let x = 7; x >= 1; x--) path.push({ px: x, py: 0 });
     return path;
 }
 
@@ -1036,6 +1029,11 @@ export class CombatSystem {
 
                 // 데미지 적용
                 target.hp -= dmg;
+
+                // ── 공격 애니메이션 트리거 ──
+                unit.lastAttackTime = performance.now();
+                const attackTargetPos = getPositionOnPath(target.pathProgress);
+                unit.lastTargetX = attackTargetPos.px;
 
                 // 투사체 + 피격 이펙트
                 if (dmg > 0 && unit.position) {

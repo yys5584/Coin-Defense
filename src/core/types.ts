@@ -97,6 +97,8 @@ export interface UnitInstance {
     skillStacks?: number;        // 누적 스택
     skillActive?: boolean;       // 전투당 1회 스킬 사용 여부
     attackCount?: number;        // 공격 카운트 (nthHit 판정용)
+    lastAttackTime?: number;     // 마지막 공격 시각 (performance.now ms)
+    lastTargetX?: number;        // 마지막 타겟 X 좌표 (시선 방향용)
 }
 
 export interface Position {

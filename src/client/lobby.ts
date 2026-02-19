@@ -69,7 +69,7 @@ function renderCurrentView(container: HTMLElement, state: ClientUserState) {
                 <span class="c-val">${s10}</span>
             </div>
         </div>
-        <button class="top-settings" id="btn-settings"><img src="/assets/icons/icon_settings.png" alt="Settings" class="lobby-btn-img" style="width:24px;height:24px" /></button>
+        <button class="top-settings" id="btn-settings">⚙️</button>
     `;
     container.appendChild(topBar);
 
@@ -163,18 +163,18 @@ function renderHome(body: HTMLElement, state: ClientUserState) {
     center.className = 'center-hub mode-hub';
     center.innerHTML = `
         <div class="mode-hub-title">
-            <div class="mode-hub-logo"><img src="/assets/icons/logo_main.png" alt="Logo" class="lobby-logo-img" /></div>
+            <div class="mode-hub-logo">⚔️</div>
             <div class="mode-hub-text">COIN DEFENSE</div>
-            <div class="mode-hub-sub">게임 모드를 선택하세요</div>
+            <div class="mode-hub-sub">크립토 랜덤디펜스</div>
         </div>
 
         <div class="mode-cards">
             <!-- 캠페인 -->
             <div class="mode-card campaign" id="mode-campaign">
                 <div class="mode-card-glow"></div>
-                <div class="mode-card-icon"><img src="/assets/icons/icon_campaign.png" alt="Campaign" class="lobby-btn-img" /></div>
-                <div class="mode-card-title">캠페인</div>
-                <div class="mode-card-desc">스토리 모드 · 튜토리얼</div>
+                <div class="mode-card-icon">📖</div>
+                <div class="mode-card-title">Campaign</div>
+                <div class="mode-card-desc">캠페인 · <small>튜토리얼</small></div>
                 <div class="mode-card-info">
                     <span class="mode-stage">S${currentStage} ${stageName}</span>
                     <span class="mode-round">Best R${bestRound}</span>
@@ -191,9 +191,9 @@ function renderHome(body: HTMLElement, state: ClientUserState) {
             <!-- 일반전 -->
             <div class="mode-card freeplay" id="mode-freeplay">
                 <div class="mode-card-glow"></div>
-                <div class="mode-card-icon"><img src="/assets/icons/icon_battle.png" alt="Battle" class="lobby-btn-img" /></div>
-                <div class="mode-card-title">일반전</div>
-                <div class="mode-card-desc">자유 대전 · 싱글플레이</div>
+                <div class="mode-card-icon">⚔️</div>
+                <div class="mode-card-title">Battle</div>
+                <div class="mode-card-desc">일반전 · <small>싱글플레이</small></div>
                 <div class="mode-card-info">
                     <span class="mode-players">👤 1 / 4</span>
                     <span class="mode-label-soon">멀티 준비중</span>
@@ -222,8 +222,7 @@ function renderHome(body: HTMLElement, state: ClientUserState) {
         </div>
 
         <div class="mode-hub-footer">
-            <div class="mode-stat">💰 ${state.wallet.soft.toLocaleString()} Gold</div>
-            <div class="mode-stat">🔑 ${state.unlocks.license7Shards} / ⭐ ${state.unlocks.license10Shards}</div>
+            <span class="mode-version">v3.5 — Pixel Edition</span>
         </div>
     `;
     body.appendChild(center);

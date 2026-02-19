@@ -63,7 +63,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.join(__dirname, '..', 'dist');
 app.use(express.static(distPath));
 
-// SPA fallback
+// Landing page: dashboard
+app.get('/', (_req, res) => {
+    res.sendFile(path.join(distPath, 'dashboard.html'));
+});
+
+// Game page
+app.get('/game', (_req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+});
+
+// SPA fallback (API 외 나머지)
 app.get('/{*path}', (_req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });

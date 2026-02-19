@@ -17,29 +17,103 @@ const ORIGIN_SPRITES: Record<string, string> = {
     [Origin.Bear]: '/sprites/bear.png',
 };
 
+// ─── 스프라이트 시트 매핑 (해시 결정론적 매핑) ──────────────
+// 코스트별 색상: 1-2=blue, 3=green, 4=red, 5+=yellow
+const COST_COLOR: Record<number, string> = {
+    1: 'blue', 2: 'blue', 3: 'green', 4: 'red', 5: 'yellow', 7: 'yellow', 10: 'yellow',
+};
+
+// 실제 파일 시스템과 정확히 일치하는 [폴더명, 파일접두사] 매핑
+// [폴더명, 파일접두사, cols, rows, posX오프셋(옵션)]
+// 현재 모든 유닛 = falconwarrior (10×8: 가로10프레임, 세로8행)
+const SPRITE_CHARS: Array<[string, string, number, number, number?]> = [
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+    ['falconwarrior', 'falconwarrior', 10, 8],
+];
+
+/** 결정론적 해시: 같은 unitId → 항상 같은 인덱스 */
+function hashUnitId(unitId: string): number {
+    let h = 0;
+    for (let i = 0; i < unitId.length; i++) {
+        h = ((h << 5) - h + unitId.charCodeAt(i)) | 0;
+    }
+    return Math.abs(h);
+}
+
+/** 유닛 ID → 스프라이트 시트 경로 + 프레임 정보 (결정론적 해시 배정) */
+export function getUnitSpriteSheet(unitId: string, origin: string, cost: number): {
+    path: string; color: string; char: string; cols: number; rows: number;
+} {
+    const charIdx = hashUnitId(unitId) % SPRITE_CHARS.length;
+    const [folder, filePrefix, cols, rows] = SPRITE_CHARS[charIdx];
+    const color = COST_COLOR[cost] ?? 'blue';
+    return {
+        path: `/assets/units/animal/animal/${folder}/${filePrefix}_${color}.png`,
+        color, char: filePrefix, cols, rows,
+    };
+}
+
+/** 유닛 스프라이트 시트 정보 반환 (경로 + background-size/position CSS) */
+export function getUnitSpriteInfo(unitId: string, origin: string, cost: number): {
+    url: string; bgSize: string; bgPos: string;
+} {
+    const ss = getUnitSpriteSheet(unitId, origin, cost);
+    const charIdx = hashUnitId(unitId) % SPRITE_CHARS.length;
+    const posX = SPRITE_CHARS[charIdx][4] ?? 0;
+    return {
+        url: ss.path,
+        bgSize: `${ss.cols * 100}% ${ss.rows * 100}%`,
+        bgPos: posX !== 0 ? `${posX}% 0` : '0 0',
+    };
+}
+
+// 하위 호환 — 제거 예정
+export function getUnitSpriteUrl(unitId: string, origin: string, cost: number): string {
+    return getUnitSpriteSheet(unitId, origin, cost).path;
+}
+export function getSpriteFirstFrameStyle(_u: string, _o: string, _c: number, _s: number = 48): string { return ''; }
+export function preloadAllUnitFrames(_u: any[]): void { }
+export function setFrameReadyCallback(_cb: () => void): void { }
+
 // ─── 몬스터 스프라이트 ───────────────────────────────────────
 export const MONSTER_SPRITE = '/sprites/monster.png';
 export const BOSS_SPRITE = '/sprites/boss.png';
 
-// ─── 코스트별 테두리 글로우 색상 ─────────────────────────────
+// ─── 코스트별 테두리 글로우 색상 (디렉터 확정) ────────────────
 export const COST_GLOW: Record<number, string> = {
-    1: '#94a3b8',  // 회색
-    2: '#22c55e',  // 초록
+    1: '#9ca3af',  // 회색
+    2: '#10b981',  // 초록
     3: '#3b82f6',  // 파랑
-    4: '#a855f7',  // 보라
-    5: '#f97316',  // 주황
-    7: '#eab308',  // 금색
-    10: '#ef4444',  // 빨강 (전설)
+    4: '#8b5cf6',  // 보라
+    5: '#f59e0b',  // 금색
+    7: '#ef4444',  // 빨강
+    10: '#ef4444', // 무지개(CSS에서 gradient 처리)
 };
 
 export const COST_GLOW_SHADOW: Record<number, string> = {
-    1: '0 0 4px rgba(148,163,184,.3)',
-    2: '0 0 6px rgba(34,197,94,.4)',
-    3: '0 0 8px rgba(59,130,246,.4)',
-    4: '0 0 10px rgba(168,85,247,.5)',
-    5: '0 0 12px rgba(249,115,22,.5)',
-    7: '0 0 16px rgba(234,179,8,.6)',
-    10: '0 0 20px rgba(239,68,68,.7)',
+    1: '0 0 4px rgba(156,163,175,.4), inset 0 0 2px rgba(156,163,175,.2)',
+    2: '0 0 6px rgba(16,185,129,.5), inset 0 0 3px rgba(16,185,129,.2)',
+    3: '0 0 8px rgba(59,130,246,.5), inset 0 0 4px rgba(59,130,246,.2)',
+    4: '0 0 10px rgba(139,92,246,.6), inset 0 0 4px rgba(139,92,246,.3)',
+    5: '0 0 12px rgba(245,158,11,.6), inset 0 0 5px rgba(245,158,11,.3)',
+    7: '0 0 16px rgba(239,68,68,.7), 0 0 30px rgba(239,68,68,.3), inset 0 0 6px rgba(239,68,68,.3)',
+    10: '0 0 12px rgba(239,68,68,.6), 0 0 20px rgba(168,85,247,.4), 0 0 30px rgba(59,130,246,.3), 0 0 40px rgba(245,158,11,.3)',
 };
 
 // ─── 스프라이트 로드 캐시 ────────────────────────────────────

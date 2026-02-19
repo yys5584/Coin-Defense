@@ -10,7 +10,7 @@ import { CombatSystem, getPositionOnPath, CombatResult } from './core/systems/Co
 import { SynergySystem } from './core/systems/SynergySystem';
 import { UNIT_MAP, SYNERGIES, STAR_MULTIPLIER, LEVELS, getBaseIncome, getInterest, getStreakBonus, getStageRound, getStage, isBossRound, BOX_DROP_TABLES, BOX_UNLOCK_CHANCE, UNLOCK_CONDITIONS, AUGMENTS, STAGE_HINTS, STAGE_DEFENSE } from './core/config';
 import { GameState, PlayerState, UnitInstance, CombatState, ActiveSynergy } from './core/types';
-import { createUnitVisual, preloadAllSprites, COST_GLOW, COST_GLOW_SHADOW, hasSpriteFor, hasUnitSprite, getUnitSprite, drawUnitSprite, drawMonsterSprite } from './client/sprites';
+import { createUnitVisual, preloadAllSprites, COST_GLOW, COST_GLOW_SHADOW, hasSpriteFor, hasUnitSprite, getUnitSprite, drawUnitSprite, drawMonsterSprite, getUnitSpriteInfo, getUnitSpriteSheet } from './client/sprites';
 
 import './client/style.css';
 
@@ -149,7 +149,7 @@ document.getElementById('btn-back-lobby')?.addEventListener('click', () => {
 document.getElementById('btn-solo')?.addEventListener('click', () => {
   isMultiMode = false;
   showScreen('game-screen');
-  startGameFromSPA(1);
+  startGameFromSPA(7);  // 7-7까지 진행 가능
 });
 
 document.getElementById('btn-4player')?.addEventListener('click', () => {
@@ -926,6 +926,39 @@ const state = createGameState(['player1']);
 const cmd = new CommandProcessor(events);
 const combat = new CombatSystem(events);
 preloadAllSprites(); // 스프라이트 미리 로드
+
+// idle 애니메이션은 CSS @keyframes로 처리 (JS setInterval 제거됨)
+
+// ─── 공격 애니메이션 동기화 루프 ───
+setInterval(() => {
+  const now = performance.now();
+  const p = player();
+  if (!p) return;
+  for (const unit of p.board) {
+    if (!unit.position) continue;
+    // DOM 에서 해당 유닛 카드 찾기
+    const card = document.querySelector(`[data-instance-id="${unit.instanceId}"]`) as HTMLElement | null;
+    if (!card) continue;
+    const sprite = card.querySelector('.board-icon') as HTMLElement | null;
+    if (!sprite) continue;
+
+    // .is-attacking 토글 (300ms 동안)
+    const timeSinceAttack = now - (unit.lastAttackTime ?? 0);
+    if (unit.lastAttackTime && timeSinceAttack < 300) {
+      if (!sprite.classList.contains('is-attacking')) {
+        sprite.classList.add('is-attacking');
+      }
+    } else {
+      sprite.classList.remove('is-attacking');
+    }
+
+    // 시선 방향: 타겟 X vs 유닛 X
+    if (unit.lastTargetX !== undefined && unit.position) {
+      const facingLeft = unit.lastTargetX < unit.position.x;
+      sprite.style.transform = facingLeft ? 'scaleX(-1)' : 'scaleX(1)';
+    }
+  }
+}, 50); // 20fps 충분
 const synergy = new SynergySystem(events);
 const player = () => state.players[0];
 
@@ -1372,18 +1405,15 @@ function renderShop(): void {
       slot.className = 'shop-slot cost-' + def.cost + (canMerge3 ? ' merge-ready-3' : canMerge2 ? ' merge-ready' : '');
       const mergeHint = canMerge3 ? '<span class="merge-badge">★★★</span>'
         : canMerge2 ? '<span class="merge-badge">★★</span>' : '';
+
       slot.innerHTML = `
         ${mergeHint}
-        <div class="unit-img" style="
-          background-image: url('/assets/units/${unitId}.png');
-          background-size: 80%; background-repeat: no-repeat; background-position: center bottom;
-          background-color: transparent;
-          image-rendering: pixelated;
-          width: 36px; height: 36px; margin: 0 auto 2px;
-        "></div>
-        <span class="unit-name">${def.name}</span>
-        <span class="unit-origin">${toCrypto(def.origin)}</span>
-        <span class="unit-cost">💰 ${def.cost}</span>
+        <div class="unit-sprite-icon" style="background-image:url('${getUnitSpriteInfo(unitId, def.origin, def.cost).url}');background-size:${getUnitSpriteInfo(unitId, def.origin, def.cost).bgSize};background-position:${getUnitSpriteInfo(unitId, def.origin, def.cost).bgPos}"></div>
+        <div class="shop-slot-info">
+          <span class="unit-name">${def.name}</span>
+          <span class="unit-origin">${toCrypto(def.origin)}</span>
+          <span class="unit-cost">💰 ${def.cost}</span>
+        </div>
       `;
 
       // 상점 유닛 호버 툴팁
@@ -1925,6 +1955,8 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
   const def = UNIT_MAP[unit.unitId];
   const card = document.createElement('div');
   card.className = `unit-card cost-${def.cost}`;
+  if (location === 'board') card.classList.add('on-board');
+  card.dataset.instanceId = unit.instanceId;
   if (selectedUnit?.instanceId === unit.instanceId) card.classList.add('selected');
 
   // 코스트별 글로우 이펙트
@@ -1933,16 +1965,16 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
 
   const stars = '⭐'.repeat(unit.star);
 
-  // 스프라이트 또는 이모지 시각 요소 (유닛 ID 전달)
-  const visual = createUnitVisual(def.origin, def.emoji, 32, unit.unitId);
-  visual.classList.add('unit-visual');
-
-  card.innerHTML = `
-    <span class="name">${def.name}</span>
-    <span class="star">${stars}</span>
-    <span class="cost-badge">${def.cost}</span>
-  `;
-  card.insertBefore(visual, card.firstChild);
+  if (location === 'board') {
+    // 보드: 스프라이트만 (별/코스트 숨김) + idle 애니메이션
+    const spriteInfo = getUnitSpriteInfo(unit.unitId, def.origin, def.cost);
+    const ss = getUnitSpriteSheet(unit.unitId, def.origin, def.cost);
+    card.innerHTML = `<div class="unit-sprite-icon board-icon" data-cols="${ss.cols}" style="background-image:url('${spriteInfo.url}');background-size:${spriteInfo.bgSize}"></div>`;
+  } else {
+    // 벤치: .unit-sprite-icon + 이름
+    const spriteInfo = getUnitSpriteInfo(unit.unitId, def.origin, def.cost);
+    card.innerHTML = `<div class="unit-sprite-icon" style="background-image:url('${spriteInfo.url}');background-size:${spriteInfo.bgSize};background-position:${spriteInfo.bgPos}"></div><span class="name">${def.name}</span><span class="star">${stars}</span><span class="cost-badge">${def.cost}</span>`;
+  }
 
   // Drag support
   card.draggable = true;
@@ -2146,19 +2178,26 @@ function renderCombatOverlay(cs: CombatState): void {
   }
   overlay.innerHTML = '';
 
-  // 몬스터 렌더
+  // 몬스터 렌더 — 외곽 트랙 중심선 직접 계산
   const grid = $('board-grid');
   const gridRect = grid.getBoundingClientRect();
   const wrapperRect = mapWrapper.getBoundingClientRect();
-  // grid 내부 좌표 → wrapper 기준 좌표 계산
   const gridOffsetX = gridRect.left - wrapperRect.left;
   const gridOffsetY = gridRect.top - wrapperRect.top;
   const cellW = gridRect.width / 7;
   const cellH = gridRect.height / 4;
+  // 논리좌표 (0~8, 0~5) → 픽셀: grid 기준 오프셋 + 수동 보정 (좌 2칸, 상 1칸)
+  const toPixelX = (lx: number) => gridOffsetX + (-0.7 + lx * 0.9375) * cellW;
+  const toPixelY = (ly: number) => gridOffsetY + (ly - 1.0) * cellH;
   const nowMs = performance.now();
 
   for (const m of cs.monsters) {
-    if (!m.alive) continue;
+    // 죽은 몬스터: deathTime 기록 + 0.5초 동안 데스 모션 표시
+    const isDead = !m.alive;
+    if (isDead) {
+      if (!(m as any)._deathTime) (m as any)._deathTime = nowMs;
+      if (nowMs - (m as any)._deathTime > 500) continue; // 0.5초 후 렌더 중단
+    }
     const pos = getPositionOnPath(m.pathProgress);
     const el = document.createElement('div');
     // 피격 플래시: 최근 150ms 이내 피격이면 hit 클래스 추가
@@ -2168,15 +2207,15 @@ function renderCombatOverlay(cs: CombatState): void {
     // HP 바
     const hpPct = Math.max(0, m.hp / m.maxHp * 100);
 
-    // 스프라이트 시트 분석값: 1024×258, 프레임 60×52, 8프레임/행
-    const FRAME_W = 60;   // 실측: 프레임 간격 60px
-    const FRAME_H = 52;   // 258 / 5행 ≈ 52
-    // 일반 몬스터 1.0배, 보스 1.6배
-    const spriteScale = m.isBoss ? 1.6 : 1.0;
+    // 스프라이트 시트: skeleton walk — 1024×128, 8프레임 가로 나열
+    const FRAME_W = 128;  // 1024 / 8 = 128
+    const FRAME_H = 128;  // 시트 높이 = 1행
+    // 일반 몬스터 0.5배, 보스 0.9배
+    const spriteScale = m.isBoss ? 0.9 : 0.5;
     const displayW = Math.round(FRAME_W * spriteScale);
     const displayH = Math.round(FRAME_H * spriteScale);
 
-    // 걷기 애니메이션: row 0, 8프레임
+    // 걷기 애니메이션: 8프레임
     const row = 0;
     const totalFrames = 8;
     const monsterOffset = cs.monsters.indexOf(m) * 2;
@@ -2186,7 +2225,7 @@ function renderCombatOverlay(cs: CombatState): void {
     const bgX = Math.round(frameIdx * FRAME_W * spriteScale);
     const bgY = Math.round(row * FRAME_H * spriteScale);
     const sheetW = Math.round(1024 * spriteScale);
-    const sheetH = Math.round(258 * spriteScale);
+    const sheetH = Math.round(128 * spriteScale);
 
     // 스테이지별 색상: 1스테이지(튜토리얼)=하얀색, 2스테이지부터 빨주노초파남보, 보스=검정
     const STAGE_COLORS: number[] = [
@@ -2212,22 +2251,26 @@ function renderCombatOverlay(cs: CombatState): void {
       const hueRotate = STAGE_COLORS[colorIdx];
       spriteFilter = `hue-rotate(${hueRotate}deg) saturate(1.3) drop-shadow(0 0 4px rgba(0,0,0,.5))`;
     }
+    // 진행 방향 감지: 현재 위치 vs 직전 위치
+    const prevPos = getPositionOnPath(Math.max(0, m.pathProgress - 0.005));
+    const facingLeft = pos.px < prevPos.px;
 
     el.innerHTML = `
       <div class="monster-hp-bar"><div class="monster-hp-fill" style="width:${hpPct}%"></div></div>
-      <div class="monster-sprite" style="
+      <div class="monster-sprite ${isDead ? 'is-dead' : ''}" style="
         width:${displayW}px; height:${displayH}px;
-        background-image:url('/sprites/monster_goblin.png');
+        background-image:url('/assets/monsters/Skeleton/skeleton-variation1-walk.png');
         background-size:${sheetW}px ${sheetH}px;
         background-position:-${bgX}px -${bgY}px;
         image-rendering:pixelated;
         filter: ${spriteFilter};
+        transform: scaleX(${facingLeft ? -1 : 1});
       "></div>
     `;
 
-    // 위치: 정수 pixel snap (no sub-pixel positioning)
-    el.style.left = `${Math.round(gridOffsetX + (pos.px + 0.5) * cellW)}px`;
-    el.style.top = `${Math.round(gridOffsetY + (pos.py + 0.5) * cellH)}px`;
+    // 위치: 외곽 트랙 기준, 타일 정중앙
+    el.style.left = `${Math.round(toPixelX(pos.px))}px`;
+    el.style.top = `${Math.round(toPixelY(pos.py))}px`;
 
     overlay.appendChild(el);
   }
@@ -2235,13 +2278,17 @@ function renderCombatOverlay(cs: CombatState): void {
   // ── 투사체 렌더 ──
   for (const proj of cs.projectiles) {
     const t = Math.min((nowMs - proj.startTime) / proj.duration, 1.0);
-    // 선형 보간: 유닛 위치 → 몬스터 위치
-    const px = proj.fromX + (proj.toX - proj.fromX) * t;
-    const py = proj.fromY + (proj.toY - proj.fromY) * t;
+    // fromX/Y = 보드 좌표 (0~6, 0~3), toX/Y = 외곽 그리드 좌표 (0~8, 0~5)
+    const fromPx = gridOffsetX + (proj.fromX + 0.5) * cellW;
+    const fromPy = gridOffsetY + (proj.fromY + 0.5) * cellH;
+    const toPx = toPixelX(proj.toX);
+    const toPy = toPixelY(proj.toY);
+    const bx = fromPx + (toPx - fromPx) * t;
+    const by = fromPy + (toPy - fromPy) * t;
     const bullet = document.createElement('div');
     bullet.className = 'projectile';
-    bullet.style.left = `${gridOffsetX + (px + 0.5) * cellW}px`;
-    bullet.style.top = `${gridOffsetY + (py + 0.5) * cellH}px`;
+    bullet.style.left = `${bx}px`;
+    bullet.style.top = `${by}px`;
     overlay.appendChild(bullet);
   }
 
@@ -2313,8 +2360,73 @@ function renderCombatOverlay(cs: CombatState): void {
   }
   const aliveCount = cs.monsters.filter(m => m.alive).length;
   const pauseLabel = combat.isPaused ? ' ⏸️ 일시정지 (Space로 재개)' : '';
+  const t = cs.elapsedTime;
+  const isBossRd = isBossRound(state.round);
+
+  // 등급 판정 (CombatSystem 로직과 동일)
+  let curGrade: string, curColor: string, bonusG: number;
+  if (isBossRd) {
+    if (t <= 10) { curGrade = 'S'; curColor = '#ffd700'; bonusG = 5; }
+    else if (t <= 20) { curGrade = 'A'; curColor = '#43e97b'; bonusG = 3; }
+    else if (t <= 35) { curGrade = 'B'; curColor = '#42a5f5'; bonusG = 2; }
+    else { curGrade = 'F'; curColor = '#888'; bonusG = 0; }
+  } else {
+    if (t <= 10) { curGrade = 'S'; curColor = '#ffd700'; bonusG = 4; }
+    else if (t <= 20) { curGrade = 'A'; curColor = '#43e97b'; bonusG = 2; }
+    else if (t <= 30) { curGrade = 'B'; curColor = '#42a5f5'; bonusG = 1; }
+    else { curGrade = 'F'; curColor = '#888'; bonusG = 0; }
+  }
+
+  // 타임아웃 경고
+  const timeLimit = isBossRd ? 120 : 60;
+  const timeLeft = Math.max(0, timeLimit - t);
+  const timeoutWarn = timeLeft <= 10 && timeLeft > 0
+    ? `<span style="color:#ef4444;font-weight:bold;animation:blink 0.5s infinite">⚠️ ${timeLeft.toFixed(0)}초 후 HP 피해!</span>`
+    : timeLeft <= 0
+      ? `<span style="color:#ef4444;font-weight:bold">💀 오버타임! HP 감소 중</span>`
+      : '';
+
+  // 등급 가이드 바
+  const grades = isBossRd
+    ? [
+      { g: 'S', t: 10, gold: 5, color: '#ffd700' },
+      { g: 'A', t: 20, gold: 3, color: '#43e97b' },
+      { g: 'B', t: 35, gold: 2, color: '#42a5f5' },
+      { g: 'F', t: 120, gold: 0, color: '#ef4444', penalty: '❤️-5' },
+    ]
+    : [
+      { g: 'S', t: 10, gold: 4, color: '#ffd700' },
+      { g: 'A', t: 20, gold: 2, color: '#43e97b' },
+      { g: 'B', t: 30, gold: 1, color: '#42a5f5' },
+      { g: 'F', t: 60, gold: 0, color: '#ef4444', penalty: '❤️-1' },
+    ];
+  const gradeBar = grades.map((g: any) => {
+    const active = t <= g.t;
+    const passed = t > g.t;
+    const label = g.penalty ? `${g.g} ${g.t}s~ ${g.penalty}` : `${g.g} ≤${g.t}s +${g.gold}G`;
+    return `<span style="
+      padding:1px 6px;border-radius:3px;font-size:11px;font-weight:bold;
+      background:${passed ? 'rgba(80,80,80,0.5)' : active && curGrade === g.g ? g.color : 'rgba(255,255,255,0.1)'};
+      color:${passed ? '#666' : active && curGrade === g.g ? '#000' : g.color};
+      ${passed ? 'text-decoration:line-through;' : ''}
+    ">${label}</span>`;
+  }).join(' ');
+
   infoEl.innerHTML = `
-    ⚔️ 킬: ${cs.totalKills} | 남은: ${aliveCount + cs.spawnQueue} | 통과: ${cs.leakedDamage} | ${cs.elapsedTime.toFixed(1)}s${pauseLabel}
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="color:${curColor};font-weight:bold;font-size:14px;min-width:28px">${curGrade}</span>
+      <span>${t.toFixed(1)}s</span>
+      <span style="opacity:0.5">|</span>
+      ⚔️ ${cs.totalKills}
+      <span style="opacity:0.5">|</span>
+      남은 ${aliveCount + cs.spawnQueue}
+      ${cs.leakedDamage > 0 ? `<span style="opacity:0.5">|</span><span style="color:#ef4444">통과 ${cs.leakedDamage}</span>` : ''}
+      <span style="opacity:0.5">|</span>
+      ${gradeBar}
+      ${bonusG > 0 ? `<span style="color:${curColor}">+${bonusG}G</span>` : ''}
+      ${timeoutWarn}
+      ${pauseLabel}
+    </div>
   `;
 }
 
