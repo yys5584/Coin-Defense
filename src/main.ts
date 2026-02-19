@@ -132,6 +132,16 @@ const viewPlayer = () => state.players[currentViewId] ?? state.players[0];
 const lobbyModesEl = document.getElementById('lobby-modes');
 const lobbySubmodesEl = document.getElementById('lobby-submodes');
 
+// 홈페이지(대시보드) 이동
+document.getElementById('btn-lobby-home')?.addEventListener('click', () => {
+  window.location.href = '/dashboard.html';
+});
+
+// 설정창 열기
+document.getElementById('btn-lobby-settings')?.addEventListener('click', () => {
+  document.getElementById('settings-overlay')?.classList.remove('hidden');
+});
+
 document.getElementById('btn-campaign')?.addEventListener('click', () => {
   alert('튜토리얼은 준비 중입니다.');
 });
