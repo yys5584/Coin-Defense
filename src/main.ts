@@ -2314,8 +2314,9 @@ function renderCombatOverlay(cs: CombatState): void {
     if (progress >= 1) continue;
 
     const el = document.createElement('div');
-    const fxX = gridOffsetX + (fx.x + 0.5) * cellW;
-    const fxY = gridOffsetY + (fx.y + 0.5) * cellH;
+    // fx.x/y = 외곽 트랙 좌표 → 몬스터와 동일한 toPixelX/Y 사용
+    const fxX = toPixelX(fx.x);
+    const fxY = toPixelY(fx.y);
 
     if (fx.type === 'damage' || fx.type === 'crit') {
       // CSS 애니메이션 기반 플로팅 데미지
