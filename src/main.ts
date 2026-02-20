@@ -2475,14 +2475,12 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
   const stars = '⭐'.repeat(unit.star);
 
   if (location === 'board') {
-    // 보드: 스프라이트만 (별/코스트 숨김) + idle 애니메이션 + 마나바
-    const spriteInfo = getUnitSpriteInfo(unit.unitId, def.origin, def.cost);
-    const ss = getUnitSpriteSheet(unit.unitId, def.origin, def.cost);
+    // 보드: 이모지 + 이름 + 별 + 마나바
     const hasMana = def.skill?.type === 'active';
     const manaBarHtml = hasMana
       ? `<div class="mana-bar-wrap"><div class="mana-bar-fill" data-mana-bar></div></div>`
       : '';
-    card.innerHTML = `<div class="unit-sprite-icon board-icon" data-cols="${ss.cols}" style="background-image:url('${spriteInfo.url}');background-size:${spriteInfo.bgSize}"></div>${manaBarHtml}`;
+    card.innerHTML = `<span class="unit-emoji">${def.emoji}</span><span class="name">${def.name}</span><span class="star">${stars}</span><span class="cost-badge">${def.cost}</span>${manaBarHtml}`;
   } else {
     // 벤치: 이모지 + 이름
     card.innerHTML = `<span class="unit-emoji">${def.emoji}</span><span class="name">${def.name}</span><span class="star">${stars}</span><span class="cost-badge">${def.cost}</span>`;
