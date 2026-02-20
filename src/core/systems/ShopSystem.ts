@@ -20,8 +20,8 @@ export class ShopSystem {
         const levelDef = getLevelDef(player.level);
         const odds = levelDef.shopOdds; // [1코%, 2코%, 3코%, 4코%, 5코%]
 
-        // ── 스테이지별 코스트 상한 ──
-        const maxCost = state.stageId === 1 ? 2 : state.stageId === 2 ? 3 : 5;
+        // ── 스테이지별 코스트 상한 (T4+ craft-only) ──
+        const maxCost = state.stageId === 1 ? 2 : 3;
 
         // 해금된 7/10코 유닛 목록 (풀에 남아있는 것만) — 코스트 제한 적용
         const unlockedHighCost = maxCost >= 7 ? UNITS.filter(u =>
@@ -61,9 +61,9 @@ export class ShopSystem {
             }
         }
 
-        // 2) 해당 코스트 유닛 중 풀에 남은 것 선택
+        // 2) 해당 코스트 유닛 중 풀에 남은 것 선택 (T4+ 하드 제외)
         const candidates = UNITS.filter(u =>
-            u.cost === targetCost && (state.unitPool[u.id] ?? 0) > 0
+            u.cost === targetCost && u.cost <= 3 && (state.unitPool[u.id] ?? 0) > 0
         );
         if (candidates.length === 0) return null;
 

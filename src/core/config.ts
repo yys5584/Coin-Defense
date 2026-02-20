@@ -652,10 +652,10 @@ export const LEVELS: LevelDef[] = [
     { level: 4, requiredXp: 14, naturalRound: 7, slots: 4, shopOdds: [50, 35, 15, 0, 0] },
     { level: 5, requiredXp: 24, naturalRound: 12, slots: 5, shopOdds: [40, 35, 25, 0, 0] },
     { level: 6, requiredXp: 40, naturalRound: 18, slots: 6, shopOdds: [35, 35, 30, 0, 0] },
-    { level: 7, requiredXp: 60, naturalRound: 24, slots: 7, shopOdds: [30, 35, 34.9, 0.1, 0] },   // T4 해금 0.1%
-    { level: 8, requiredXp: 150, naturalRound: 33, slots: 8, shopOdds: [22, 33, 44.8, 0.2, 0] },   // 잔인한 벽
-    { level: 9, requiredXp: 300, naturalRound: 38, slots: 9, shopOdds: [15, 30, 54.7, 0.3, 0] },   // 천문학적 벽
-    { level: 10, requiredXp: 999, naturalRound: 99, slots: 10, shopOdds: [10, 25, 64.5, 0.5, 0] },  // T1 10% 유지, T4 0.5% 최대
+    { level: 7, requiredXp: 60, naturalRound: 24, slots: 7, shopOdds: [30, 35, 35, 0, 0] },      // T4+ craft-only
+    { level: 8, requiredXp: 150, naturalRound: 33, slots: 8, shopOdds: [22, 33, 45, 0, 0] },     // T4+ craft-only
+    { level: 9, requiredXp: 300, naturalRound: 38, slots: 9, shopOdds: [15, 30, 55, 0, 0] },     // T4+ craft-only
+    { level: 10, requiredXp: 999, naturalRound: 99, slots: 10, shopOdds: [10, 25, 65, 0, 0] },   // T4+ craft-only
 ];
 
 
