@@ -78,12 +78,14 @@ setOnStartGame(async (stageId: number) => {
 // 결과→로비 복귀 (최신 메인 로비로)
 function returnToLobby() {
   resultViewEl?.classList.add('hidden');
-  lobbyProEl?.classList.add('hidden');
   appEl?.classList.add('hidden');
+  document.querySelector('.rug-pull-overlay')?.remove();
+  // 로비 화면 표시 + 콘텐츠 복원
   showScreen('lobby-screen');
-  // 모드 선택 초기화 (캠페인/일반전 선택 화면)
-  document.getElementById('lobby-submodes')?.classList.add('hidden');
-  document.getElementById('lobby-modes')?.classList.remove('hidden');
+  if (lobbyProEl) {
+    lobbyProEl.classList.remove('hidden');
+    renderLobby(lobbyProEl);
+  }
 }
 
 initProLobby();
