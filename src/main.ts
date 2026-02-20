@@ -2026,7 +2026,7 @@ function showGoldTooltip(targetEl: HTMLElement): void {
   }
 
   // 등급별 색상
-  const gc: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', F: '#f87171' };
+  const gc: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', C: '#fb923c', F: '#f87171' };
 
   // 전 라운드 실적 HTML
   const prev = lastRoundIncome;
@@ -2049,8 +2049,8 @@ function showGoldTooltip(targetEl: HTMLElement): void {
   // 예상 등급 보너스 (전 라운드 등급 기준 예측)
   const isBossNext = isBossRound(nextRound);
   const gradeGoldTable: Record<string, number> = isBossNext
-    ? { S: 5, A: 3, B: 2, F: 0 }
-    : { S: 4, A: 2, B: 1, F: 0 };
+    ? { S: 5, A: 3, B: 2, C: 0, F: 0 }
+    : { S: 4, A: 2, B: 1, C: 0, F: 0 };
   const prevGrade = prev.grade !== '-' ? prev.grade : 'B';
   const estGradeGold = gradeGoldTable[prevGrade] ?? 0;
   const predictedTotal = base + interest + estGradeGold + totemGold;
@@ -2873,12 +2873,14 @@ function renderCombatOverlay(cs: CombatState): void {
   if (isBossRd) {
     if (t <= 10) { curGrade = 'S'; curColor = '#ffd700'; bonusG = 5; }
     else if (t <= 20) { curGrade = 'A'; curColor = '#43e97b'; bonusG = 3; }
-    else if (t <= 35) { curGrade = 'B'; curColor = '#42a5f5'; bonusG = 2; }
+    else if (t <= 30) { curGrade = 'B'; curColor = '#42a5f5'; bonusG = 2; }
+    else if (t <= 40) { curGrade = 'C'; curColor = '#fb923c'; bonusG = 0; }
     else { curGrade = 'F'; curColor = '#888'; bonusG = 0; }
   } else {
     if (t <= 10) { curGrade = 'S'; curColor = '#ffd700'; bonusG = 4; }
     else if (t <= 20) { curGrade = 'A'; curColor = '#43e97b'; bonusG = 2; }
     else if (t <= 30) { curGrade = 'B'; curColor = '#42a5f5'; bonusG = 1; }
+    else if (t <= 40) { curGrade = 'C'; curColor = '#fb923c'; bonusG = 0; }
     else { curGrade = 'F'; curColor = '#888'; bonusG = 0; }
   }
 
@@ -2896,14 +2898,16 @@ function renderCombatOverlay(cs: CombatState): void {
     ? [
       { g: 'S', t: 10, gold: 5, color: '#ffd700' },
       { g: 'A', t: 20, gold: 3, color: '#43e97b' },
-      { g: 'B', t: 35, gold: 2, color: '#42a5f5' },
+      { g: 'B', t: 30, gold: 2, color: '#42a5f5' },
+      { g: 'C', t: 40, gold: 0, color: '#fb923c' },
       { g: 'F', t: 60, gold: 0, color: '#ef4444', penalty: '❤️-5' },
     ]
     : [
       { g: 'S', t: 10, gold: 4, color: '#ffd700' },
       { g: 'A', t: 20, gold: 2, color: '#43e97b' },
       { g: 'B', t: 30, gold: 1, color: '#42a5f5' },
-      { g: 'F', t: 40, gold: 0, color: '#ef4444', penalty: '❤️-1' },
+      { g: 'C', t: 40, gold: 0, color: '#fb923c' },
+      { g: 'F', t: 50, gold: 0, color: '#ef4444', penalty: '❤️-1' },
     ];
   const gradeBar = grades.map((g: any) => {
     const active = t <= g.t;
@@ -3363,7 +3367,7 @@ function onCombatComplete(result: CombatResult): void {
     total: baseGold + interestGold + totalGold + totemG,
   };
 
-  const gradeColors: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', F: '#f87171' };
+  const gradeColors: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', C: '#fb923c', F: '#f87171' };
   const gradeColor = gradeColors[result.grade] || '#94a3b8';
   const gradeLabel = gradeGold > 0 ? ` [${result.grade}등급 +${gradeGold}G]` : ` [${result.grade}등급]`;
 

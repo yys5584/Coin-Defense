@@ -511,17 +511,19 @@ export class CombatSystem {
 
                 // ── 등급 판정 ──
                 const t = this.combat.elapsedTime;
-                let grade: 'S' | 'A' | 'B' | 'F';
+                let grade: 'S' | 'A' | 'B' | 'C' | 'F';
                 let bonusGold = 0;
                 if (isBoss) {
                     if (t <= 10) { grade = 'S'; bonusGold = 5; }
                     else if (t <= 20) { grade = 'A'; bonusGold = 3; }
-                    else if (t <= 35) { grade = 'B'; bonusGold = 2; }
+                    else if (t <= 30) { grade = 'B'; bonusGold = 2; }
+                    else if (t <= 40) { grade = 'C'; bonusGold = 0; }
                     else { grade = 'F'; bonusGold = 0; }
                 } else {
                     if (t <= 10) { grade = 'S'; bonusGold = 4; }
                     else if (t <= 20) { grade = 'A'; bonusGold = 2; }
                     else if (t <= 30) { grade = 'B'; bonusGold = 1; }
+                    else if (t <= 40) { grade = 'C'; bonusGold = 0; }
                     else { grade = 'F'; bonusGold = 0; }
                 }
 
@@ -2425,6 +2427,6 @@ export interface CombatResult {
     goldEarned: number;
     damage: number;      // 통과 피해
     elapsedTime: number;
-    grade: 'S' | 'A' | 'B' | 'F';
+    grade: 'S' | 'A' | 'B' | 'C' | 'F';
     bonusGold: number;   // 등급 보너스 골드
 }
