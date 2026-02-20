@@ -20,7 +20,7 @@ const BOARD_H = 4;
 const TICK_RATE = 1 / 60;             // 60fps 시뮬레이션
 const DEFAULT_RANGE = 2.5;
 const DEFAULT_ATTACK_SPEED = 1.0;
-const SPAWN_INTERVAL = 0.6;           // 몬스터 스폰 간격 (초)
+const SPAWN_INTERVAL = 0.25;          // 몬스터 스폰 간격 (초) — 대규모 웨이브
 const MONSTER_BASE_SPEED = 1.2;       // 초당 이동 칸
 const LAP_DAMAGE = 1;                 // 몬스터 1바퀴당 플레이어 HP 피해
 
@@ -192,20 +192,20 @@ export class CombatSystem {
         // 몬스터 수/스펙 결정
         const round = state.round;
         const isBoss = isBossRound(round);
-        // Monster count
+        // Monster count — 대규모 웨이브 (AoE 도파민)
         let monsterCount: number;
         if (isBoss) {
             monsterCount = 1;
         } else if (getStage(round) === 1) {
-            monsterCount = round === 1 ? 1 : round === 2 ? 3 : 5;
+            monsterCount = round === 1 ? 3 : round === 2 ? 8 : 12;
         } else {
-            monsterCount = 10;
+            monsterCount = 25;
         }
         // Boss HP: 벽 느낌 — 높은 HP + 높은 방어 + 빠른 이속
-        // Normal: 기본 공식
+        // Normal: HP 40% 감소 (몬스터 수 3배 보상)
         const baseHp = isBoss
             ? Math.floor(round * round * 12 + round * 150 + 300)      // Boss HP (큰 벽)
-            : Math.floor(round * round * 0.52 + round * 7.8 + 5);    // Normal HP
+            : Math.floor(round * round * 0.20 + round * 3 + 3);      // Normal HP (40%)
         const baseSpeed = MONSTER_BASE_SPEED + round * 0.012;
         // 보스 이속 30% 빠르게 + 시너지 슬로우 적용
         const speed = (isBoss ? baseSpeed * 1.3 : baseSpeed) * (1 - (synergyBuffs.slowPercent ?? 0));

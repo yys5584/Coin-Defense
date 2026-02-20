@@ -2674,18 +2674,38 @@ function renderCombatOverlay(cs: CombatState): void {
       overlay.appendChild(el);
 
     } else if (fx.type === 'skill_lightning' || fx.type === 'skill_chain') {
-      // ⚡ 번개/체인 — 노란 지그재그 라인
-      const color = fx.type === 'skill_lightning' ? '#ffeb3b' : '#00e5ff';
-      const glow = fx.type === 'skill_lightning' ? 'rgba(255,235,59' : 'rgba(0,229,255';
-      const size = 30 + progress * 20;
+      // ⚡ 번개/체인 — 시안/노란 전기 버스트 + 글로우 링
+      const isChain = fx.type === 'skill_chain';
+      const color = isChain ? '#00e5ff' : '#ffeb3b';
+      const glowColor = isChain ? '0,229,255' : '255,235,59';
+      // 번개 버스트: 빠른 확산 후 페이드
+      const burstSize = 10 + progress * 50;
+      const ringSize = 20 + progress * 70;
       el.style.cssText = `
-        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2}px;
-        width:${size}px; height:${size}px;
-        font-size:${20 + progress * 10}px; text-align:center; line-height:${size}px;
-        text-shadow:0 0 ${8 + progress * 15}px ${glow},0.9);
-        opacity:${1 - progress}; pointer-events:none;
+        position:absolute; left:${fxX}px; top:${fxY}px;
+        width:0; height:0; pointer-events:none;
       `;
-      el.textContent = fx.type === 'skill_lightning' ? '⚡' : '🔗';
+      // 내부 글로우
+      const burst = document.createElement('div');
+      burst.style.cssText = `
+        position:absolute; left:${-burstSize / 2}px; top:${-burstSize / 2}px;
+        width:${burstSize}px; height:${burstSize}px; border-radius:50%;
+        background:radial-gradient(circle, ${color} 0%, rgba(${glowColor},0.6) 40%, transparent 80%);
+        box-shadow:0 0 ${15 + progress * 25}px rgba(${glowColor},${0.9 - progress * 0.9}),
+                   0 0 ${5 + progress * 10}px white;
+        opacity:${1 - progress * progress};
+      `;
+      el.appendChild(burst);
+      // 외부 링
+      const ring = document.createElement('div');
+      ring.style.cssText = `
+        position:absolute; left:${-ringSize / 2}px; top:${-ringSize / 2}px;
+        width:${ringSize}px; height:${ringSize}px; border-radius:50%;
+        border:2px solid rgba(${glowColor},${0.7 - progress * 0.7});
+        box-shadow:0 0 ${8}px rgba(${glowColor},${0.4 - progress * 0.4});
+        opacity:${1 - progress};
+      `;
+      el.appendChild(ring);
       overlay.appendChild(el);
 
     } else if (fx.type === 'skill_sniper') {
@@ -2786,6 +2806,53 @@ function renderCombatOverlay(cs: CombatState): void {
         pointer-events:none;
       `;
       overlay.appendChild(el);
+    }
+  }
+
+  // ── 체인 라이트닝 빔 연결선 ──
+  // 비슷한 타이밍의 skill_chain 이펙트끼리 시안색 빔으로 연결
+  const chainFx = cs.effects.filter(fx => fx.type === 'skill_chain' && (nowMs - fx.startTime) < fx.duration);
+  // 같은 시간대(50ms 이내)의 체인 이펙트를 그룹화
+  const chainGroups: typeof chainFx[] = [];
+  const used = new Set<number>();
+  for (let i = 0; i < chainFx.length; i++) {
+    if (used.has(i)) continue;
+    const group = [chainFx[i]];
+    used.add(i);
+    for (let j = i + 1; j < chainFx.length; j++) {
+      if (used.has(j)) continue;
+      if (Math.abs(chainFx[j].startTime - chainFx[i].startTime) < 80) {
+        group.push(chainFx[j]);
+        used.add(j);
+      }
+    }
+    if (group.length > 1) chainGroups.push(group);
+  }
+  for (const group of chainGroups) {
+    for (let i = 0; i < group.length - 1; i++) {
+      const a = group[i];
+      const b = group[i + 1];
+      const ax = toPixelX(a.x);
+      const ay = toPixelY(a.y);
+      const bx = toPixelX(b.x);
+      const by = toPixelY(b.y);
+      const dx = bx - ax;
+      const dy = by - ay;
+      const dist = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+      const progress = (nowMs - a.startTime) / a.duration;
+      const beam = document.createElement('div');
+      beam.style.cssText = `
+        position:absolute; left:${ax}px; top:${ay}px;
+        width:${dist}px; height:3px;
+        background:linear-gradient(90deg, #00e5ff, #80ffff, #00e5ff);
+        box-shadow:0 0 12px rgba(0,229,255,${0.9 - progress * 0.9}),
+                   0 0 4px white;
+        transform-origin:0 50%; transform:rotate(${angle}rad);
+        opacity:${1 - progress * progress};
+        z-index:999; pointer-events:none;
+      `;
+      overlay.appendChild(beam);
     }
   }
 
