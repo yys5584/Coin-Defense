@@ -589,6 +589,49 @@ export class CombatSystem {
             const frontTarget = alive.reduce((a, b) => b.pathProgress > a.pathProgress ? b : a);
             const hpTarget = alive.reduce((a, b) => b.hp > a.hp ? b : a);
 
+            // ═══ 스킬 VFX 생성 ═══
+            const fxTarget = frontTarget;
+            const fxPos = getPositionOnPath(fxTarget.pathProgress);
+            const unitPos = unit.position!;
+            let skillFxType: CombatEffect['type'] = 'skill_explosion'; // 기본
+
+            // 스킬 파라미터에 따라 이펙트 타입 결정
+            if (p.gold || p.goldStatue) skillFxType = 'skill_gold';
+            else if (p.splashTargets || p.sniperShots) skillFxType = 'skill_explosion';
+            else if (p.chainTargets || p.ampChainTargets) skillFxType = 'skill_chain';
+            else if (p.freezeTargets || p.freezeDuration || p.freezeSlow) skillFxType = 'freeze';
+            else if (p.stunTargets || p.stunDuration) skillFxType = 'skill_stun';
+            else if (p.pierceTargets || p.distancePierce) skillFxType = 'skill_sniper';
+            else if (p.knockback || p.hpHalve) skillFxType = 'skill_aoe';
+            else if (p.allyPermDmgBuff || p.buffDuration || p.rangeBonus) skillFxType = 'skill_buff';
+            else if (p.executeThreshold || p.shatterExplode) skillFxType = 'skill_execute';
+            else if (p.summonDmg) skillFxType = 'skill_aoe';
+            else if (p.superCycle) skillFxType = 'skill_lightning';
+            else if (p.doubleCast) skillFxType = 'skill_chain';
+            else if (p.feeHustle || p.hyperCarry) skillFxType = 'skill_sniper';
+            else if (p.selfDmgPct) skillFxType = 'skill_buff';
+
+            // 유닛 위치에서 이펙트 생성
+            this.combat.effects.push({
+                id: this.effectIdCounter++,
+                type: skillFxType,
+                x: fxPos.px, y: fxPos.py,
+                value: Math.round(baseDmg),
+                startTime: performance.now(),
+                duration: 800,
+                frameIndex: 0,
+            });
+            // 유닛 시전 이펙트 (원형 파동)
+            this.combat.effects.push({
+                id: this.effectIdCounter++,
+                type: 'skill_buff',
+                x: unitPos.x + 1, y: unitPos.y + 1,
+                value: 0,
+                startTime: performance.now(),
+                duration: 400,
+                frameIndex: 0,
+            });
+
             // 골드 생성 스킬 (PC방 채굴자, Mashinsky)
             if (p.gold) {
                 this.combat.totalGoldEarned += p.gold;

@@ -151,7 +151,10 @@ export interface Monster {
 /** 전투 이펙트 (Unity 매핑: type → VFX Prefab) */
 export interface CombatEffect {
     id: number;
-    type: 'damage' | 'crit' | 'death' | 'boss_warning' | 'freeze';
+    type: 'damage' | 'crit' | 'death' | 'boss_warning' | 'freeze'
+    | 'skill_explosion' | 'skill_lightning' | 'skill_heal' | 'skill_stun'
+    | 'skill_aoe' | 'skill_buff' | 'skill_sniper' | 'skill_gold'
+    | 'skill_blackhole' | 'skill_execute' | 'skill_chain';
     x: number;               // grid 좌표
     y: number;
     value?: number;           // 데미지 수치

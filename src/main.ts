@@ -2385,6 +2385,119 @@ function renderCombatOverlay(cs: CombatState): void {
       el.textContent = '⚠️ BOSS ⚠️';
       el.style.opacity = `${1 - progress}`;
       overlay.appendChild(el);
+
+      // ═══ 스킬 이펙트 렌더링 ═══
+    } else if (fx.type === 'skill_explosion') {
+      // 💥 폭발 — 빨간 원형 확산
+      const size = 20 + progress * 60;
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2}px;
+        width:${size}px; height:${size}px; border-radius:50%;
+        background:radial-gradient(circle, rgba(255,80,50,${0.8 - progress * 0.8}) 0%, rgba(255,160,0,${0.4 - progress * 0.4}) 60%, transparent 100%);
+        box-shadow:0 0 ${10 + progress * 20}px rgba(255,100,0,${0.6 - progress * 0.6});
+        pointer-events:none;
+      `;
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'skill_lightning' || fx.type === 'skill_chain') {
+      // ⚡ 번개/체인 — 노란 지그재그 라인
+      const color = fx.type === 'skill_lightning' ? '#ffeb3b' : '#00e5ff';
+      const glow = fx.type === 'skill_lightning' ? 'rgba(255,235,59' : 'rgba(0,229,255';
+      const size = 30 + progress * 20;
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2}px;
+        width:${size}px; height:${size}px;
+        font-size:${20 + progress * 10}px; text-align:center; line-height:${size}px;
+        text-shadow:0 0 ${8 + progress * 15}px ${glow},0.9);
+        opacity:${1 - progress}; pointer-events:none;
+      `;
+      el.textContent = fx.type === 'skill_lightning' ? '⚡' : '🔗';
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'skill_sniper') {
+      // 🎯 저격 — 하얀 레이저 빔 효과
+      const size = 16 + progress * 8;
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2}px;
+        width:${size}px; height:${size}px; border-radius:50%;
+        background:radial-gradient(circle, rgba(255,255,255,${0.9 - progress * 0.9}) 0%, rgba(100,180,255,${0.5 - progress * 0.5}) 70%, transparent 100%);
+        box-shadow:0 0 ${15 + progress * 10}px rgba(100,180,255,${0.8 - progress * 0.8});
+        pointer-events:none;
+      `;
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'skill_stun') {
+      // 💫 스턴 — 노란 별 회전
+      const rotDeg = progress * 360;
+      el.style.cssText = `
+        position:absolute; left:${fxX - 12}px; top:${fxY - 20}px;
+        font-size:${16 + progress * 6}px; transform:rotate(${rotDeg}deg);
+        text-shadow:0 0 8px rgba(255,215,0,0.8);
+        opacity:${1 - progress}; pointer-events:none;
+      `;
+      el.textContent = '💫';
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'skill_aoe') {
+      // 🌀 광역 — 주황 원형 파동
+      const size = 30 + progress * 80;
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2}px;
+        width:${size}px; height:${size}px; border-radius:50%;
+        border:2px solid rgba(255,165,0,${0.7 - progress * 0.7});
+        background:radial-gradient(circle, rgba(255,165,0,${0.15 - progress * 0.15}) 0%, transparent 70%);
+        pointer-events:none;
+      `;
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'skill_buff') {
+      // 💚 버프 — 녹색 상승 파티클
+      const floatY = fxY - progress * 25;
+      const size = 20 + Math.sin(progress * Math.PI) * 15;
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${floatY - size / 2}px;
+        width:${size}px; height:${size}px; border-radius:50%;
+        background:radial-gradient(circle, rgba(100,255,150,${0.5 - progress * 0.5}) 0%, transparent 70%);
+        box-shadow:0 0 ${6 + progress * 8}px rgba(100,255,150,${0.4 - progress * 0.4});
+        pointer-events:none;
+      `;
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'skill_gold') {
+      // 💰 골드 — 금색 반짝
+      const floatY = fxY - progress * 20;
+      el.style.cssText = `
+        position:absolute; left:${fxX - 10}px; top:${floatY}px;
+        font-size:${18 - progress * 4}px;
+        text-shadow:0 0 10px rgba(255,215,0,0.9);
+        opacity:${1 - progress}; pointer-events:none;
+      `;
+      el.textContent = '💰';
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'skill_execute') {
+      // 💀 처형 — 빨간 해골
+      const size = 20 + Math.sin(progress * Math.PI) * 12;
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2 - 5}px;
+        font-size:${size}px; text-align:center;
+        text-shadow:0 0 12px rgba(255,0,0,0.8);
+        opacity:${1 - progress * 0.7}; pointer-events:none;
+      `;
+      el.textContent = '💀';
+      overlay.appendChild(el);
+
+    } else if (fx.type === 'freeze') {
+      // ❄️ 빙결 — 파란 결정
+      const size = 20 + Math.sin(progress * Math.PI) * 15;
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2}px;
+        width:${size}px; height:${size}px; border-radius:50%;
+        background:radial-gradient(circle, rgba(100,200,255,${0.6 - progress * 0.6}) 0%, rgba(50,100,200,${0.3 - progress * 0.3}) 60%, transparent 100%);
+        box-shadow:0 0 ${10 + progress * 15}px rgba(100,200,255,${0.5 - progress * 0.5});
+        pointer-events:none;
+      `;
+      overlay.appendChild(el);
     }
   }
 
