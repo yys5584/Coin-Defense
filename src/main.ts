@@ -3710,6 +3710,25 @@ async function showGameOver(): Promise<void> {
   inCountdown = false;
 
   // RUG PULL 연출 (HP 0 패배 — 클리어 시 비표시)
+  // ── AI 텔레메트리 덤프 ──
+  (window as any).__ENDGAME_STATS__ = {
+    maxWaveReached: reachedRound,
+    playerLevel: p.level,
+    finalGold: p.gold,
+    finalHp: p.hp,
+    cleared,
+    stageId: currentStageId,
+    unitPerformance: p.board.map(u => ({
+      unitId: u.unitId,
+      name: UNIT_MAP[u.unitId]?.name ?? u.unitId,
+      star: u.star,
+      totalDamageDealt: u.totalDamageDealt ?? 0,
+      position: u.position,
+    })),
+    bossGrades: collectedBossGrades,
+    runStats,
+    timestamp: new Date().toISOString(),
+  };
   if (!cleared) {
     // 게임 화면 즉시 숨기기 (RUG PULL 뒤에서 보이지 않도록)
     appEl?.classList.add('hidden');
@@ -4582,3 +4601,91 @@ document.querySelectorAll('.right-tab').forEach(btn => {
 log('🎮 CoinRandomDefense v3.5 시작!', 'green');
 log('D=리롤, F=XP구매, E=판매, Space=전투, 우클릭=판매', 'blue');
 render();
+
+// ═══════════════════════════════════════════════════════════
+// PHASE 7: AI BRIDGE — Headless Puppeteer API
+// ═══════════════════════════════════════════════════════════
+
+// Task 2: 시간 가속 기본값
+(window as any).__TIME_SCALE__ = 1;
+
+// Task 1: AI Remote Control API
+(window as any).__AI_API__ = {
+  /** XP 구매 (-4G, +4XP) */
+  buyExp(): boolean {
+    const ok = cmd.execute(state, { type: 'BUY_XP', playerId: player().id });
+    if (ok) { totalGoldSpent += 4; render(); }
+    return ok;
+  },
+
+  /** 상점 리롤 (-2G) */
+  rerollShop(): boolean {
+    const p = player();
+    const ok = cmd.execute(state, { type: 'REROLL', playerId: p.id });
+    if (ok) { totalGoldSpent += 2; render(); }
+    return ok;
+  },
+
+  /** 상점 index번째 유닛 구매 → 벤치 */
+  buyShopItem(index: number): boolean {
+    const ok = cmd.execute(state, { type: 'BUY_UNIT', playerId: player().id, shopIndex: index });
+    if (ok) render();
+    return ok;
+  },
+
+  /** 벤치 index번째 유닛을 보드 (gridX, gridY)에 배치 */
+  placeUnit(benchIndex: number, gridX: number, gridY: number): boolean {
+    const p = player();
+    if (benchIndex < 0 || benchIndex >= p.bench.length) return false;
+    const unit = p.bench[benchIndex];
+    // 슬롯 상한 체크
+    const maxSlots = LEVELS.find(l => l.level === p.level)?.slots ?? 1;
+    if (p.board.length >= maxSlots) return false;
+    // 중복 위치 체크
+    if (p.board.some(u => u.position?.x === gridX && u.position?.y === gridY)) return false;
+    // 벤치에서 제거, 보드에 추가
+    p.bench.splice(benchIndex, 1);
+    unit.position = { x: gridX, y: gridY };
+    p.board.push(unit);
+    render();
+    return true;
+  },
+
+  /** 자동 합성 실행 */
+  triggerCombine(): number {
+    const p = player();
+    const before = p.board.length + p.bench.length;
+    autoMergeAll(p);
+    render();
+    return before - (p.board.length + p.bench.length); // 합성으로 줄어든 유닛 수
+  },
+
+  /** 즉시 전투 시작 */
+  forceStartWave(): boolean {
+    if (inCombat) return false;
+    startCombat();
+    return true;
+  },
+
+  /** 현재 게임 상태 스냅샷 */
+  getState() {
+    const p = player();
+    return {
+      round: state.round,
+      phase: state.phase,
+      gold: p.gold,
+      hp: p.hp,
+      level: p.level,
+      xp: p.xp,
+      boardCount: p.board.length,
+      benchCount: p.bench.length,
+      shop: p.shop,
+      inCombat,
+    };
+  },
+
+  /** 시간 가속 설정 */
+  setTimeScale(scale: number) {
+    (window as any).__TIME_SCALE__ = Math.max(1, scale);
+  },
+};

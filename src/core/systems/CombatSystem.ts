@@ -358,7 +358,8 @@ export class CombatSystem {
                 return;
             }
             const rawDt = Math.min((now - this.lastTime) / 1000, 0.05); // cap delta
-            const dt = rawDt * this._gameSpeed;
+            const timeScale = (window as any).__TIME_SCALE__ ?? 1;
+            const dt = rawDt * this._gameSpeed * timeScale;
             this.lastTime = now;
 
             // 1) 스폰
