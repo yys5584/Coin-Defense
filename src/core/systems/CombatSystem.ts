@@ -92,22 +92,42 @@ export class CombatSystem {
     private _adaptiveDmg = false;
     private _bailoutUsed = false;
 
-    // 레이아웃 정규화: dx * cellScaleX + dy * cellScaleY 로 거리 계산
-    // avgCellSize 기준 1그리드단위 = 1 으로 변환
-    private cellScaleX = 1;
-    private cellScaleY = 1;
+    // 픽셀 기반 거리 계산용 레이아웃 파라미터
+    private _layout = {
+        gridOffsetX: 0, gridOffsetY: 0,
+        cellW: 1, cellH: 1,
+        trackLeft: 0, trackTop: 0,
+        trackW: 1, trackH: 1,
+        avgCell: 1,
+    };
 
-    /** 렌더링 레이아웃에서 계산한 셀 비율 설정 */
-    setCellScale(sx: number, sy: number): void {
-        this.cellScaleX = sx;
-        this.cellScaleY = sy;
+    /** 렌더링 레이아웃 설정 (startCombat 시 호출) */
+    setLayout(params: {
+        gridOffsetX: number; gridOffsetY: number;
+        cellW: number; cellH: number;
+        trackLeft: number; trackTop: number;
+        trackW: number; trackH: number;
+    }): void {
+        this._layout = {
+            ...params,
+            avgCell: (params.cellW + params.cellH) / 2,
+        };
     }
 
-    /** avgCellSize 정규화 거리 (range circle 시각과 일치) */
-    private rangeDistNorm(dx: number, dy: number): number {
-        const nx = dx * this.cellScaleX;
-        const ny = dy * this.cellScaleY;
-        return Math.sqrt(nx * nx + ny * ny);
+    /** 유닛(보드좌표) ↔ 몬스터(경로좌표) 픽셀 거리 / avgCellSize
+     *  시각적 범위원(range * avgCellSize)과 정확히 일치 */
+    private distToMonster(boardX: number, boardY: number, pathX: number, pathY: number): number {
+        const L = this._layout;
+        // 유닛 픽셀 좌표 (보드 셀 중심)
+        const uPx = L.gridOffsetX + (boardX + 0.5) * L.cellW;
+        const uPy = L.gridOffsetY + (boardY + 0.5) * L.cellH;
+        // 몬스터 픽셀 좌표 (트랙 위)
+        const mPx = L.trackLeft + (pathX / 8) * L.trackW;
+        const mPy = L.trackTop + (pathY / 5) * L.trackH;
+        // 픽셀 거리 / avgCellSize = range 단위
+        const dx = uPx - mPx;
+        const dy = uPy - mPy;
+        return Math.sqrt(dx * dx + dy * dy) / L.avgCell;
     }
 
     /** 게임 속도 (1x, 2x, 3x) */
@@ -600,9 +620,7 @@ export class CombatSystem {
             const hasTargetInRange = this.combat.monsters.some(m => {
                 if (!m.alive) return false;
                 const mPos = getPositionOnPath(m.pathProgress);
-                const dx = mPos.px - (unit.position!.x + 1.5);
-                const dy = mPos.py - (unit.position!.y + 1.5);
-                return this.rangeDistNorm(dx, dy) <= unitRange;
+                return this.distToMonster(unit.position!.x, unit.position!.y, mPos.px, mPos.py) <= unitRange;
             });
             if (!hasTargetInRange) continue; // 마나 만땅이지만 사거리 내 적 없음 → 대기
             unit.currentMana = 0;
@@ -1897,9 +1915,7 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - (unit.position.x + 1.5);
-                    const dy = pos.py - (unit.position.y + 1.5);
-                    const dist = this.rangeDistNorm(dx, dy);
+                    const dist = this.distToMonster(unit.position.x, unit.position.y, pos.px, pos.py);
                     if (dist <= range && m.pathProgress < worstProgress) {
                         target = m;
                         worstProgress = m.pathProgress;
@@ -1911,9 +1927,7 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - (unit.position.x + 1.5);
-                    const dy = pos.py - (unit.position.y + 1.5);
-                    const dist = this.rangeDistNorm(dx, dy);
+                    const dist = this.distToMonster(unit.position.x, unit.position.y, pos.px, pos.py);
                     if (dist <= range && m.hp > bestHp) {
                         target = m;
                         bestHp = m.hp;
@@ -1925,9 +1939,7 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - (unit.position.x + 1.5);
-                    const dy = pos.py - (unit.position.y + 1.5);
-                    const dist = this.rangeDistNorm(dx, dy);
+                    const dist = this.distToMonster(unit.position.x, unit.position.y, pos.px, pos.py);
                     if (dist <= range && m.pathProgress > bestProgress) {
                         target = m;
                         bestProgress = m.pathProgress;

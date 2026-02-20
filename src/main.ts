@@ -2394,7 +2394,7 @@ function startCombat(): void {
     if (mapWrapper && grid) {
       const { cellW, cellH, gridOffsetX, gridOffsetY } = getGridCoords(mapWrapper, grid);
       const monsterPath = document.getElementById('monster-path');
-      let trackW: number, trackH: number;
+      let trackLeft: number, trackTop: number, trackW: number, trackH: number;
       if (monsterPath) {
         const s = currentScale;
         const pr = monsterPath.getBoundingClientRect();
@@ -2405,16 +2405,20 @@ function startCombat(): void {
         const pathBottom = pathTop + pr.height / s;
         const gridRight = gridOffsetX + cellW * 7;
         const gridBottom = gridOffsetY + cellH * 4;
-        trackW = ((pathRight + gridRight) / 2) - ((pathLeft + gridOffsetX) / 2);
-        trackH = ((pathBottom + gridBottom) / 2) - ((pathTop + gridOffsetY) / 2);
+        // 60/40 비율 (renderCombatOverlay와 동일)
+        trackLeft = pathLeft * 0.6 + gridOffsetX * 0.4;
+        trackTop = pathTop * 0.6 + gridOffsetY * 0.4;
+        const trackRight = pathRight * 0.6 + gridRight * 0.4;
+        const trackBottom = pathBottom * 0.6 + gridBottom * 0.4;
+        trackW = trackRight - trackLeft;
+        trackH = trackBottom - trackTop;
       } else {
+        trackLeft = gridOffsetX - cellW * 0.7;
+        trackTop = gridOffsetY - cellH * 0.7;
         trackW = cellW * 8.4;
         trackH = cellH * 5.4;
       }
-      const pxPerGridX = trackW / 8; // 1 grid X unit = pixels
-      const pxPerGridY = trackH / 5; // 1 grid Y unit = pixels
-      const avgCellSize = (cellW + cellH) / 2;
-      combat.setCellScale(pxPerGridX / avgCellSize, pxPerGridY / avgCellSize);
+      combat.setLayout({ gridOffsetX, gridOffsetY, cellW, cellH, trackLeft, trackTop, trackW, trackH });
     }
   }
 
