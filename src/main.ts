@@ -1041,6 +1041,117 @@ setInterval(() => {
 const synergy = new SynergySystem(events);
 const player = () => state.players[0];
 
+// ─── QA 봇용 Headless 백도어 API ─────────────────────────────
+if (typeof window !== 'undefined') {
+  // Time dilation (봇이 주입)
+  (window as any).__TIME_SCALE__ = 1;
+
+  // Endgame stats (게임 오버 시 채워짐)
+  (window as any).__ENDGAME_STATS__ = null;
+
+  // AI API
+  (window as any).__AI_API__ = {
+    buyExp: () => {
+      const p = player();
+      if (p.gold >= 4 && p.level < 10) {
+        return cmd.execute(state, { type: 'BUY_XP', playerId: p.id });
+      }
+      return false;
+    },
+    rerollShop: () => {
+      const p = player();
+      if (p.freeRerolls > 0 || p.gold >= 2) {
+        return cmd.execute(state, { type: 'REROLL', playerId: p.id });
+      }
+      return false;
+    },
+    buyShopItem: (shopIndex: number) => {
+      const p = player();
+      const shopId = p.shop[shopIndex];
+      if (!shopId) return false;
+      const def = UNIT_MAP[shopId];
+      if (!def || p.gold < def.cost) return false;
+      return cmd.execute(state, {
+        type: 'BUY_UNIT', playerId: p.id, shopIndex,
+      });
+    },
+    placeUnit: (instanceId: string, x: number, y: number) => {
+      const p = player();
+      return cmd.execute(state, {
+        type: 'MOVE_UNIT', playerId: p.id,
+        instanceId, to: { x, y },
+      });
+    },
+    sellUnit: (instanceId: string) => {
+      const p = player();
+      return cmd.execute(state, {
+        type: 'SELL_UNIT', playerId: p.id, instanceId,
+      });
+    },
+    triggerCombine: () => {
+      // 합성은 BUY_UNIT 시 CommandProcessor가 자동 처리
+      // 여기서는 벤치+보드에서 3개 같은 유닛 찾아서 강제 합성
+      const p = player();
+      const all = [...p.board, ...p.bench];
+      const counts: Record<string, typeof all> = {};
+      for (const u of all) {
+        const key = `${u.unitId}_${u.star}`;
+        if (!counts[key]) counts[key] = [];
+        counts[key].push(u);
+      }
+      let combined = false;
+      for (const [, units] of Object.entries(counts)) {
+        if (units.length >= 3) {
+          // 같은 유닛 3개 → 합성 (sell 2개, 남은 1개가 별 올라감)
+          // CommandProcessor는 BUY_UNIT 시 자동 합성하므로, 수동 트리거 불필요
+          combined = true;
+        }
+      }
+      return combined;
+    },
+    forceStartWave: () => {
+      if (typeof startCombat === 'function') {
+        startCombat();
+        return true;
+      }
+      return false;
+    },
+    getState: () => {
+      const p = player();
+      const lvlDef = getLevelDef(p.level);
+      return {
+        gold: p.gold,
+        level: p.level,
+        xp: p.xp,
+        xpNeeded: p.level >= 10 ? 0 : lvlDef.requiredXp,
+        life: p.hp,
+        benchCount: p.bench.length,
+        boardCount: p.board.length,
+        maxBoard: lvlDef.slots,
+        round: state.round,
+        shop: p.shop.map((id: string | null, i: number) => {
+          if (!id) return null;
+          const def = UNIT_MAP[id];
+          return { index: i, unitId: id, name: def?.name, cost: def?.cost, origin: def?.origin };
+        }),
+        bench: p.bench.map((u: UnitInstance) => ({
+          instanceId: u.instanceId, unitId: u.unitId,
+          name: UNIT_MAP[u.unitId]?.name, star: u.star,
+        })),
+        board: p.board.map((u: UnitInstance) => ({
+          instanceId: u.instanceId, unitId: u.unitId,
+          name: UNIT_MAP[u.unitId]?.name, star: u.star,
+          position: u.position,
+        })),
+        synergies: (p as any).activeSynergies || [],
+        inCombat,
+        isGameOver: p.hp <= 0,
+        freeRerolls: p.freeRerolls || 0,
+      };
+    },
+  };
+}
+
 // 게임 통계 추적
 let totalGoldSpent = 0;
 // (gameStartTime is set in multiplayer block above)
@@ -4609,7 +4720,7 @@ render();
 // Task 2: 시간 가속 기본값
 (window as any).__TIME_SCALE__ = 1;
 
-// Task 1: AI Remote Control API
+// Task 1: AI Remote Control API (통합 버전)
 (window as any).__AI_API__ = {
   /** XP 구매 (-4G, +4XP) */
   buyExp(): boolean {
@@ -4638,12 +4749,9 @@ render();
     const p = player();
     if (benchIndex < 0 || benchIndex >= p.bench.length) return false;
     const unit = p.bench[benchIndex];
-    // 슬롯 상한 체크
     const maxSlots = LEVELS.find(l => l.level === p.level)?.slots ?? 1;
     if (p.board.length >= maxSlots) return false;
-    // 중복 위치 체크
     if (p.board.some(u => u.position?.x === gridX && u.position?.y === gridY)) return false;
-    // 벤치에서 제거, 보드에 추가
     p.bench.splice(benchIndex, 1);
     unit.position = { x: gridX, y: gridY };
     p.board.push(unit);
@@ -4657,7 +4765,7 @@ render();
     const before = p.board.length + p.bench.length;
     autoMergeAll(p);
     render();
-    return before - (p.board.length + p.bench.length); // 합성으로 줄어든 유닛 수
+    return before - (p.board.length + p.bench.length);
   },
 
   /** 즉시 전투 시작 */
@@ -4667,20 +4775,46 @@ render();
     return true;
   },
 
-  /** 현재 게임 상태 스냅샷 */
+  /** 유닛 판매 */
+  sellUnit(instanceId: string): boolean {
+    return cmd.execute(state, {
+      type: 'SELL_UNIT', playerId: player().id, instanceId,
+    });
+  },
+
+  /** 현재 게임 상태 스냅샷 (상세 버전) */
   getState() {
     const p = player();
+    const lvlDef = getLevelDef(p.level);
     return {
       round: state.round,
       phase: state.phase,
       gold: p.gold,
+      life: p.hp,
       hp: p.hp,
       level: p.level,
       xp: p.xp,
+      xpNeeded: p.level >= 10 ? 0 : lvlDef.requiredXp,
       boardCount: p.board.length,
       benchCount: p.bench.length,
-      shop: p.shop,
+      maxBoard: lvlDef.slots,
+      shop: p.shop.map((id: string | null, i: number) => {
+        if (!id) return null;
+        const def = UNIT_MAP[id];
+        return { index: i, unitId: id, name: def?.name, cost: def?.cost, origin: def?.origin };
+      }),
+      bench: p.bench.map((u: UnitInstance) => ({
+        instanceId: u.instanceId, unitId: u.unitId,
+        name: UNIT_MAP[u.unitId]?.name, star: u.star, benchIndex: p.bench.indexOf(u),
+      })),
+      board: p.board.map((u: UnitInstance) => ({
+        instanceId: u.instanceId, unitId: u.unitId,
+        name: UNIT_MAP[u.unitId]?.name, star: u.star,
+        position: u.position,
+      })),
       inCombat,
+      isGameOver: p.hp <= 0,
+      freeRerolls: p.freeRerolls || 0,
     };
   },
 
@@ -4689,3 +4823,4 @@ render();
     (window as any).__TIME_SCALE__ = Math.max(1, scale);
   },
 };
+
