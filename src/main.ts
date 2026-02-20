@@ -1871,115 +1871,106 @@ function renderDPSPanel(): void {
     return;
   }
 
-  // 시너지 버프 계산
-  const activeSynergies = synergy.calculateSynergies(p);
-  const buffs = synergy.calculateBuffs(activeSynergies);
-  const buffData = {
-    dmgMult: buffs.dmgMultiplier,
-    atkSpdMult: buffs.atkSpeedMultiplier,
-    flatDmg: buffs.flatDmgBonus,
-    doubleHit: buffs.doubleHitChance,
-    splash: buffs.splashDmg,
-  };
-  const hasBuff = buffs.dmgMultiplier > 1.01 || buffs.atkSpeedMultiplier > 1.01 || buffs.flatDmgBonus > 0 || buffs.doubleHitChance > 0 || buffs.splashDmg > 0;
-
-  // 판정: 전투 중이면 실시간 DPS, 아니면 이론 DPS
   const isCombatActive = combatStartTime > 0;
   const elapsedSec = isCombatActive ? Math.max(1, (performance.now() - combatStartTime) / 1000) : 0;
 
-  const dpsEntries = p.board.map(unit => {
-    const def = UNIT_MAP[unit.unitId];
-    const theoryDps = calculateUnitDPS(unit, buffData);
-    const coverage = getRangeCoverage(unit);
-    const theoryEffDps = theoryDps * coverage;
-    // 실시간: 누적 실제 데미지 ÷ 경과 시간
-    const realDps = isCombatActive ? Math.floor((unit.totalDamageDealt ?? 0) / elapsedSec) : 0;
-    const totalDmg = unit.totalDamageDealt ?? 0;
-    return {
-      name: def?.name || unit.unitId,
-      emoji: def?.emoji || '?',
-      star: unit.star,
-      theoryDps: Math.floor(theoryEffDps),
-      realDps,
-      totalDmg,
-      effectiveDps: isCombatActive ? realDps : theoryEffDps,
-      coverage: Math.round(coverage * 100),
-    };
-  }).sort((a, b) => b.effectiveDps - a.effectiveDps);
-
-  const totalDPS = dpsEntries.reduce((sum, e) => sum + e.effectiveDps, 0);
-  $('hud-dps').textContent = Math.floor(totalDPS).toString();
-
-  // TOP5 표시 (유효 DPS 기준)
-  const top5 = dpsEntries.slice(0, 5);
-  for (let i = 0; i < top5.length; i++) {
-    const e = top5[i];
-    const row = document.createElement('div');
-    row.className = 'dps-row';
-    // 전투 중: 실시간 DPS + 누적 데미지, 준비 중: 이론 DPS
-    const dpsVal = Math.floor(e.effectiveDps);
-    const dpsDisplay = isCombatActive
-      ? `${dpsVal} <span class="dps-bonus" style="color:#818cf8">📊${Math.floor(e.totalDmg).toLocaleString()}</span>`
-      : `${dpsVal}`;
-    row.innerHTML = `
-      <span class="dps-rank">#${i + 1}</span>
-      <span class="dps-emoji">${e.emoji}</span>
-      <span class="dps-name">${e.name} ${'⭐'.repeat(e.star)}</span>
-      <span class="dps-value">${dpsDisplay}</span>
-    `;
-    row.title = `이론: ${e.theoryDps} | 실제: ${e.realDps} | 누적: ${Math.floor(e.totalDmg)} | 커버리지: ${e.coverage}%`;
-    dpsList.appendChild(row);
-  }
-
-  // 총 유효 DPS
-  const total = document.createElement('div');
-  total.className = 'dps-total';
-  total.innerHTML = `<span>${isCombatActive ? '실시간 DPS' : '유효 DPS'}</span><span>${Math.floor(totalDPS)}</span>`;
-  dpsList.appendChild(total);
-
-  if (hasBuff) {
-    const buffRow = document.createElement('div');
-    buffRow.className = 'dps-buff-info';
-    buffRow.textContent = `시너지: DMG×${buffs.dmgMultiplier.toFixed(1)} 공속×${buffs.atkSpeedMultiplier.toFixed(1)}`;
-    dpsList.appendChild(buffRow);
-  }
-
-  // 다음 스테이지 필요 DPS (커버리지 반영)
+  // ── B등급 기준 DPS 계산 ──
   const nextRound = state.round;
-  const isBoss = nextRound % 10 === 0;
+  const isBoss = isBossRound(nextRound);
+  const bTime = isBoss ? 35 : 30;   // B등급 시간 제한
+  const aTime = 20;                  // A등급 시간 제한
+  const sTime = 10;                  // S등급 시간 제한
+
   let monsterCount: number;
-  if (isBoss) {
-    monsterCount = 1;
-  } else if (getStage(nextRound) === 1) {
-    monsterCount = nextRound === 1 ? 1 : nextRound === 2 ? 3 : 5;
-  } else {
-    monsterCount = 10;
-  }
-  // CombatSystem과 동일한 HP 공식 사용
+  if (isBoss) monsterCount = 1;
+  else if (getStage(nextRound) === 1) monsterCount = nextRound === 1 ? 1 : nextRound === 2 ? 3 : 5;
+  else monsterCount = 10;
+
   const monsterHp = isBoss
     ? Math.floor(nextRound * nextRound * 12 + nextRound * 150 + 300)
     : Math.floor(nextRound * nextRound * 0.52 + nextRound * 7.8 + 5);
   const totalHp = monsterHp * monsterCount;
 
-  // 몬스터가 1바퀴 도는 시간
-  const PATH_LEN = 28;
-  const baseSpeed = 1.2 + nextRound * 0.012;
-  const speed = baseSpeed * (1 - (buffs.slowPercent ?? 0));
-  const onelapTime = PATH_LEN / speed;
+  const bDPS = Math.ceil(totalHp / bTime);
+  const aDPS = Math.ceil(totalHp / aTime);
+  const sDPS = Math.ceil(totalHp / sTime);
 
-  // 필요 유효 DPS = 총 HP ÷ 1바퀴 시간
-  // 유효 DPS와 직접 비교 가능 (둘 다 커버리지 반영)
-  const requiredEffDPS = Math.ceil(totalHp / onelapTime);
-  const isEnough = totalDPS >= requiredEffDPS;
+  // ── 실시간 팀 DPS ──
+  const totalRealDmg = p.board.reduce((s, u) => s + (u.totalDamageDealt ?? 0), 0);
+  const teamDPS = isCombatActive ? Math.floor(totalRealDmg / elapsedSec) : 0;
 
-  const req = document.createElement('div');
-  req.className = 'dps-required';
-  req.innerHTML = `
-    <span>${getStageRound(nextRound)} 필요</span>
-    <span style="color:${isEnough ? '#4ade80' : '#f87171'}">${requiredEffDPS} DPS</span>
-  `;
-  dpsList.appendChild(req);
+  // 현재 등급 판정
+  let curGrade: string, gradeColor: string;
+  if (!isCombatActive) { curGrade = '-'; gradeColor = '#94a3b8'; }
+  else if (teamDPS >= sDPS) { curGrade = 'S'; gradeColor = '#ffd700'; }
+  else if (teamDPS >= aDPS) { curGrade = 'A'; gradeColor = '#43e97b'; }
+  else if (teamDPS >= bDPS) { curGrade = 'B'; gradeColor = '#42a5f5'; }
+  else { curGrade = 'F'; gradeColor = '#ef4444'; }
 
+  $('hud-dps').textContent = isCombatActive ? teamDPS.toString() : bDPS.toString();
+
+  // ── 등급별 DPS 임계값 바 ──
+  const gradeBar = document.createElement('div');
+  gradeBar.style.cssText = 'display:flex;gap:4px;margin-bottom:4px;';
+  const grades = [
+    { g: 'S', dps: sDPS, color: '#ffd700' },
+    { g: 'A', dps: aDPS, color: '#43e97b' },
+    { g: 'B', dps: bDPS, color: '#42a5f5' },
+  ];
+  for (const g of grades) {
+    const reached = isCombatActive && teamDPS >= g.dps;
+    const el = document.createElement('span');
+    el.style.cssText = `padding:1px 6px;border-radius:3px;font-size:11px;font-weight:bold;
+      background:${reached ? g.color : 'rgba(255,255,255,0.08)'};
+      color:${reached ? '#000' : g.color};`;
+    el.textContent = `${g.g} ≥${g.dps}`;
+    gradeBar.appendChild(el);
+  }
+  dpsList.appendChild(gradeBar);
+
+  // ── 팀 DPS 요약 ──
+  const summary = document.createElement('div');
+  summary.className = 'dps-total';
+  if (isCombatActive) {
+    summary.innerHTML = `<span style="color:${gradeColor};font-weight:bold;font-size:14px">${curGrade}</span>
+      <span>실시간 DPS</span>
+      <span style="font-weight:bold;color:${gradeColor}">${teamDPS}</span>`;
+  } else {
+    summary.innerHTML = `<span>B등급 필요</span><span style="font-weight:bold;color:#42a5f5">${bDPS} DPS</span>`;
+  }
+  dpsList.appendChild(summary);
+
+  // ── 유닛별 기여도 (전투 중만) ──
+  if (isCombatActive && totalRealDmg > 0) {
+    const entries = p.board
+      .map(u => ({
+        name: UNIT_MAP[u.unitId]?.name || u.unitId,
+        emoji: UNIT_MAP[u.unitId]?.emoji || '?',
+        star: u.star,
+        dmg: u.totalDamageDealt ?? 0,
+        dps: Math.floor((u.totalDamageDealt ?? 0) / elapsedSec),
+        pct: Math.round(((u.totalDamageDealt ?? 0) / totalRealDmg) * 100),
+      }))
+      .sort((a, b) => b.dmg - a.dmg)
+      .slice(0, 5);
+
+    for (let i = 0; i < entries.length; i++) {
+      const e = entries[i];
+      if (e.dmg === 0) continue;
+      const row = document.createElement('div');
+      row.className = 'dps-row';
+      row.innerHTML = `
+        <span class="dps-rank">#${i + 1}</span>
+        <span class="dps-emoji">${e.emoji}</span>
+        <span class="dps-name">${e.name} ${'⭐'.repeat(e.star)}</span>
+        <span class="dps-value">${e.dps} <span style="color:#818cf8;font-size:10px">${e.pct}%</span></span>
+      `;
+      row.title = `DPS: ${e.dps} | 누적: ${Math.floor(e.dmg).toLocaleString()} | 기여: ${e.pct}%`;
+      dpsList.appendChild(row);
+    }
+  }
+
+  // ── 보스 경고 ──
   if (isBoss) {
     const bossWarn = document.createElement('div');
     bossWarn.className = 'dps-boss-warn';
@@ -1987,7 +1978,7 @@ function renderDPSPanel(): void {
     dpsList.appendChild(bossWarn);
   }
 
-  // ── 다음 스테이지 방어 경향 예고 ──
+  // ── 스테이지 예고 ──
   const currentStage = getStage(nextRound);
   const nextStage = currentStage < 7 ? currentStage + 1 : null;
   if (nextStage && STAGE_HINTS[nextStage]) {
@@ -1998,13 +1989,6 @@ function renderDPSPanel(): void {
       <span style="font-size:12px;font-weight:bold">${STAGE_HINTS[nextStage]}</span>
     `;
     dpsList.appendChild(previewEl);
-  }
-
-  if (!isEnough) {
-    const deficit = document.createElement('div');
-    deficit.className = 'dps-deficit';
-    deficit.textContent = `⚠ ${Math.ceil(requiredEffDPS - totalDPS)} DPS 부족`;
-    dpsList.appendChild(deficit);
   }
 }
 
