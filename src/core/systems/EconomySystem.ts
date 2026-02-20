@@ -19,20 +19,18 @@ export class EconomySystem {
         let interest = isWarmup ? 0 : getInterest(player.gold);
         const streak = isWarmup ? 0 : getStreakBonus(Math.max(player.winStreak, player.lossStreak));
 
-        // 증강: 이자왕 — 이자 상한 +3
-        if (player.augments.includes('aug_interest_king') && !isWarmup) {
+        // 증강: 디파이 이자농사 — 이자 상한 +3
+        if (player.augments.includes('aug_defi_farm') && !isWarmup) {
             interest = Math.min(interest + 3, 8);
         }
-        // 증강: 골드 러시 — 라운드 기본 수입 +3
-        const goldRushBonus = player.augments.includes('aug_gold_rush') ? 3 : 0;
+        // MEV 샌드위치: 킬 골드는 CombatSystem에서 처리
+        const goldRushBonus = 0;
 
         const total = base + interest + streak + goldRushBonus;
         player.gold += total;
 
-        // 증강: 재생의 오라 — 매 라운드 HP+5 (maxHP+20은 선택 시 1회)
-        if (player.augments.includes('aug_heal')) {
-            player.hp = Math.min(player.hp + 5, (player as any).maxHp ?? 100);
-        }
+        // 증강: 구제 금융 — HP 회복 없음 (1회성 비상 안전망)
+        // (체크는 CombatSystem에서 처리)
 
         this.events.emit('gold:changed', {
             gold: player.gold,
@@ -49,7 +47,7 @@ export class EconomySystem {
 
         player.gold -= XP_BUY_COST;
         // 증강: 빠른 성장 — XP 구매 시 +3 추가 XP
-        const bonusXp = player.augments.includes('aug_xp_boost') ? 3 : 0;
+        const bonusXp = 0;
         this.addXp(player, XP_BUY_AMOUNT + bonusXp);
         this.events.emit('gold:changed', { gold: player.gold });
 
@@ -61,7 +59,7 @@ export class EconomySystem {
         if (player.level >= 10) return;
         if (round <= 1) return; // 1-1은 첫 라운드, XP 없음
         // 증강: 빠른 성장 — 라운드당 XP +2 추가
-        const bonusXp = player.augments.includes('aug_xp_boost') ? 2 : 0;
+        const bonusXp = 0;
         this.addXp(player, getXpPerRound(round) + bonusXp);
     }
 

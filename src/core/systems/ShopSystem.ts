@@ -168,7 +168,7 @@ export class ShopSystem {
     reroll(state: GameState, player: PlayerState): boolean {
         const isFree = player.freeRerolls > 0;
         // 증강: 리롤 마스터 — 리롤 비용 2→1
-        const cost = player.augments.includes('aug_reroll_master') ? 1 : REROLL_COST;
+        const cost = player.augments.includes('aug_dex_swap') ? 1 : REROLL_COST;
         if (!isFree && player.gold < cost) return false;
 
         // 현재 상점의 유닛을 풀에 반환

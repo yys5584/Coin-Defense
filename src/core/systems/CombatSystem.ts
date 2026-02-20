@@ -228,14 +228,9 @@ export class CombatSystem {
         if (augs.has('aug_lightning_network')) {
             // 플래그 저장
         }
-        // 💰 이자왕: 경제 (main.ts에서 처리)
-        // 🎲 리롤 마스터: 경제 (main.ts에서 처리)
-        // 📈 빠른 성장: 경제 (main.ts에서 처리)
-        // 💚 재생의 오라: HP 회복 (main.ts에서 처리)
-        // 🏆 골드 러시: 킬 골드+1, 라운드 수입+3
-        if (augs.has('aug_gold_rush')) {
+        // 🤖 MEV 샌드위치: 킬 골드 +1
+        if (augs.has('aug_mev')) {
             synergyBuffs.bonusKillGold += 1;
-            synergyBuffs.bonusRoundGold += 3;
         }
         // ⏳ 모래시계: 몬스터 이속 -20% (slowPercent에 합산)
         if (augs.has('aug_monster_slow')) {
@@ -536,6 +531,10 @@ export class CombatSystem {
             // 📈 숏 스퀴즈: 보스 공격 시 마나 회복 2배
             if (augSet.has('aug_short_squeeze') && this.combat.monsters.some(m => m.alive && m.isBoss)) {
                 manaRegen *= 2;
+            }
+            // 🌾 디파이 이자농사: 보유 10G당 마나 회복 +1
+            if (augSet.has('aug_defi_farm')) {
+                manaRegen += Math.floor(player.gold / 10);
             }
             unit.currentMana = (unit.currentMana ?? 0) + manaRegen * dt;
 

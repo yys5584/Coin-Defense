@@ -2646,7 +2646,7 @@ function showAugmentPick(round: number): void {
       log(`🧬 증강 획득: ${aug.emoji} ${aug.name} — ${aug.effect}`, 'purple');
 
       // ── 즉시 효과 ──
-      if (aug.id === 'aug_heal') {
+      if (aug.id === 'aug_bailout') {
         // 재생의 오라: maxHP +20, 즉시 HP+5
         (p as any).maxHp = ((p as any).maxHp ?? 100) + 20;
         p.hp = Math.min(p.hp + 5, (p as any).maxHp);
@@ -2660,7 +2660,7 @@ function showAugmentPick(round: number): void {
         // 진격력: 보드 배치 슬롯 +1 (레벨 제한 완화)
         log('📶 보드 슬롯 +1!', 'green');
       }
-      if (aug.id === 'aug_reroll_master') {
+      if (aug.id === 'aug_dex_swap') {
         // 리롤 마스터: 무료 리롤 1회 즉시 지급
         p.freeRerolls += 1;
         log('🎲 무료 리롤 +1!', 'green');
@@ -2681,7 +2681,7 @@ function showAugmentPick(round: number): void {
 
 function getCategoryLabel(augId: string): string {
   if (['aug_zk_proof', 'aug_chain_liquidation', 'aug_margin_call', 'aug_dead_cat', 'aug_short_squeeze', 'aug_lightning_network'].includes(augId)) return '⚔️ 전투';
-  if (['aug_interest_king', 'aug_reroll_master', 'aug_xp_boost', 'aug_heal', 'aug_gold_rush', 'aug_lucky'].includes(augId)) return '💰 유틸';
+  if (['aug_defi_farm', 'aug_dex_swap', 'aug_pow', 'aug_bailout', 'aug_mev', 'aug_airdrop'].includes(augId)) return '💰 유틸';
   return '🧠 전략';
 }
 
