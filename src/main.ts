@@ -3519,16 +3519,17 @@ function showRangeCircle(cellX: number, cellY: number, unit: UnitInstance): void
   const cell = grid.querySelector(`.board-cell[data-x="${cellX}"][data-y="${cellY}"]`) as HTMLElement;
   if (!cell) return;
 
-  // 셀 크기에서 반지름 계산
+  // 셀 크기에서 사거리 타원 계산 (전투 판정은 그리드 유클리드 거리)
   const cellW = cell.offsetWidth;
   const cellH = cell.offsetHeight;
-  const avgCellSize = (cellW + cellH) / 2;
-  const radius = range * avgCellSize;
+  const radiusX = range * cellW;
+  const radiusY = range * cellH;
 
   const circle = document.createElement('div');
   circle.id = 'range-circle';
-  circle.style.width = `${radius * 2}px`;
-  circle.style.height = `${radius * 2}px`;
+  circle.style.width = `${radiusX * 2}px`;
+  circle.style.height = `${radiusY * 2}px`;
+  circle.style.borderRadius = '50%';
   // 셀의 자식으로 추가 → CSS로 정확히 중앙 정렬
   circle.style.position = 'absolute';
   circle.style.left = '50%';
