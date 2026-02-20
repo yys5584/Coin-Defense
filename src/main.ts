@@ -3658,15 +3658,22 @@ function executeRecipe(targetId: string): boolean {
   const { isCraftable, unitsToConsume } = checkCraftability(targetId);
   if (!isCraftable) return false;
 
-  // 재료 제거
+  // 1) 모달 즉시 닫기
+  closeCraftModal();
+
+  // 2) 재료 DOM 요소 제거 + 상태 배열에서 제거
   for (const rem of unitsToConsume) {
+    // DOM 제거 (보드/벤치 .unit-card)
+    const domEl = document.querySelector(`[data-instance-id="${rem.instanceId}"]`);
+    if (domEl) domEl.remove();
+
     const bIdx = p.board.findIndex(u => u.instanceId === rem.instanceId);
     if (bIdx >= 0) p.board.splice(bIdx, 1);
     const eIdx = p.bench.findIndex(u => u.instanceId === rem.instanceId);
     if (eIdx >= 0) p.bench.splice(eIdx, 1);
   }
 
-  // 결과물 생성 (벤치에 배치)
+  // 3) 결과물 생성 (벤치에 배치)
   const newUnit = createUnitInstance(targetId);
   p.bench.push(newUnit);
 
@@ -3674,9 +3681,21 @@ function executeRecipe(targetId: string): boolean {
   log(`✨ 합성! ${def?.emoji ?? '?'} ${def?.name ?? targetId} 생성!`, 'gold');
   events.emit('unit:merged', { unitId: targetId, newStar: 1, instanceId: newUnit.instanceId });
 
-  // 자동 별 합성 체크
+  // 4) 자동 별 합성 체크 (연쇄 합성)
   autoMergeAll(p);
-  closeCraftModal();
+
+  // 5) 시각 효과: 골드 플래시
+  const wrapper = document.getElementById('game-scale-wrapper') || document.getElementById('logical-wrapper');
+  if (wrapper) {
+    wrapper.style.transition = 'box-shadow 0.15s ease-out';
+    wrapper.style.boxShadow = '0 0 40px rgba(255, 215, 0, 0.6), inset 0 0 20px rgba(255, 215, 0, 0.15)';
+    setTimeout(() => {
+      wrapper.style.boxShadow = '';
+      wrapper.style.transition = '';
+    }, 400);
+  }
+
+  // 6) 전체 UI 리렌더
   render();
   return true;
 }
