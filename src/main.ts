@@ -3315,22 +3315,85 @@ function showTooltip(e: MouseEvent, unit: UnitInstance): void {
     ? `${baseAtkSpd} → <span style="color:#4ade80">${buffedAtkSpd}</span>/s`
     : `${baseAtkSpd}/s`;
 
+  // DPS 계산
+  const dps = Math.floor(buffedDmg * buffedAtkSpd);
+
+  // 데미지 타입
+  const dmgTypeIcon = def.dmgType === 'magic' ? '🔮 마법' : '⚔️ 물리';
+  const dmgTypeColor = def.dmgType === 'magic' ? '#c084fc' : '#fb923c';
+
+  // 마나 정보
+  let manaHtml = '';
+  if (def.maxMana && skill?.type === 'active') {
+    const currentMana = Math.floor(unit.currentMana ?? 0);
+    const maxMana = def.maxMana;
+    const startMana = def.startingMana ?? 0;
+    const manaPct = Math.min(100, (currentMana / maxMana) * 100);
+    manaHtml = `<div class="tt-mana">
+      <div class="tt-mana-label">⚡ 마나: ${currentMana}/${maxMana} ${startMana > 0 ? `(시작: ${startMana})` : ''}</div>
+      <div class="tt-mana-bar-bg"><div class="tt-mana-bar-fill" style="width:${manaPct}%"></div></div>
+    </div>`;
+  }
+
   // 스킬 정보
   const skillTypeLabel: Record<string, string> = {
-    onHit: '⚔️ 적중 시', onKill: '💀 킬 시', passive: '🔵 패시브',
+    active: '🔥 액티브', onHit: '⚔️ 적중 시', onKill: '💀 킬 시', passive: '🔵 패시브',
     periodic: '🔄 주기적', onCombatStart: '🟢 전투 시작'
   };
   const skillTypeColor: Record<string, string> = {
-    onHit: '#fb923c', onKill: '#f87171', passive: '#60a5fa',
+    active: '#f59e0b', onHit: '#fb923c', onKill: '#f87171', passive: '#60a5fa',
     periodic: '#c084fc', onCombatStart: '#4ade80'
   };
   let skillHtml = '';
   if (skill) {
+    // 스킬 파라미터 상세 태그
+    const sp = skill.params;
+    const tags: string[] = [];
+    if (sp.chainTargets) tags.push(`⚡체인 ${sp.chainTargets}회`);
+    if (sp.chainPct) tags.push(`체인딜 ${Math.round(sp.chainPct * 100)}%`);
+    if (sp.splashPct) tags.push(`💥스플래시 ${Math.round(sp.splashPct * 100)}%`);
+    if (sp.splashTargets) tags.push(`범위 ${sp.splashTargets}체`);
+    if (sp.executeThreshold) tags.push(`🪓처형 HP${Math.round(sp.executeThreshold * 100)}%↓`);
+    if (sp.executeManaRefund) tags.push(`마나환급 ${Math.round(sp.executeManaRefund * 100)}%`);
+    if (sp.freezeDuration) tags.push(`❄️빙결 ${sp.freezeDuration}초`);
+    if (sp.freezeTargets) tags.push(`빙결 ${sp.freezeTargets}체`);
+    if (sp.stunDuration) tags.push(`💫기절 ${sp.stunDuration}초`);
+    if (sp.stunTargets) tags.push(`기절 ${sp.stunTargets}체`);
+    if (sp.pierceTargets) tags.push(`🎯관통 ${sp.pierceTargets}체`);
+    if (sp.piercePct) tags.push(`관통딜 ${Math.round(sp.piercePct * 100)}%`);
+    if (sp.dotPct) tags.push(`🔥도트 ${Math.round(sp.dotPct * 100)}%`);
+    if (sp.dotDuration) tags.push(`${sp.dotDuration}초`);
+    if (sp.burstMult) tags.push(`💥버스트 ×${sp.burstMult}`);
+    if (sp.burstDmg) tags.push(`💥고정딜 ${sp.burstDmg}`);
+    if (sp.hpPct) tags.push(`HP비례 ${Math.round(sp.hpPct * 100)}%`);
+    if (sp.hpPctDmg) tags.push(`HP비례딜 ${Math.round(sp.hpPctDmg * 100)}%`);
+    if (sp.defShred) tags.push(`🛡️방깎 ${sp.defShred}`);
+    if (sp.slowPct) tags.push(`🐌감속 ${Math.round(sp.slowPct * 100)}%`);
+    if (sp.knockback !== undefined) tags.push(`🔙넉백`);
+    if (sp.blackhole) tags.push(`🕳️블랙홀`);
+    if (sp.superCycle) tags.push(`🌀슈퍼사이클`);
+    if (sp.marsRocket) tags.push(`🚀로켓`);
+    if (sp.genesisBlock) tags.push(`🌟제네시스`);
+    if (sp.theMerge) tags.push(`🔮더 머지`);
+    if (sp.gold) tags.push(`💰골드 +${sp.gold}`);
+    if (sp.allyManaHeal) tags.push(`🔋마나충전 +${sp.allyManaHeal}`);
+    if (sp.atkSpdBuff) tags.push(`⚡공속↑ ${Math.round(sp.atkSpdBuff * 100)}%`);
+    if (sp.allyDmgBuff) tags.push(`📈아군딜↑`);
+    if (sp.guaranteedCrit) tags.push(`💎확정크리`);
+    if (sp.critMultiplier) tags.push(`크리 ×${sp.critMultiplier}`);
+    if (sp.dmgMult) tags.push(`딜배 ×${sp.dmgMult}`);
+    if (sp.multiHit) tags.push(`🔨${sp.multiHit}연타`);
+
+    const tagsHtml = tags.length > 0
+      ? `<div class="tt-skill-tags">${tags.map(t => `<span class="tt-tag">${t}</span>`).join('')}</div>`
+      : '';
+
     skillHtml = `<div class="tt-skill">
       <div class="tt-skill-header" style="color:${skillTypeColor[skill.type] ?? '#fff'}">
         ${skillTypeLabel[skill.type] ?? skill.type} — ${skill.name}
       </div>
       <div class="tt-skill-desc">${skill.desc}${skill.cooldown ? ` (${skill.cooldown}초)` : ''}${skill.chance && skill.chance < 1 ? ` [${Math.round(skill.chance * 100)}%]` : ''}</div>
+      ${tagsHtml}
     </div>`;
   }
 
@@ -3356,15 +3419,27 @@ function showTooltip(e: MouseEvent, unit: UnitInstance): void {
     </div>`;
   }
 
-  // const jobName = toCrypto(def.job); // 직업 시너지 비활성화
   tooltipEl = document.createElement('div');
   tooltipEl.className = 'tooltip';
   tooltipEl.innerHTML = `
     <div class="tt-name">${def.emoji} ${def.name} ${'⭐'.repeat(unit.star)}</div>
-    <div class="tt-cost">코스트: ${def.cost}</div>
-    <div class="tt-origin">특성: ${toCrypto(def.origin)}</div>
+    <div class="tt-meta">
+      <span class="tt-cost">코스트: ${def.cost}</span>
+      <span class="tt-dmg-type" style="color:${dmgTypeColor}">${dmgTypeIcon}</span>
+      <span class="tt-origin">${toCrypto(def.origin)}</span>
+    </div>
 
-    <div class="tt-dmg">DMG: ${dmgText} | 사거리: ${range} | 공속: ${atkText}</div>
+    <div class="tt-stats">
+      <div class="tt-stat-row">
+        <span>⚔️ DMG: ${dmgText}</span>
+        <span>📏 사거리: ${range}</span>
+      </div>
+      <div class="tt-stat-row">
+        <span>⚡ 공속: ${atkText}</span>
+        <span>💥 DPS: <span style="color:#fbbf24">${dps}</span></span>
+      </div>
+    </div>
+    ${manaHtml}
     ${skillHtml}
     ${def.uniqueEffect ? `<div class="tt-effect">${def.uniqueEffect}</div>` : ''}
     ${buffSummary}
