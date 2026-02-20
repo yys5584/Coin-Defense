@@ -2196,8 +2196,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: left 0.05s linear, top 0.05s linear;
-    /* 부드러운 이동, 프레임 전환은 즉각 */
+    /* NO transition on left/top — JS rAF controls coordinates directly */
+    /* transition 제거: left/top CSS transition은 매 프레임 DOM 재생성 시 */
+    /* 기본 위치(0,0)에서 실제 좌표로 슬라이딩을 유발하여 순간이동 원인 */
     z-index: 11;
 }
 
@@ -3065,7 +3066,7 @@ body {
     border-radius: 50%;
     pointer-events: none;
     z-index: 15;
-    transition: left 0.05s, top 0.05s, width 0.05s, height 0.05s;
+    /* transition 제거 — JS 직접 제어 */
 }
 
 /* ═══════════════════════════════════════════════════════════
