@@ -3746,15 +3746,17 @@ function renderCraftPanel(): void {
         if (owned === 0 && !check.isCraftable) continue; // 0/n은 숨김
         const craftableClass = check.isCraftable ? ' craft-ready' : '';
 
-        // 호버 툴팁: 재료 목록
-        const tooltipLines = check.ingredients.map(ing => {
+        // 호버 툴팁: 재료 목록 (data-tooltip → CSS ::after)
+        const tooltipHtml = check.ingredients.map(ing => {
           const iDef = UNIT_MAP[ing.id];
           const star = ing.star > 1 ? `★${ing.star} ` : '';
           const mark = ing.owned ? '✔' : 'X';
-          return `[${mark}] ${star}${iDef?.name ?? ing.id}`;
-        }).join('\n');
+          const color = ing.owned ? '#00ff00' : '#ff4444';
+          return `<span style="color:${color}">[${mark}]</span> ${star}${iDef?.name ?? ing.id}`;
+        }).join('<br>');
 
-        html += `<div class="craft-recipe-row compact${craftableClass}" title="${tooltipLines}">`;
+        html += `<div class="craft-recipe-row compact${craftableClass} has-tooltip">`;
+        html += `<div class="craft-tooltip">${tooltipHtml}</div>`;
         html += `<span class="craft-recipe-name">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId}</span>`;
         if (check.isCraftable) {
           html += `<span class="craft-ready-badge">⚡ 가능</span>`;
