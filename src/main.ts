@@ -3701,10 +3701,10 @@ function renderCraftPanel(): void {
 
   // 티어별 그룹 정의 (게임 내 로어 기준)
   const tierGroups: { key: string; label: string; color: string; targets: string[] }[] = [
-    { key: 't4', label: '🪙 T4 코인', color: '#f59e0b', targets: [] },
-    { key: 't5', label: '⭐ T5 에픽', color: '#a78bfa', targets: [] },
-    { key: 't7', label: '👑 T7 레전드', color: '#ef4444', targets: [] },
-    { key: 't10', label: '💎 T10 미식', color: '#ffd700', targets: [] },
+    { key: 't4', label: '🪙 T4 에픽', color: '#f59e0b', targets: [] },
+    { key: 't5', label: '⭐ T5 유니크', color: '#a78bfa', targets: [] },
+    { key: 't7', label: '👑 T7 레전드리', color: '#43e97b', targets: [] },
+    { key: 't10', label: '💎 T10 유일', color: '#ef4444', targets: [] },
   ];
 
   for (const [targetId] of Object.entries(UNIT_RECIPES)) {

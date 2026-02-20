@@ -589,37 +589,37 @@ UNITS.forEach(u => { UNIT_MAP[u.id] = u; });
 //  T1/T2/T3 → T4 Coins → T5 Figures → T7 Legends → T10 Mythic
 
 export const UNIT_RECIPES: Record<string, string[]> = {
-    // --- Tier 4: COINS (from T1/T2/T3 ingredients, all ★1) ---
-    'u4_btc': ['u2_hal', 'u2_node', 'u1_miner'],
-    'u4_eth': ['u3_gavin', 'u2_smart', 'u1_gas'],
-    'u4_base': ['u2_pollak', 'u2_smart', 'u1_meta'],
-    'u4_sol': ['u3_anatoly', 'u2_rust', 'u1_pump'],
-    'u4_bnb': ['u3_paolo', 'u2_manager', 'u1_bot'],
-    'u4_hype': ['u3_kang', 'u2_mev', 'u1_bot'],
-    'u4_xrp': ['u3_garling', 'u2_sec', 'u1_paper'],
-    'u4_doge': ['u3_cobie', 'u2_long', 'u1_meme'],
-    'u4_pepe': ['u3_gcr', 'u2_wonyoung', 'u1_meme'],
-    'u4_wif': ['u3_ansem', 'u2_long', 'u1_pump'],
-    'u4_luna': ['u2_daniele', 'u1_scam', 'u1_fud'],
+    // --- Tier 4: 에픽 (★2 핵심 재료 + ★1 보조) ---
+    'u4_btc': ['u2_hal:2', 'u2_node:2', 'u1_miner:1', 'u1_hodl:1'],   // 4재료
+    'u4_eth': ['u3_gavin:2', 'u2_smart:2', 'u1_gas:1'],
+    'u4_base': ['u2_pollak:2', 'u2_smart:2', 'u1_meta:1', 'u1_intern:1'], // 4재료
+    'u4_sol': ['u3_anatoly:2', 'u2_rust:2', 'u1_pump:1'],
+    'u4_bnb': ['u3_paolo:2', 'u2_manager:2', 'u1_bot:1', 'u1_chart:1'],  // 4재료
+    'u4_hype': ['u3_kang:2', 'u2_mev:2', 'u1_bot:1'],
+    'u4_xrp': ['u3_garling:2', 'u2_sec:2', 'u1_paper:1'],
+    'u4_doge': ['u3_cobie:2', 'u2_long:2', 'u1_meme:1', 'u1_yapper:1'], // 4재료
+    'u4_pepe': ['u3_gcr:2', 'u2_wonyoung:2', 'u1_meme:1'],
+    'u4_wif': ['u3_ansem:2', 'u2_long:2', 'u1_pump:1', 'u1_meme:1'],   // 4재료
+    'u4_luna': ['u2_daniele:2', 'u1_scam:2', 'u1_fud:1'],
 
-    // --- Tier 5: EPIC FIGURES (from their coins, all ★1) ---
-    'u5_saylor': ['u4_btc', 'u4_btc', 'u1_hodl'],
-    'u5_armstrong': ['u4_base', 'u4_eth', 'u1_intern'],
-    'u5_coplan': ['u4_eth', 'u2_poly', 'u1_chart'],
-    'u5_murad': ['u4_pepe', 'u4_wif', 'u1_yapper'],
-    'u5_hayes': ['u4_eth', 'u4_bnb', 'u2_long'],
-    'u5_jeff': ['u4_hype', 'u2_mev', 'u1_bot'],
-    'u5_dokwon': ['u4_luna', 'u2_hacker', 'u1_scam'],
-    'u5_sbf': ['u4_sol', 'u2_hacker', 'u1_fud'],
+    // --- Tier 5: 유니크 (★2 T4코인 필수 + ★2/★1 보조) ---
+    'u5_saylor': ['u4_btc:2', 'u1_hodl:2', 'u1_miner:1'],
+    'u5_armstrong': ['u4_base:2', 'u4_eth:1', 'u1_intern:2', 'u1_meta:1'],    // 4재료
+    'u5_coplan': ['u4_eth:2', 'u2_poly:2', 'u1_chart:1'],
+    'u5_murad': ['u4_pepe:2', 'u4_wif:1', 'u1_yapper:2', 'u1_meme:1'],    // 4재료
+    'u5_hayes': ['u4_eth:2', 'u4_bnb:1', 'u2_long:2'],
+    'u5_jeff': ['u4_hype:2', 'u2_mev:2', 'u1_bot:2', 'u1_chart:1'],   // 4재료
+    'u5_dokwon': ['u4_luna:2', 'u2_hacker:2', 'u1_scam:1', 'u1_fud:1'],     // 4재료
+    'u5_sbf': ['u4_sol:2', 'u2_hacker:2', 'u1_fud:1', 'u1_scam:1', 'u1_paper:1'], // 5재료!
 
-    // --- Tier 7: LEGENDS (BRUTAL — requires ★2 ingredients!) ---
+    // --- Tier 7: 레전드리 (★2 에픽/유니크 필수 — 극악) ---
     'u7_trump': ['u5_saylor:2', 'u5_coplan:2', 'u4_btc:2'],
     'u7_vitalik': ['u5_armstrong:2', 'u4_eth:2', 'u4_base:2'],
     'u7_elon': ['u5_murad:2', 'u4_doge:2', 'u4_wif:2'],
     'u7_cz': ['u5_hayes:2', 'u5_jeff:2', 'u4_bnb:2'],
     'u7_gensler': ['u5_dokwon:2', 'u5_sbf:2', 'u4_xrp:2'],
 
-    // --- Tier 10: MYTHIC (★1 — board space limit) ---
+    // --- Tier 10: 유일 (T7 레전드리 3종) ---
     'u10_satoshi': ['u7_trump:1', 'u7_elon:1', 'u7_vitalik:1'],
 };
 
