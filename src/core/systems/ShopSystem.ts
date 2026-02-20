@@ -85,7 +85,7 @@ export class ShopSystem {
         const unitDef = UNIT_MAP[unitId];
         if (!unitDef) return false;
         if (player.gold < unitDef.cost) return false;
-        if (player.bench.length >= (MAX_BENCH + (player.augments.includes('aug_bench_expand') ? 3 : 0))) {
+        if (player.bench.length >= (MAX_BENCH + (player.augments.includes('aug_cold_wallet') ? 3 : 0))) {
             // 벤치 꽉 찼지만 합성 가능하면 구매 허용
             // 전투 중에는 벤치만 합성 대상
             const mergePool = state.phase === 'combat'

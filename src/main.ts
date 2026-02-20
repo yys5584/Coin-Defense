@@ -2652,11 +2652,11 @@ function showAugmentPick(round: number): void {
         p.hp = Math.min(p.hp + 5, (p as any).maxHp);
         log('💚 최대 HP +20, HP +5 회복!', 'green');
       }
-      if (aug.id === 'aug_bench_expand') {
+      if (aug.id === 'aug_cold_wallet') {
         // 벤치 확장: 벤치 슬롯 +3
         log('🪑 벤치 슬롯 +3!', 'green');
       }
-      if (aug.id === 'aug_extra_slot') {
+      if (aug.id === 'aug_layer2') {
         // 진격력: 보드 배치 슬롯 +1 (레벨 제한 완화)
         log('📶 보드 슬롯 +1!', 'green');
       }

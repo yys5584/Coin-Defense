@@ -91,7 +91,7 @@ export function countUnits(player: PlayerState, unitId: string, star: 1 | 2 | 3 
 
 /** 플레이어의 배치 가능 슬롯 수 */
 export function getMaxBoardSize(player: PlayerState): number {
-    const bonus = player.augments.includes('aug_extra_slot') ? 1 : 0;
+    const bonus = player.augments.includes('aug_layer2') ? 1 : 0;
     return getLevelDef(player.level).slots + bonus;
 }
 

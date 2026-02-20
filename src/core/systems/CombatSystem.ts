@@ -232,17 +232,19 @@ export class CombatSystem {
         if (augs.has('aug_mev')) {
             synergyBuffs.bonusKillGold += 1;
         }
-        // ⏳ 모래시계: 몬스터 이속 -20% (slowPercent에 합산)
-        if (augs.has('aug_monster_slow')) {
+        // ❄️ 크립토 윈터: 몰스터 이속 -20%
+        if (augs.has('aug_crypto_winter')) {
             synergyBuffs.slowPercent = Math.min(0.8, (synergyBuffs.slowPercent ?? 0) + 0.20);
         }
         // 🔊 시너지 증폭기: 시너지 유닛 수+1 (SynergySystem에서 처리 필요 — 여기선 DMG 보너스로 근사)
-        if (augs.has('aug_synergy_amp')) {
-            synergyBuffs.dmgMultiplier *= 1.10;
-            synergyBuffs.atkSpeedMultiplier *= 1.05;
+        // 🌉 크로스체인 브릿지: 시너지 카운트 +1
+        if (augs.has('aug_crosschain')) {
+            synergyBuffs.dmgMultiplier *= 1.15;
+            synergyBuffs.atkSpeedMultiplier *= 1.10;
         }
         // 🔮 적응형 관통: 물방/마방 중 낮은 값으로 적용 (flag 저장)
         // (실제 적용은 데미지 계산 루프에서 this._adaptiveDmg 참조)
+        // ⛽ 가스비 페이백 + 하드포크: processActiveSkills에서 처리
         this._adaptiveDmg = augs.has('aug_adaptive');
 
         // 📋 스마트 컨트랙트 복제: 보유 7/10코 유닛 1마리 복제 → 벤치
@@ -550,6 +552,10 @@ export class CombatSystem {
             const payback = this.buffs?.manaPayback ?? 0;
             if (payback > 0) {
                 unit.currentMana += maxMana * payback;
+            }
+            // ⛽ 가스비 페이백: 스킬 후 마나 30%로 시작
+            if (augSet.has('aug_gas_payback')) {
+                unit.currentMana = Math.max(unit.currentMana ?? 0, maxMana * 0.30);
             }
 
             const p = s.params;
