@@ -2648,6 +2648,235 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   UNIT INFO PANEL (Right-Click)
+   ═══════════════════════════════════════════════════════════ */
+
+.unit-info-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    background: rgba(15, 15, 25, 0.97);
+    border: 2px solid rgba(243, 186, 47, 0.6);
+    border-radius: 12px;
+    padding: 14px 16px;
+    z-index: 9999;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7), 0 0 20px rgba(243, 186, 47, 0.15);
+    backdrop-filter: blur(16px);
+    animation: panelFadeIn 0.15s ease;
+    color: #e2e8f0;
+    font-size: 13px;
+}
+
+@keyframes panelFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.uip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.uip-name {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.uip-cost {
+    font-size: 14px;
+    color: #fbbf24;
+    font-weight: 600;
+}
+
+.uip-traits {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #94a3b8;
+}
+
+.uip-origin {
+    color: #4ade80;
+}
+
+.uip-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px 12px;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.uip-stat {
+    color: #94a3b8;
+}
+
+.uip-val {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.uip-gold {
+    color: #fbbf24;
+}
+
+.uip-mana {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.uip-mana-text {
+    font-size: 12px;
+    color: #60a5fa;
+    white-space: nowrap;
+}
+
+.uip-mana-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.uip-mana-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 2px;
+}
+
+.uip-skill {
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border-left: 3px solid #f59e0b;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 8px;
+}
+
+.uip-skill-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #f59e0b;
+    margin-bottom: 4px;
+}
+
+.uip-skill-desc {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.4;
+}
+
+.uip-role {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fbbf24;
+    margin-bottom: 8px;
+}
+
+.uip-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.uip-btn {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+
+.uip-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.uip-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.uip-btn-sell:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+.uip-btn-detail:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #60a5fa;
+}
+
+/* 상세보기 확장 */
+.uip-detail {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    animation: panelFadeIn 0.15s ease;
+}
+
+.uip-detail-flavor {
+    font-size: 11px;
+    font-style: italic;
+    color: #94a3b8;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.uip-stars {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.uip-star {
+    font-size: 11px;
+    color: #64748b;
+    padding: 3px 6px;
+    border-radius: 4px;
+    line-height: 1.3;
+}
+
+.uip-star.active {
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    font-weight: 600;
+}
+
+.uip-star-label {
+    font-weight: 700;
+    margin-right: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════
    DRAG & DROP
    ═══════════════════════════════════════════════════════════ */
 

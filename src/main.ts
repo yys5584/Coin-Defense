@@ -2089,16 +2089,7 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
   card.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // 전투 중에는 보드 위 유닛 판매 불가 (벤치 유닛은 가능)
-    const isOnBoard = player().board.some(u => u.instanceId === unit.instanceId);
-    if (inCombat && isOnBoard) return;
-    const sellMultiplier = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
-    cmd.execute(state, {
-      type: 'SELL_UNIT', playerId: player().id, instanceId: unit.instanceId,
-    });
-    log(`판매: ${def.emoji} ${def.name} ★${unit.star} (+${def.cost * sellMultiplier}G)`, 'green');
-    selectedUnit = null;
-    render();
+    showUnitInfoPanel(unit);
   });
 
   // 터치 드래그 지원
@@ -3513,6 +3504,176 @@ function hideTooltip(): void {
   tooltipEl?.remove();
   tooltipEl = null;
 }
+
+// ─── 우클릭 유닛 정보 패널 ─────────────────────────────────────
+let unitInfoPanel: HTMLElement | null = null;
+let unitInfoDetailOpen = false;
+
+function showUnitInfoPanel(unit: UnitInstance): void {
+  hideUnitInfoPanel();
+  hideTooltip();
+  const def = UNIT_MAP[unit.unitId];
+  if (!def) return;
+  const dict = UNIT_DICTIONARY[unit.unitId];
+  const starMult = STAR_MULTIPLIER[unit.star];
+  const baseDmg = Math.floor(def.baseDmg * starMult);
+  let range = def.attackRange ?? 2.5;
+  const atkSpd = def.attackSpeed ?? 1.0;
+  const dps = Math.floor(baseDmg * atkSpd);
+  const skill = def.skill;
+  const dmgTypeIcon = def.dmgType === 'magic' ? '🔮 마법' : '⚔️ 물리';
+  const dmgTypeColor = def.dmgType === 'magic' ? '#c084fc' : '#fb923c';
+
+  // passive 사거리 보정
+  if (skill?.type === 'passive' && skill.params.rangeBonus) {
+    range += skill.params.rangeBonus;
+  }
+
+  // 마나 바
+  let manaHtml = '';
+  if (def.maxMana && skill?.type === 'active') {
+    const currentMana = Math.floor(unit.currentMana ?? 0);
+    const maxMana = def.maxMana;
+    const manaPct = Math.min(100, (currentMana / maxMana) * 100);
+    manaHtml = `
+      <div class="uip-mana">
+        <span class="uip-mana-text">마나: ${currentMana}/${maxMana}</span>
+        <div class="uip-mana-bar"><div class="uip-mana-fill" style="width:${manaPct}%"></div></div>
+      </div>`;
+  }
+
+  // 스킬 영역
+  let skillHtml = '';
+  if (skill) {
+    const typeLabels: Record<string, string> = {
+      active: '🔥 액티브', onHit: '⚔️ 적중 시', onKill: '💀 킬 시',
+      passive: '🔵 패시브', periodic: '🔄 주기적', onCombatStart: '🟢 전투 시작'
+    };
+    const starDesc = dict?.skillDesc;
+    const currentDesc = starDesc
+      ? (unit.star === 3 ? starDesc.star3 : unit.star === 2 ? starDesc.star2 : starDesc.star1)
+      : skill.desc;
+
+    skillHtml = `
+      <div class="uip-skill">
+        <div class="uip-skill-name">${typeLabels[skill.type] ?? skill.type} — ${skill.name}</div>
+        <div class="uip-skill-desc">${currentDesc}</div>
+      </div>`;
+  }
+
+  // ★별 설명
+  let starDescsHtml = '';
+  if (dict && dict.skillDesc.star2 !== '-') {
+    const descs = [
+      { label: '★', text: dict.skillDesc.star1, star: 1 },
+      { label: '★★', text: dict.skillDesc.star2, star: 2 },
+      { label: '★★★', text: dict.skillDesc.star3, star: 3 },
+    ];
+    starDescsHtml = '<div class="uip-stars">';
+    for (const sd of descs) {
+      const cls = sd.star === unit.star ? 'uip-star active' : 'uip-star';
+      starDescsHtml += `<div class="${cls}"><span class="uip-star-label">${sd.label}</span> ${sd.text}</div>`;
+    }
+    starDescsHtml += '</div>';
+  }
+
+  // 역할
+  const roleLine = dict ? `<div class="uip-role">${dict.role}</div>` : '';
+
+  // 판매 가격
+  const sellMult = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
+  const sellPrice = def.cost * sellMult;
+  const isOnBoard = player().board.some(u => u.instanceId === unit.instanceId);
+
+  // 상세보기 컨텐츠 (숨김)
+  let detailHtml = '';
+  if (dict) {
+    detailHtml = `
+      <div class="uip-detail" style="display:none">
+        <div class="uip-detail-flavor">"${dict.flavorText}"</div>
+        ${starDescsHtml}
+      </div>`;
+  }
+
+  unitInfoPanel = document.createElement('div');
+  unitInfoPanel.className = 'unit-info-panel';
+  unitInfoPanel.innerHTML = `
+    <div class="uip-header">
+      <span class="uip-name">${def.emoji} ${def.name} ${'⭐'.repeat(unit.star)}</span>
+      <span class="uip-cost">💰 ${def.cost}</span>
+    </div>
+    <div class="uip-traits">
+      <span style="color:${dmgTypeColor}">${dmgTypeIcon}</span>
+      <span class="uip-origin">${toCrypto(def.origin)}</span>
+    </div>
+    <div class="uip-stats">
+      <div class="uip-stat">공격: <span class="uip-val">${baseDmg}</span></div>
+      <div class="uip-stat">사거리: <span class="uip-val">${range}</span></div>
+      <div class="uip-stat">공속: <span class="uip-val">${atkSpd}/s</span></div>
+      <div class="uip-stat">DPS: <span class="uip-val uip-gold">${dps}</span></div>
+    </div>
+    ${manaHtml}
+    ${skillHtml}
+    ${roleLine}
+    ${detailHtml}
+    <div class="uip-actions">
+      <button class="uip-btn uip-btn-detail" data-uid="${unit.instanceId}">📖 상세보기</button>
+      <button class="uip-btn uip-btn-sell" data-uid="${unit.instanceId}" data-price="${sellPrice}" ${inCombat && isOnBoard ? 'disabled' : ''}>🗑️ 판매 (${sellPrice}G)</button>
+    </div>
+  `;
+
+  // 상세보기 토글
+  unitInfoPanel.querySelector('.uip-btn-detail')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const detailEl = unitInfoPanel?.querySelector('.uip-detail') as HTMLElement;
+    if (detailEl) {
+      unitInfoDetailOpen = !unitInfoDetailOpen;
+      detailEl.style.display = unitInfoDetailOpen ? 'block' : 'none';
+      const btn = unitInfoPanel?.querySelector('.uip-btn-detail') as HTMLElement;
+      if (btn) btn.textContent = unitInfoDetailOpen ? '📖 접기' : '📖 상세보기';
+    }
+  });
+
+  // 판매 버튼
+  unitInfoPanel.querySelector('.uip-btn-sell')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isBoardUnit = player().board.some(u => u.instanceId === unit.instanceId);
+    if (inCombat && isBoardUnit) return;
+    cmd.execute(state, {
+      type: 'SELL_UNIT', playerId: player().id, instanceId: unit.instanceId,
+    });
+    log(`판매: ${def.emoji} ${def.name} ★${unit.star} (+${sellPrice}G)`, 'green');
+    selectedUnit = null;
+    hideUnitInfoPanel();
+    render();
+  });
+
+  // 패널 클릭 시 이벤트 전파 방지
+  unitInfoPanel.addEventListener('click', (e) => e.stopPropagation());
+  unitInfoPanel.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); });
+
+  document.body.appendChild(unitInfoPanel);
+  unitInfoDetailOpen = false;
+}
+
+function hideUnitInfoPanel(): void {
+  unitInfoPanel?.remove();
+  unitInfoPanel = null;
+  unitInfoDetailOpen = false;
+}
+
+// 전역: 빈 공간 클릭/우클릭 시 패널 닫기
+document.addEventListener('click', () => {
+  if (unitInfoPanel) hideUnitInfoPanel();
+});
+document.addEventListener('contextmenu', (e) => {
+  // 패널이 열려 있고, 유닛 카드가 아닌 곳을 우클릭하면 패널 닫기
+  const target = e.target as HTMLElement;
+  if (unitInfoPanel && !target.closest('.unit-card') && !target.closest('.unit-info-panel')) {
+    e.preventDefault();
+    hideUnitInfoPanel();
+  }
+});
 
 // ─── 버튼 이벤트 ────────────────────────────────────────────
 
