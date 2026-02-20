@@ -1533,7 +1533,7 @@ function renderShop(): void {
       const owned2 = star2Count[unitId] || 0;
       const canMerge2 = owned1 >= 2; // 구매하면 ★2 합성 가능
       const canMerge3 = owned2 >= 2 && owned1 >= 2; // ★3 연쇄 합성
-      slot.className = 'shop-slot cost-' + def.cost + (canMerge3 ? ' merge-ready-3' : canMerge2 ? ' merge-ready' : '');
+      slot.className = 'shop-slot cost-' + def.cost + (def.cost >= 4 ? ' jackpot-glow' : '') + (canMerge3 ? ' merge-ready-3' : canMerge2 ? ' merge-ready' : '');
       const mergeHint = canMerge3 ? '<span class="merge-badge">★★★</span>'
         : canMerge2 ? '<span class="merge-badge">★★</span>' : '';
 
@@ -2201,12 +2201,12 @@ function showLevelTooltip(targetEl: HTMLElement): void {
   const nextLevel = LEVELS.find(l => l.level === p.level + 1);
   if (!curLevel) return;
 
-  const costLabels = ['1코', '2코', '3코', '4코', '5코'];
-  const costClasses = ['c1', 'c2', 'c3', 'c4', 'c5'];
+  const costLabels = ['1코', '2코', '3코', '4코'];
+  const costClasses = ['c1', 'c2', 'c3', 'c4'];
 
   // 좌측: 현재 레벨 확률
   let leftHtml = `<div class="xp-tt-header">현재 Lv.${p.level}</div>`;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     const pct = curLevel.shopOdds[i];
     leftHtml += `
       <div class="odds-row">
@@ -2220,7 +2220,7 @@ function showLevelTooltip(targetEl: HTMLElement): void {
   let rightHtml = '';
   if (nextLevel && p.level < 10) {
     rightHtml = `<div class="xp-tt-header next">다음 Lv.${nextLevel.level}</div>`;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const pct = nextLevel.shopOdds[i];
       const diff = pct - curLevel.shopOdds[i];
       const diffStr = diff > 0 ? `<span class="odds-diff up">+${diff}</span>` : diff < 0 ? `<span class="odds-diff down">${diff}</span>` : '';

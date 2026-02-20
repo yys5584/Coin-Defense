@@ -606,16 +606,16 @@ export const POOL_SIZE: Record<number, number> = {
 // ─── 레벨 정의 ──────────────────────────────────────────────
 
 export const LEVELS: LevelDef[] = [
-    { level: 1, requiredXp: 2, naturalRound: 1, slots: 1, shopOdds: [100, 0, 0, 0, 0] },
-    { level: 2, requiredXp: 2, naturalRound: 2, slots: 2, shopOdds: [100, 0, 0, 0, 0] },
-    { level: 3, requiredXp: 6, naturalRound: 4, slots: 3, shopOdds: [75, 25, 0, 0, 0] },
-    { level: 4, requiredXp: 10, naturalRound: 7, slots: 4, shopOdds: [55, 30, 15, 0, 0] },
-    { level: 5, requiredXp: 20, naturalRound: 12, slots: 5, shopOdds: [40, 30, 25, 5, 0] },
-    { level: 6, requiredXp: 36, naturalRound: 18, slots: 6, shopOdds: [25, 30, 30, 12, 3] },
-    { level: 7, requiredXp: 48, naturalRound: 24, slots: 7, shopOdds: [20, 25, 30, 18, 7] },
-    { level: 8, requiredXp: 72, naturalRound: 33, slots: 8, shopOdds: [15, 20, 25, 25, 15] },
-    { level: 9, requiredXp: 80, naturalRound: 38, slots: 9, shopOdds: [10, 15, 25, 30, 20] },
-    { level: 10, requiredXp: 100, naturalRound: 45, slots: 10, shopOdds: [5, 10, 20, 30, 35] },
+    { level: 1, requiredXp: 2, naturalRound: 1, slots: 1, shopOdds: [90, 10, 0, 0, 0] },
+    { level: 2, requiredXp: 4, naturalRound: 2, slots: 2, shopOdds: [75, 25, 0, 0, 0] },
+    { level: 3, requiredXp: 8, naturalRound: 4, slots: 3, shopOdds: [60, 35, 5, 0, 0] },
+    { level: 4, requiredXp: 14, naturalRound: 7, slots: 4, shopOdds: [50, 35, 15, 0, 0] },
+    { level: 5, requiredXp: 24, naturalRound: 12, slots: 5, shopOdds: [40, 35, 25, 0, 0] },
+    { level: 6, requiredXp: 40, naturalRound: 18, slots: 6, shopOdds: [35, 35, 30, 0, 0] },
+    { level: 7, requiredXp: 60, naturalRound: 24, slots: 7, shopOdds: [30, 35, 34.9, 0.1, 0] },   // T4 해금 0.1%
+    { level: 8, requiredXp: 150, naturalRound: 33, slots: 8, shopOdds: [22, 33, 44.8, 0.2, 0] },   // 잔인한 벽
+    { level: 9, requiredXp: 300, naturalRound: 38, slots: 9, shopOdds: [15, 30, 54.7, 0.3, 0] },   // 천문학적 벽
+    { level: 10, requiredXp: 999, naturalRound: 99, slots: 10, shopOdds: [10, 25, 64.5, 0.5, 0] },  // T1 10% 유지, T4 0.5% 최대
 ];
 
 

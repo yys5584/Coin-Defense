@@ -5085,3 +5085,40 @@ body {
     background: rgba(255, 255, 255, 0.2);
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
+
+/* ─── Jackpot Glow (T4 상점 등장) ─── */
+
+@keyframes jackpotPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 8px #ffd700, 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 16px #ffd700, 0 0 40px rgba(255, 215, 0, 0.6), inset 0 0 8px rgba(255, 215, 0, 0.15);
+    }
+}
+
+.shop-slot.jackpot-glow {
+    border: 2px solid #ffd700 !important;
+    animation: jackpotPulse 1.2s ease-in-out infinite;
+    position: relative;
+}
+
+.shop-slot.jackpot-glow::before {
+    content: '🎰 JACKPOT';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #000;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 1px 8px;
+    border-radius: 6px;
+    z-index: 2;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
