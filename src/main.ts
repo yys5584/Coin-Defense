@@ -2946,7 +2946,7 @@ function renderCombatOverlay(cs: CombatState): void {
       ⚔️ ${cs.totalKills}
       <span style="opacity:0.5">|</span>
       남은 ${aliveCount + cs.spawnQueue}
-      ${cs.leakedDamage > 0 ? `<span style="opacity:0.5">|</span><span style="color:#ef4444">통과 ${cs.leakedDamage}</span>` : ''}
+      ${cs.leakedDamage > 0 ? `<span style="opacity:0.5">|</span><span style="color:#ef4444">❤️ -${cs.leakedDamage}</span>` : ''}
       <span style="opacity:0.5">|</span>
       ${gradeBar}
       ${bonusG > 0 ? `<span style="color:${curColor}">+${bonusG}G</span>` : ''}
