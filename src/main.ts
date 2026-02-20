@@ -3690,7 +3690,20 @@ function executeRecipe(targetId: string): boolean {
   return true;
 }
 
-/** 합성 모달 표시: 클릭한 유닛이 참여하는 모든 레시피를 보여줌 */
+/** 코스트별 색상 (상점 CSS와 동일) */
+function getCostColor(cost: number): string {
+  switch (cost) {
+    case 1: return '#9ca3af';
+    case 2: return '#10b981';
+    case 3: return '#3b82f6';
+    case 4: return '#8b5cf6';
+    case 5: return '#f59e0b';
+    case 7: return '#ef4444';
+    case 10: return '#ff6b6b';
+    default: return '#cbd5e1';
+  }
+}
+
 /** 합성 패널 렌더링: 티어별 그룹, 상위유닛 → 재료 방식 (✨합성 탭) */
 let craftPanelExpandedRecipe: string | null = null;
 const craftTierExpanded: Record<string, boolean> = {};
@@ -3752,7 +3765,8 @@ function renderCraftPanel(): void {
           const star = ing.star > 1 ? `★${ing.star} ` : '';
           const mark = ing.owned ? '✔' : 'X';
           const color = ing.owned ? '#00ff00' : '#ff4444';
-          return `<span style="color:${color}">[${mark}]</span> ${star}${iDef?.name ?? ing.id}`;
+          const cc = getCostColor(iDef?.cost ?? 1);
+          return `<span style="color:${color}">[${mark}]</span> <span style="color:${cc}">${iDef?.cost ?? 1}코</span> ${star}${iDef?.name ?? ing.id}`;
         }).join('<br>');
 
         html += `<div class="craft-recipe-row compact${craftableClass} has-tooltip">`;
@@ -3790,12 +3804,14 @@ function renderCraftPanel(): void {
           for (const ing of check.ingredients) {
             const iDef = UNIT_MAP[ing.id];
             const starText = ing.star > 1 ? `${ing.star}⭐ ` : '';
+            const cc = getCostColor(iDef?.cost ?? 1);
+            const costTag = `<span class="ing-cost" style="color:${cc}">${iDef?.cost ?? 1}코</span>`;
             if (ing.owned) {
-              html += `<div class="req-item"><span style="color:#00ff00">[✔] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#00ff00">★${ing.ownedStar}</span></div>`;
+              html += `<div class="req-item"><span style="color:#00ff00">[✔] ${costTag} ${starText}${iDef?.name ?? ing.id}</span><span style="color:#00ff00">★${ing.ownedStar}</span></div>`;
             } else if (ing.ownedStar > 0) {
-              html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">★${ing.ownedStar}(★${ing.star}필요)</span></div>`;
+              html += `<div class="req-item"><span style="color:#ff4444">[X] ${costTag} ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">★${ing.ownedStar}(★${ing.star}필요)</span></div>`;
             } else {
-              html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">미보유</span></div>`;
+              html += `<div class="req-item"><span style="color:#ff4444">[X] ${costTag} ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">미보유</span></div>`;
             }
           }
           if (check.isCraftable) {
