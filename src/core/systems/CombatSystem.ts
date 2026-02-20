@@ -909,6 +909,161 @@ export class CombatSystem {
                     }
                 }
             }
+            // ⚡ 체인 + 감전장판 (jackdorsey — electricField)
+            if (p.chainTargets && p.chainPct && p.electricField && !p.chainKillManaPayback && !p.defiDmgBuff) {
+                const target = frontTarget;
+                const chainCount = (p.chainTargets - 1) + unit.star;
+                target.hp -= baseDmg;
+                const tPos = getPositionOnPath(target.pathProgress);
+                const nearby = alive
+                    .filter(m => m !== target)
+                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
+                    .sort((a, b) => a.d - b.d)
+                    .slice(0, chainCount);
+                for (const { m } of nearby) {
+                    m.hp -= baseDmg * p.chainPct;
+                    // ★3: 감전 장판 (DoT 부여 + 아군 마나 회복)
+                    if (unit.star >= 3) {
+                        if (!m.dots) m.dots = [];
+                        m.dots.push({ dps: baseDmg * 0.1, remaining: 3 });
+                    }
+                }
+                // ★3: 체인 맞은 수만큼 아군 마나 회복
+                if (unit.star >= 3 && nearby.length > 0) {
+                    for (const ally of boardUnits) {
+                        if (UNIT_MAP[ally.unitId]?.skill?.type === 'active') {
+                            ally.currentMana = (ally.currentMana ?? 0) + nearby.length * 3;
+                        }
+                    }
+                }
+            }
+            // 🌐 체인 + DeFi 공격력 버프 (jessepollak — defiDmgBuff)
+            if (p.chainTargets && p.chainPct && p.defiDmgBuff) {
+                const target = frontTarget;
+                const chainCount = (p.chainTargets - 1) + unit.star;
+                target.hp -= baseDmg;
+                const tPos = getPositionOnPath(target.pathProgress);
+                const nearby = alive
+                    .filter(m => m !== target)
+                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
+                    .sort((a, b) => a.d - b.d)
+                    .slice(0, chainCount);
+                let hitCount = 1;
+                for (const { m } of nearby) { m.hp -= baseDmg * p.chainPct; hitCount++; }
+                // DeFi 유닛 공격력 버프 (임시: 공속으로 구현)
+                const dmgBuff = p.defiDmgBuff * hitCount * unit.star;
+                for (const ally of boardUnits) {
+                    const allyDef = UNIT_MAP[ally.unitId];
+                    if (allyDef?.origin === 'DeFi' && ally.position) {
+                        ally.attackCooldown = Math.max(0, (ally.attackCooldown ?? 0) * (1 - dmgBuff));
+                    }
+                }
+            }
+            // 🔍 아군 딜↑ 버프 (opensea NFT 민팅 — allyDmgBuff)
+            if (p.allyDmgBuff && p.allyBuffTargets) {
+                const targets = (p.allyBuffTargets - 1) + unit.star;
+                // 가장 공격력 높은 아군부터 버프
+                const allies = boardUnits
+                    .filter(a => a !== unit && a.position)
+                    .map(a => ({ a, dmg: (UNIT_MAP[a.unitId]?.baseDmg ?? 0) * STAR_MULTIPLIER[a.star] }))
+                    .sort((a, b) => b.dmg - a.dmg)
+                    .slice(0, targets);
+                for (const { a } of allies) {
+                    a.attackCooldown = Math.max(0, (a.attackCooldown ?? 0) * (1 - p.allyDmgBuff * unit.star));
+                }
+            }
+            // 💀 디버프 + ★3 스킬 표절 (craigwright 소송 — skillSteal)
+            if (p.dotPct && p.dotDuration && p.defShred && p.skillSteal !== undefined && !p.defShredTargets) {
+                const targets = Math.min(alive.length, unit.star >= 2 ? 3 : 1);
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.dots) t.dots = [];
+                    t.dots.push({ dps: baseDmg * p.dotPct, remaining: p.dotDuration });
+                    t.def = Math.max(0, t.def - p.defShred);
+                }
+                // ★3: 가장 강한 아군 스킬 복사 (50% 위력으로 추가딜)
+                if (unit.star >= 3) {
+                    let bestDmg = 0;
+                    for (const ally of boardUnits) {
+                        if (ally === unit) continue;
+                        const ad = UNIT_MAP[ally.unitId];
+                        if (ad) bestDmg = Math.max(bestDmg, ad.baseDmg * STAR_MULTIPLIER[ally.star]);
+                    }
+                    if (bestDmg > 0) { frontTarget.hp -= bestDmg * 0.5; }
+                }
+            }
+            // 👻 관통 + ★3 HP 되감기 (daniele 리베이스 — hpRewind)
+            if (p.pierceTargets && p.piercePct && p.hpRewind !== undefined && !p.pierceManaPer) {
+                const target = frontTarget;
+                const pierceCount = (p.pierceTargets - 1) + unit.star;
+                target.hp -= baseDmg;
+                const sorted = alive
+                    .filter(m => m !== target)
+                    .sort((a, b) => b.pathProgress - a.pathProgress)
+                    .slice(0, pierceCount);
+                for (const m of sorted) { m.hp -= baseDmg * p.piercePct; }
+                // ★3: HP 되감기 (타격 대상의 HP를 maxHp 기준 큰 버스트 딜)
+                if (unit.star >= 3) {
+                    const rewindDmg = target.maxHp * 0.20;
+                    target.hp -= rewindDmg;
+                }
+            }
+            // 🔑 ₿ 사거리 버프 (halfinney 최초의 수신자 — btcRangeBuff)
+            if (p.btcRangeBuff) {
+                // ★3: 모든 ₿ 유닛 사거리 무한 (큰 값으로 설정)
+                // 간단 구현: 공속 버프로 대체
+                for (const ally of boardUnits) {
+                    if (ally === unit) continue;
+                    const ad = UNIT_MAP[ally.unitId];
+                    if (ad?.origin === 'Bitcoin' && ally.position) {
+                        ally.attackCooldown = Math.max(0, (ally.attackCooldown ?? 0) * (1 - 0.15 * unit.star));
+                    }
+                }
+            }
+            // 💳 버스트 + 골드 비례 DMG (kris 캐시백 — goldScaleDmg)
+            if (p.burstDmg && p.goldScaleDmg && !p.killManaPayback) {
+                const target = frontTarget;
+                let dmg = p.burstDmg * unit.star;
+                // ★3: 플레이어 현재 골든 비례 추가 DMG
+                if (unit.star >= 3) {
+                    const playerGold = this.combat.totalGoldEarned;
+                    dmg += playerGold * 2;
+                }
+                target.hp -= dmg;
+                if (target.hp <= 0 && target.alive) {
+                    this.combat.totalGoldEarned += p.killGold ?? 1;
+                }
+            }
+            // 📖 아군 크리 버프 (cdixon Read Write Own — allyCritBuff)
+            if (p.allyCritBuff && p.critBuffRange) {
+                // 간단 구현: 범위 내 아군 공속 + 크리 효과 (공속 버프로 구현)
+                const range = p.critBuffRange ?? 3;
+                for (const ally of boardUnits) {
+                    if (ally === unit || !ally.position || !unit.position) continue;
+                    const dx = Math.abs(ally.position.x - unit.position.x);
+                    const dy = Math.abs(ally.position.y - unit.position.y);
+                    if (dx <= range && dy <= range) {
+                        ally.attackCooldown = Math.max(0, (ally.attackCooldown ?? 0) * (1 - p.allyCritBuff * unit.star));
+                    }
+                }
+            }
+            // 🏛️ 광역 슬로우 + ★3 전체 빙결 (kashkari 금리 인상 — fullFreeze)
+            if (p.slowPct && p.slowDuration && p.fullFreeze !== undefined && !p.slowTargets) {
+                const targets = unit.star >= 2 ? alive.length : Math.min(3, alive.length);
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.debuffs) t.debuffs = [];
+                    t.debuffs.push({ type: 'slow', slowPct: p.slowPct, remaining: p.slowDuration });
+                    // ★3: 전체 빙결 + 골드
+                    if (unit.star >= 3) {
+                        const bossDur = t.isBoss ? 1.0 : 3.0;
+                        t.debuffs.push({ type: 'freeze', slowPct: 0.95, remaining: bossDur });
+                    }
+                }
+                if (unit.star >= 3 && p.freezeGold) {
+                    this.combat.totalGoldEarned += 1;
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)

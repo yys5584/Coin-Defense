@@ -261,14 +261,16 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
         baseDmg: 16, attackSpeed: 0.9, attackRange: 3,
-        skill: { type: 'passive', name: '라이트닝 결제', desc: '4번째 공격마다 ⚡체인 1', params: { nthHit: 4, chainTargets: 1, chainPct: 0.30 } }
+        maxMana: 50, startingMana: 0,
+        skill: { type: 'active', name: '라이트닝 네트워크', desc: '마나 충전 시 체인 번개 + 감전 장판', cooldown: 5, params: { chainTargets: 3, chainPct: 0.35, electricField: 1 } }
     },
     {
         id: 'jessepollak', name: 'Jesse Pollak', emoji: '🌐', cost: 2,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.91, attackRange: 3,
-        skill: { type: 'passive', name: 'Base Chain', desc: '4번째 공격마다 ⚡체인 1', params: { nthHit: 4, chainTargets: 1, chainPct: 0.30 } }
+        maxMana: 50, startingMana: 0,
+        skill: { type: 'active', name: '스마트 컨트랙트', desc: '마나 충전 시 체인 + DeFi 공격력 버프', cooldown: 5, params: { chainTargets: 3, chainPct: 0.35, defiDmgBuff: 0.10, defiBuffDuration: 2 } }
     },
     {
         id: 'wonyotti', name: '워뇨띠', emoji: '🥷', cost: 2,
@@ -291,22 +293,24 @@ export const UNITS: UnitDef[] = [
         origin: Origin.VC,
         dmgType: 'physical' as const,
         baseDmg: 16, attackSpeed: 0.91, attackRange: 3,
-        skill: { type: 'passive', name: '로열티', desc: '처치 시 주변 아군 1명에게 강화탄 1회 부여', params: { buffRange: 1 } }
+        maxMana: 80, startingMana: 0,
+        skill: { type: 'active', name: 'NFT 민팅', desc: '마나 충전 시 아군 딜↑ 버프', cooldown: 5, params: { allyDmgBuff: 0.20, allyBuffTargets: 1, buffDuration: 3 } }
     },
     {
         id: 'craigwright', name: 'Craig Wright', emoji: '💀', cost: 2,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.89, attackRange: 3,
-        maxMana: 80, startingMana: 20,
-        skill: { type: 'active', name: '소송 폭탄', desc: '마나 충전 시 🔥도트', cooldown: 8, params: { dotPct: 0.03, dotDuration: 3 } }
+        maxMana: 70, startingMana: 0,
+        skill: { type: 'active', name: '소송 남발', desc: '마나 충전 시 적 디버프 + ★3 스킬 표절', cooldown: 5, params: { dotPct: 0.05, dotDuration: 3, defShred: 5, skillSteal: 1 } }
     },
     {
         id: 'daniele', name: 'Daniele Sesta', emoji: '👻', cost: 2,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
         baseDmg: 16, attackSpeed: 0.9, attackRange: 3,
-        skill: { type: 'passive', name: '유령 관통', desc: '기본 공격 🔫관통 1', params: { pierceTargets: 1, piercePct: 0.50 } }
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '리베이스', desc: '마나 충전 시 관통 빔 + ★3 HP 되감기', cooldown: 5, params: { pierceTargets: 2, piercePct: 0.60, hpRewind: 1 } }
     },
     {
         id: 'hsaka', name: 'Hsaka', emoji: '📉', cost: 2,
@@ -391,7 +395,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
         baseDmg: 16, attackSpeed: 0.93, attackRange: 3,
-        skill: { type: 'passive', name: '노드 운영', desc: '인접 ₿ 아군 사거리+1 (오라)', params: { rangeBonus: 1, buffRange: 1 } }
+        maxMana: 70, startingMana: 0,
+        skill: { type: 'active', name: '최초의 수신자', desc: '마나 충전 시 인접 ₿ 사거리+1 + ★3 전체 사거리 무한', cooldown: 5, params: { btcRangeBuff: 1, btcRangeTargets: 1 } }
     },
 
     // ── DeFi +2 ──
@@ -443,7 +448,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Exchange,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.88, attackRange: 3,
-        skill: { type: 'passive', name: '캐시백', desc: '처치 3회마다 💰골드+1', params: { killsPerGold: 3 } }
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '캐시백', desc: '마나 충전 시 버스트 + 킬 시 골드 + ★3 골드비례 DMG', cooldown: 5, params: { burstDmg: 150, killGold: 1, goldScaleDmg: 1 } }
     },
 
     // ── VC +3 ──
@@ -460,7 +466,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.VC,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.92, attackRange: 3,
-        skill: { type: 'passive', name: '투자 테제', desc: '처치 3회마다 자신 크리↑(누적, 상한)', params: { killsPerStack: 3, critPerStack: 0.05, maxStacks: 6 } }
+        maxMana: 80, startingMana: 0,
+        skill: { type: 'active', name: 'Read Write Own', desc: '마나 충전 시 아군크리 버프 + ★3 확정크리', cooldown: 5, params: { allyCritBuff: 0.15, critBuffRange: 3, critBuffDuration: 3 } }
     },
     {
         id: 'cathie', name: 'Cathie Wood', emoji: '🏹', cost: 3,
@@ -527,7 +534,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bear,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.87, attackRange: 3,
-        skill: { type: 'passive', name: '금리 인상', desc: '5번째 공격마다 대상 + 주변 1기 슬로우', params: { nthHit: 5, slowPct: 0.30, slowDuration: 3, slowTargets: 1 } }
+        maxMana: 90, startingMana: 0,
+        skill: { type: 'active', name: '금리 인상', desc: '마나 충전 시 광역 슬로우 + ★3 전체빙결+골드', cooldown: 5, params: { slowPct: 0.40, slowDuration: 3, fullFreeze: 1, freezeGold: 1 } }
     },
     {
         id: 'burry', name: 'Michael Burry', emoji: '🔍', cost: 3,
