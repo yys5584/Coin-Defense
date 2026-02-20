@@ -2529,6 +2529,15 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
     showUnitInfoPanel(unit, e as MouseEvent);
   });
 
+  // 유닛 클릭 → 합성 모달 (더블클릭 또는 Shift+클릭)
+  card.addEventListener('click', (e) => {
+    if (inCombat) return;
+    if (e.shiftKey || e.detail >= 2) {
+      e.stopPropagation();
+      showCraftModal(unit.unitId);
+    }
+  });
+
   // 터치 드래그 지원
   setupTouchDrag(card, unit, location);
 
@@ -3676,43 +3685,44 @@ function executeRecipe(targetId: string): boolean {
 function showCraftModal(unitId: string): void {
   if (inCombat) return;
 
-  const recipes = getRecipesForUnit(unitId);
-  if (recipes.length === 0) return; // 이 유닛은 어떤 레시피에도 사용되지 않음
-
   closeCraftModal(); // 이전 모달 정리
 
   const clickedDef = UNIT_MAP[unitId];
   const modal = document.createElement('div');
   modal.id = 'craft-modal';
 
+  const recipes = getRecipesForUnit(unitId);
+
   let html = `<span class="close-modal" id="craft-modal-close">✕</span>`;
   html += `<div style="font-size:14px;color:#94a3b8;margin-bottom:12px;">${clickedDef?.emoji ?? '?'} <b>${clickedDef?.name ?? unitId}</b> 합성 경로</div>`;
 
-  for (const targetId of recipes) {
-    const targetDef = UNIT_MAP[targetId];
-    const check = checkCraftability(targetId);
+  if (recipes.length === 0) {
+    html += `<div style="color:#888;font-size:13px;padding:16px 0;text-align:center;">이 유닛으로 합성 가능한 상위 티어 조합이 없습니다.</div>`;
+  } else {
+    for (const targetId of recipes) {
+      const targetDef = UNIT_MAP[targetId];
+      const check = checkCraftability(targetId);
 
-    html += `<div class="recipe-block">`;
-    html += `<div class="recipe-title">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId} (T${targetDef?.cost ?? '?'})</div>`;
+      html += `<div class="recipe-block">`;
+      html += `<div class="recipe-title">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId} (Tier ${targetDef?.cost ?? '?'})</div>`;
 
-    for (const ing of check.ingredients) {
-      const iDef = UNIT_MAP[ing.id];
-      const starReq = '⭐'.repeat(ing.star);
-      const status = ing.owned
-        ? `<span style="color:#4ade80">✅ 보유 (★${ing.ownedStar})</span>`
-        : ing.ownedStar > 0
-          ? `<span style="color:#fbbf24">⚠️ ★${ing.ownedStar} (★${ing.star} 필요)</span>`
-          : `<span style="color:#f87171">❌ 미보유</span>`;
-      html += `<div class="req-item">
-        <span>${iDef?.emoji ?? '?'} ${iDef?.name ?? ing.id} ${starReq}</span>
-        ${status}
-      </div>`;
+      for (const ing of check.ingredients) {
+        const iDef = UNIT_MAP[ing.id];
+        const starText = ing.star > 1 ? `${ing.star}⭐ ` : '';
+        if (ing.owned) {
+          html += `<div class="req-item"><span style="color:#00ff00">[✔] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#00ff00">★${ing.ownedStar} 보유</span></div>`;
+        } else if (ing.ownedStar > 0) {
+          html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">★${ing.ownedStar} (★${ing.star} 필요)</span></div>`;
+        } else {
+          html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">미보유</span></div>`;
+        }
+      }
+
+      html += `<button class="craft-btn" data-target="${targetId}" ${check.isCraftable ? '' : 'disabled'}>
+        ${check.isCraftable ? '⚡ CRAFT' : '⛔ 재료 부족'}
+      </button>`;
+      html += `</div>`;
     }
-
-    html += `<button class="craft-btn" data-target="${targetId}" ${check.isCraftable ? '' : 'disabled'}>
-      ${check.isCraftable ? '✨ 합성하기' : '⛔ 재료 부족'}
-    </button>`;
-    html += `</div>`;
   }
 
   modal.innerHTML = html;
