@@ -2921,6 +2921,23 @@ function renderCombatOverlay(cs: CombatState): void {
     ">${label}</span>`;
   }).join(' ');
 
+  // 등급 타이머 바: 시간에 따라 줄어드는 색상 바
+  const maxTime = isBossRd ? 60 : 50;
+  const gradeSegments = grades.map((g: any, i: number) => {
+    const prevT = i === 0 ? 0 : grades[i - 1].t;
+    const segStart = prevT / maxTime * 100;
+    const segEnd = g.t / maxTime * 100;
+    return `${g.color} ${segStart}%, ${g.color} ${segEnd}%`;
+  }).join(', ');
+  const elapsedPct = Math.min(t / maxTime * 100, 100);
+  const timerBar = `
+    <div style="position:relative;width:100%;height:6px;border-radius:3px;overflow:hidden;margin-top:3px;
+                background:linear-gradient(90deg, ${gradeSegments});">
+      <div style="position:absolute;left:0;top:0;width:${elapsedPct}%;height:100%;
+                  background:rgba(0,0,0,0.65);border-radius:3px 0 0 3px;
+                  transition:width 0.1s linear;"></div>
+    </div>`;
+
   infoEl.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span style="color:${curColor};font-weight:bold;font-size:14px;min-width:28px">${curGrade}</span>
@@ -2936,6 +2953,7 @@ function renderCombatOverlay(cs: CombatState): void {
       ${timeoutWarn}
       ${pauseLabel}
     </div>
+    ${timerBar}
   `;
 }
 
