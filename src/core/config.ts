@@ -275,15 +275,16 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.98, attackRange: 3,
-        maxMana: 80, startingMana: 20,
-        skill: { type: 'active', name: '풀매수', desc: '마나 충전 시 자신 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.30, buffDuration: 3 } }
+        maxMana: 70, startingMana: 0,
+        skill: { type: 'active', name: '풀시드 롱', desc: '마나 충전 시 최강 아군 공속 대폭↑', cooldown: 5, params: { bestAllyAtkSpdBuff: 0.40, buffDuration: 4 } }
     },
     {
         id: 'jessepowell', name: 'Jesse Powell', emoji: '🛡️', cost: 2,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 16, attackSpeed: 0.95, attackRange: 3,
-        skill: { type: 'passive', name: '수수료 리베이트', desc: '4킬마다 💰골드+1', params: { killsPerGold: 4 } }
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '수수료 장사', desc: '마나 충전 시 단일 버스트딜 + 킬 시 골드/마나', cooldown: 5, params: { burstDmg: 200, killGold: 1, killManaPayback: 30 } }
     },
     {
         id: 'opensea', name: 'OpenSea', emoji: '🔍', cost: 2,
@@ -312,7 +313,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bear,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.95, attackRange: 3,
-        skill: { type: 'passive', name: '공매도', desc: '5번째 공격마다 대상 ❄️빙결 (80% 감속)', params: { nthHit: 5, freezeDuration: 1.0, freezeSlow: 0.80, bossFreezeDuration: 0.35 } }
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '크립토 윈터', desc: '마나 충전 시 적 빙결 + 빙결 적 추가피해', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 2, freezeSlow: 0.90, frozenBonusDmg: 0.20, shatterHpPct: 0.10 } }
     },
 
     // ═══ 1코 (8종) ═══

@@ -706,6 +706,61 @@ export class CombatSystem {
                     }
                 }
             }
+            // 🛡️ 버스트딜 + 킬 골드/마나 (jessepowell 수수료 장사 — burstDmg + killGold + killManaPayback)
+            if (p.burstDmg && !p.burstMult && !p.splashPct) {
+                const dmg = p.burstDmg * unit.star;  // ★ 스케일링
+                const target = frontTarget;
+                target.hp -= dmg;
+                // 킬 체크: 스킬로 처치 시 골드 + 마나 페이백
+                if (target.hp <= 0 && target.alive) {
+                    const goldReward = unit.star >= 3 ? 2 : (p.killGold ?? 1);
+                    this.combat.totalGoldEarned += goldReward;
+                    const manaBack = unit.star >= 3 ? maxMana : (p.killManaPayback ?? 0) * unit.star;
+                    unit.currentMana = (unit.currentMana ?? 0) + manaBack;
+                }
+            }
+            // 🥷 최강 아군 공속 버프 (wonyotti 풀시드 롱 — bestAllyAtkSpdBuff)
+            if (p.bestAllyAtkSpdBuff) {
+                const buffMult = p.bestAllyAtkSpdBuff * unit.star;  // ★ 스케일링
+                // 공격력 가장 높은 아군 찾기
+                let bestAlly: UnitInstance | null = null;
+                let bestDmg = -1;
+                for (const ally of boardUnits) {
+                    if (ally === unit || !ally.position) continue;
+                    const allyDef = UNIT_MAP[ally.unitId];
+                    if (!allyDef) continue;
+                    const allyDmg = allyDef.baseDmg * STAR_MULTIPLIER[ally.star];
+                    if (allyDmg > bestDmg) { bestDmg = allyDmg; bestAlly = ally; }
+                }
+                if (bestAlly) {
+                    bestAlly.attackCooldown = Math.max(0, (bestAlly.attackCooldown ?? 0) * (1 - buffMult));
+                }
+            }
+            // ❄️ 빙결 스킬 (hsaka 크립토 윈터 — freezeTargets + frozenBonusDmg)
+            if (p.freezeTargets && p.freezeDuration && p.frozenBonusDmg !== undefined) {
+                const targets = p.freezeTargets * unit.star;  // ★ 스케일링
+                const dur = p.freezeDuration + (unit.star - 1);  // ★2=3초, ★3=4초
+                const slowFactor = p.freezeSlow ?? 0.90;
+                const sorted = alive
+                    .sort((a, b) => b.pathProgress - a.pathProgress)
+                    .slice(0, targets);
+                for (const t of sorted) {
+                    if (!t.debuffs) t.debuffs = [];
+                    const bossDur = t.isBoss ? dur * 0.3 : dur;
+                    t.debuffs.push({ type: 'freeze', slowPct: slowFactor, remaining: bossDur });
+                    // 빙결 이펙트
+                    const fPos = getPositionOnPath(t.pathProgress);
+                    this.combat.effects.push({
+                        id: this.effectIdCounter++,
+                        type: 'freeze',
+                        x: fPos.px, y: fPos.py,
+                        value: 0,
+                        startTime: performance.now(),
+                        duration: bossDur * 1000,
+                        frameIndex: 0,
+                    });
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)
