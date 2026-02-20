@@ -2119,8 +2119,8 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
     hideSellZone();
   });
 
-  card.addEventListener('mouseenter', (e) => { hoveredUnit = unit; showTooltip(e as MouseEvent, unit); });
-  card.addEventListener('mouseleave', () => { hoveredUnit = null; hideTooltip(); });
+  card.addEventListener('mouseenter', () => { hoveredUnit = unit; });
+  card.addEventListener('mouseleave', () => { hoveredUnit = null; });
 
   card.addEventListener('contextmenu', (e) => {
     e.preventDefault();
