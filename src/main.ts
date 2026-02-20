@@ -2680,7 +2680,7 @@ function showAugmentPick(round: number): void {
 }
 
 function getCategoryLabel(augId: string): string {
-  if (['aug_crit_master', 'aug_splash_all', 'aug_berserker', 'aug_armor_break', 'aug_boss_slayer', 'aug_chain_light'].includes(augId)) return '⚔️ 전투';
+  if (['aug_zk_proof', 'aug_chain_liquidation', 'aug_margin_call', 'aug_dead_cat', 'aug_short_squeeze', 'aug_lightning_network'].includes(augId)) return '⚔️ 전투';
   if (['aug_interest_king', 'aug_reroll_master', 'aug_xp_boost', 'aug_heal', 'aug_gold_rush', 'aug_lucky'].includes(augId)) return '💰 유틸';
   return '🧠 전략';
 }

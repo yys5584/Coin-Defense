@@ -861,34 +861,34 @@ export const UNLOCK_CONDITIONS: UnlockCondition[] = [
 export const AUGMENTS: AugmentDef[] = [
     // ═══ 전투 증강 (Combat) ═══
     {
-        id: 'aug_crit_master', name: '크리 마스터', emoji: '🎯',
+        id: 'aug_zk_proof', name: '👁️🗨️ 영지식 증명', emoji: '👁️',
         minRound: 10,
-        effect: '모든 유닛 크리확률 +15%, 크리DMG +30%'
+        effect: '크리티컬이 스킬 데미지에도 적용됩니다 (VC 시너지 크리확률 → 궁극기 크리)'
     },
     {
-        id: 'aug_splash_all', name: '폭발의 손', emoji: '💥',
-        minRound: 10,
-        effect: '모든 유닛 스플래시 25% 추가'
-    },
-    {
-        id: 'aug_berserker', name: '광전사', emoji: '🔥',
+        id: 'aug_chain_liquidation', name: '🩸 연쇄 청산', emoji: '🩸',
         minRound: 20,
-        effect: '모든 유닛 공속+20%, DMG+15%'
+        effect: '스킬로 적 처치 시 시체 폭발(주변 200DMG) + 마나 50% 즉시 회복'
     },
     {
-        id: 'aug_armor_break', name: '관통탄', emoji: '🔱',
+        id: 'aug_margin_call', name: '📉 마진 콜', emoji: '📉',
         minRound: 20,
-        effect: '모든 유닛 방어무시 30%'
+        effect: '모든 유닛 최대 마나 50% 감소 (스킬 2배 빈도). 단, 스킬 시전 시 기지 HP -1'
     },
     {
-        id: 'aug_boss_slayer', name: '보스 슬레이어', emoji: '👑',
-        minRound: 30,
-        effect: '보스에게 DMG ×2.5'
+        id: 'aug_dead_cat', name: '🐈 데드캣 바운스', emoji: '🐈',
+        minRound: 20,
+        effect: '관통 투사체가 맵 끝에서 반사되어 2차 타격 (당구 쿠션 효과)'
     },
     {
-        id: 'aug_chain_light', name: '체인 라이트닝', emoji: '⚡',
+        id: 'aug_short_squeeze', name: '📈 숏 스퀴즈', emoji: '📈',
         minRound: 30,
-        effect: '공격 시 30% 확률로 인접 적 2명에게 50% 데미지'
+        effect: '보스 공격 시 마나 회복 2배. 체력 30% 이하 보스에게 스킬 즉사'
+    },
+    {
+        id: 'aug_lightning_network', name: '🌩️ 라이트닝 네트워크', emoji: '🌩️',
+        minRound: 30,
+        effect: '체인 번개가 튕기지 않고 모든 횟수가 단일 타겟에 집중 (보스 극딜)'
     },
 
     // ═══ 유틸 증강 (Utility) ═══

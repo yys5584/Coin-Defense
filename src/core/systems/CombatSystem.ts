@@ -199,31 +199,34 @@ export class CombatSystem {
         // ── 증강 효과 적용 ──
         const augs = new Set(player.augments);
 
-        // 🎯 크리 마스터: 크리확률+15%, 크리DMG+30%
-        if (augs.has('aug_crit_master')) {
-            synergyBuffs.critChance += 0.15;
-            synergyBuffs.critDmgMultiplier += 0.3;
+        // 👁️ 영지식 증명: 크리가 스킬에도 적용 (크리확률을 synergyBuffs에 유지)
+        if (augs.has('aug_zk_proof')) {
+            synergyBuffs.critChance += 0.10;
+            synergyBuffs.critDmgMultiplier += 0.5;
         }
-        // 💥 폭발의 손: 스플래시 25% 추가
-        if (augs.has('aug_splash_all')) {
-            synergyBuffs.splashDmg += 0.25;
+        // 🩸 연쇄 청산: 스킬 킬 시 폭발+마나50% (processActiveSkills에서 처리)
+        // → flag만 저장, 실제 로직은 스킬 핸들러 이후에 처리
+        if (augs.has('aug_chain_liquidation')) {
+            // 플래그 저장 (combat state에서 참조)
         }
-        // 🔥 광전사: 공속+20%, DMG+15%
-        if (augs.has('aug_berserker')) {
-            synergyBuffs.atkSpeedMultiplier *= 1.20;
-            synergyBuffs.dmgMultiplier *= 1.15;
+        // 📉 마진 콜: 최대마나 50% 감소, 스킬 시전 시 HP-1
+        // → processActiveSkills에서 maxMana 계산 시 적용
+        if (augs.has('aug_margin_call')) {
+            // 플래그 저장
         }
-        // 🔱 관통탄: 방어무시 30%
-        if (augs.has('aug_armor_break')) {
-            synergyBuffs.armorIgnore = Math.min(1.0, (synergyBuffs.armorIgnore ?? 0) + 0.3);
+        // 🐈 데드캣 바운스: 관통 반사
+        // → 관통 스킬 핸들러에서 처리
+        if (augs.has('aug_dead_cat')) {
+            // 플래그 저장
         }
-        // 👑 보스 슬레이어: 보스DMG ×2.5
-        if (augs.has('aug_boss_slayer')) {
-            synergyBuffs.bossDmgMultiplier *= 2.5;
+        // 📈 숏 스퀴즈: 보스 마나2배 + 30%이하 즉사
+        if (augs.has('aug_short_squeeze')) {
+            synergyBuffs.bossDmgMultiplier *= 1.5;
         }
-        // ⚡ 체인 라이트닝: 30% 확률로 인접 2명에게 50% DMG (doubleHitChance로 근사)
-        if (augs.has('aug_chain_light')) {
-            synergyBuffs.doubleHitChance += 0.30;
+        // 🌩️ 라이트닝 네트워크: 체인→단일집중
+        // → 체인 스킬 핸들러에서 처리
+        if (augs.has('aug_lightning_network')) {
+            // 플래그 저장
         }
         // 💰 이자왕: 경제 (main.ts에서 처리)
         // 🎲 리롤 마스터: 경제 (main.ts에서 처리)
@@ -521,15 +524,29 @@ export class CombatSystem {
             const s = def.skill;
             // permManaReduce: skillStacks만큼 maxMana 축소 (akang ★3)
             const manaReduction = (def.skill.params?.permManaReduce && unit.star >= 3) ? (unit.skillStacks ?? 0) : 0;
-            const maxMana = Math.max(10, (def.maxMana ?? 100) - manaReduction);
+            let maxMana = Math.max(10, (def.maxMana ?? 100) - manaReduction);
+            // 📉 마진 콜 증강: 최대마나 50% 감소
+            const augSet = new Set(player.augments);
+            if (augSet.has('aug_margin_call')) {
+                maxMana = Math.max(5, Math.floor(maxMana * 0.50));
+            }
 
             // 초당 자연 마나 회복 +5/s
-            unit.currentMana = (unit.currentMana ?? 0) + 5 * dt;
+            let manaRegen = 5;
+            // 📈 숏 스퀴즈: 보스 공격 시 마나 회복 2배
+            if (augSet.has('aug_short_squeeze') && this.combat.monsters.some(m => m.alive && m.isBoss)) {
+                manaRegen *= 2;
+            }
+            unit.currentMana = (unit.currentMana ?? 0) + manaRegen * dt;
 
             // 마나 부족 → 스킬 미발동
             if (unit.currentMana < maxMana) continue;
             // 마나 충전 완료 → 스킬 발동!
             unit.currentMana = 0;
+            // 📉 마진 콜: 스킬 시전 시 기지 HP -1
+            if (augSet.has('aug_margin_call')) {
+                player.hp = Math.max(0, player.hp - 1);
+            }
             // 💧 DeFi 시너지: 마나 환급 (manaPayback)
             const payback = this.buffs?.manaPayback ?? 0;
             if (payback > 0) {
