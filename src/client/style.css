@@ -3090,6 +3090,12 @@ body {
     animation: tooltipFadeIn .15s ease;
 }
 
+/* 골드 툴팁: 아래로 표시 (상단 HUD에서 위로 나가는 것 방지) */
+.hud-tooltip.gold-tooltip {
+    bottom: auto;
+    top: calc(100% + 10px);
+}
+
 @keyframes tooltipFadeIn {
     from {
         opacity: 0;
