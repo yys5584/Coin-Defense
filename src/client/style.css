@@ -5257,6 +5257,25 @@ body {
     padding: 6px 8px 3px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     margin-top: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.1s;
+}
+
+.craft-tier-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.craft-recipe-row.compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 8px;
+    margin: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
 }
 
 .craft-recipe-row {

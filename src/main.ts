@@ -3693,20 +3693,20 @@ function executeRecipe(targetId: string): boolean {
 /** 합성 모달 표시: 클릭한 유닛이 참여하는 모든 레시피를 보여줌 */
 /** 합성 패널 렌더링: 티어별 그룹, 상위유닛 → 재료 방식 (✨합성 탭) */
 let craftPanelExpandedRecipe: string | null = null;
+const craftTierExpanded: Record<string, boolean> = {};
 
 function renderCraftPanel(): void {
   const container = document.getElementById('craft-panel-content');
   if (!container) return;
 
-  // 티어별 그룹 정의
-  const tierGroups: { label: string; color: string; targets: string[] }[] = [
-    { label: '🪙 T4 코인', color: '#f59e0b', targets: [] },
-    { label: '🔗 T5 프로토콜', color: '#a78bfa', targets: [] },
-    { label: '👑 T7 레전드', color: '#ef4444', targets: [] },
-    { label: '💎 T10 미식', color: '#ffd700', targets: [] },
+  // 티어별 그룹 정의 (게임 내 로어 기준)
+  const tierGroups: { key: string; label: string; color: string; targets: string[] }[] = [
+    { key: 't4', label: '🪙 T4 코인', color: '#f59e0b', targets: [] },
+    { key: 't5', label: '⭐ T5 에픽', color: '#a78bfa', targets: [] },
+    { key: 't7', label: '👑 T7 레전드', color: '#ef4444', targets: [] },
+    { key: 't10', label: '💎 T10 미식', color: '#ffd700', targets: [] },
   ];
 
-  // 레시피를 티어별로 분류
   for (const [targetId] of Object.entries(UNIT_RECIPES)) {
     const def = UNIT_MAP[targetId];
     if (!def) continue;
@@ -3722,48 +3722,79 @@ function renderCraftPanel(): void {
   for (const group of tierGroups) {
     if (group.targets.length === 0) continue;
 
-    html += `<div class="craft-tier-header" style="color:${group.color}">${group.label}</div>`;
+    const isOpen = craftTierExpanded[group.key] ?? false;
+    const arrow = isOpen ? '▼' : '▶';
 
-    for (const targetId of group.targets) {
-      const targetDef = UNIT_MAP[targetId];
-      const check = checkCraftability(targetId);
-      const isExpanded = craftPanelExpandedRecipe === targetId;
-      const craftableClass = check.isCraftable ? ' craft-ready' : '';
+    // 티어 헤더: 합성 가능 개수 표시
+    const craftableCount = group.targets.filter(tid => checkCraftability(tid).isCraftable).length;
+    const craftBadge = craftableCount > 0
+      ? `<span style="color:#00ff88;font-size:11px;margin-left:6px;">⚡${craftableCount}</span>`
+      : '';
 
-      html += `<div class="craft-recipe-row${craftableClass}" data-target="${targetId}">`;
-      html += `<div class="craft-recipe-header" data-target="${targetId}">`;
-      html += `<span class="craft-recipe-name">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId}</span>`;
-      if (check.isCraftable) {
-        html += `<span class="craft-ready-badge">⚡ 가능</span>`;
-      } else {
-        // 보유 개수 / 총 필요 개수
+    html += `<div class="craft-tier-header" style="color:${group.color}" data-tier="${group.key}">
+      <span>${arrow} ${group.label}${craftBadge}</span>
+      <span style="font-size:11px;color:#64748b">${group.targets.length}개</span>
+    </div>`;
+
+    if (!isOpen) {
+      // 접힌 상태: 레시피별 한줄 요약만
+      for (const targetId of group.targets) {
+        const targetDef = UNIT_MAP[targetId];
+        const check = checkCraftability(targetId);
         const owned = check.ingredients.filter(i => i.owned).length;
         const total = check.ingredients.length;
-        html += `<span class="craft-progress">${owned}/${total}</span>`;
-      }
-      html += `</div>`; // header
+        const craftableClass = check.isCraftable ? ' craft-ready' : '';
 
-      // 확장 영역: 재료 목록 + CRAFT 버튼
-      if (isExpanded) {
-        html += `<div class="craft-recipe-detail">`;
-        for (const ing of check.ingredients) {
-          const iDef = UNIT_MAP[ing.id];
-          const starText = ing.star > 1 ? `${ing.star}⭐ ` : '';
-          if (ing.owned) {
-            html += `<div class="req-item"><span style="color:#00ff00">[✔] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#00ff00">★${ing.ownedStar}</span></div>`;
-          } else if (ing.ownedStar > 0) {
-            html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">★${ing.ownedStar}(★${ing.star}필요)</span></div>`;
-          } else {
-            html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">미보유</span></div>`;
-          }
-        }
+        html += `<div class="craft-recipe-row compact${craftableClass}">`;
+        html += `<span class="craft-recipe-name">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId}</span>`;
         if (check.isCraftable) {
-          html += `<button class="craft-btn" data-target="${targetId}">⚡ CRAFT</button>`;
+          html += `<span class="craft-ready-badge">⚡ 가능</span>`;
+        } else {
+          html += `<span class="craft-progress">${owned}/${total}</span>`;
         }
-        html += `</div>`; // detail
+        html += `</div>`;
       }
+    } else {
+      // 펼친 상태: 레시피별 클릭 → 상세 확장
+      for (const targetId of group.targets) {
+        const targetDef = UNIT_MAP[targetId];
+        const check = checkCraftability(targetId);
+        const isExpanded = craftPanelExpandedRecipe === targetId;
+        const craftableClass = check.isCraftable ? ' craft-ready' : '';
 
-      html += `</div>`; // row
+        html += `<div class="craft-recipe-row${craftableClass}" data-target="${targetId}">`;
+        html += `<div class="craft-recipe-header" data-target="${targetId}">`;
+        html += `<span class="craft-recipe-name">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId}</span>`;
+        if (check.isCraftable) {
+          html += `<span class="craft-ready-badge">⚡ 가능</span>`;
+        } else {
+          const owned = check.ingredients.filter(i => i.owned).length;
+          const total = check.ingredients.length;
+          html += `<span class="craft-progress">${owned}/${total}</span>`;
+        }
+        html += `</div>`;
+
+        if (isExpanded) {
+          html += `<div class="craft-recipe-detail">`;
+          for (const ing of check.ingredients) {
+            const iDef = UNIT_MAP[ing.id];
+            const starText = ing.star > 1 ? `${ing.star}⭐ ` : '';
+            if (ing.owned) {
+              html += `<div class="req-item"><span style="color:#00ff00">[✔] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#00ff00">★${ing.ownedStar}</span></div>`;
+            } else if (ing.ownedStar > 0) {
+              html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">★${ing.ownedStar}(★${ing.star}필요)</span></div>`;
+            } else {
+              html += `<div class="req-item"><span style="color:#ff4444">[X] ${starText}${iDef?.name ?? ing.id}</span><span style="color:#ff4444">미보유</span></div>`;
+            }
+          }
+          if (check.isCraftable) {
+            html += `<button class="craft-btn" data-target="${targetId}">⚡ CRAFT</button>`;
+          }
+          html += `</div>`;
+        }
+
+        html += `</div>`;
+      }
     }
   }
 
@@ -3774,7 +3805,16 @@ function renderCraftPanel(): void {
 
   container.innerHTML = html;
 
-  // 레시피 헤더 클릭 → 확장/축소
+  // 티어 헤더 클릭 → 접기/펼치기
+  container.querySelectorAll('.craft-tier-header').forEach(hdr => {
+    hdr.addEventListener('click', () => {
+      const tier = (hdr as HTMLElement).dataset.tier!;
+      craftTierExpanded[tier] = !craftTierExpanded[tier];
+      renderCraftPanel();
+    });
+  });
+
+  // 레시피 헤더 클릭 → 상세 확장/축소
   container.querySelectorAll('.craft-recipe-header').forEach(hdr => {
     hdr.addEventListener('click', () => {
       const tid = (hdr as HTMLElement).dataset.target!;
