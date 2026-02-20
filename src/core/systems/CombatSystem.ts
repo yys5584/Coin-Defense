@@ -761,6 +761,154 @@ export class CombatSystem {
                     });
                 }
             }
+            // 🏦 관통 빔 + 명중당 마나 (perpdex 롱/숏 빔 — pierceManaPer)
+            if (p.pierceTargets && p.piercePct && p.pierceManaPer) {
+                const target = frontTarget;
+                const pierceDmg = baseDmg * p.piercePct;
+                const targets = (p.pierceTargets - 1) + unit.star;  // ★ 스케일링
+                target.hp -= baseDmg;
+                let hitCount = 1;
+                const sorted = alive
+                    .filter(m => m !== target)
+                    .sort((a, b) => b.pathProgress - a.pathProgress)
+                    .slice(0, targets);
+                for (const m of sorted) { m.hp -= pierceDmg; hitCount++; }
+                // 명중당 마나 회복
+                unit.currentMana = (unit.currentMana ?? 0) + p.pierceManaPer * hitCount;
+            }
+            // 🛡️ 확정 크리 + 영구 크리DMG 누적 (hodler 다이아몬드 핸드 — guaranteedCrit + permCritDmgBonus)
+            if (p.guaranteedCrit) {
+                const critHits = unit.star >= 2 ? 3 : 1;  // ★2=3타, ★1=1타
+                const target = frontTarget;
+                const critMult = 2.0 + (unit.skillStacks ?? 0) * (p.permCritDmgBonus ?? 0.10);
+                for (let i = 0; i < critHits && target.alive; i++) {
+                    target.hp -= baseDmg * critMult;
+                }
+                // 영구 크리DMG 누적 (★3 매 스킬마다)
+                if (unit.star >= 3) {
+                    unit.skillStacks = (unit.skillStacks ?? 0) + 1;
+                }
+            }
+            // 💀 DoT + 사망 시 마나 구슬 (fudspreader 공포 전염 — dotManaOrb)
+            if (p.dotPct && p.dotDuration && p.dotManaOrb) {
+                const targets = Math.min(alive.length, unit.star >= 2 ? 3 : 1);
+                const dotDps = baseDmg * p.dotPct * unit.star;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.dots) t.dots = [];
+                    t.dots.push({ dps: dotDps, remaining: p.dotDuration });
+                }
+            }
+            // 📱 다연속 강타 + 즉사 확률 (piuser 폰 채굴 — multiHit + instantKillChance)
+            if (p.multiHit) {
+                const hits = unit.star >= 2 ? p.multiHit + 1 : p.multiHit;  // ★2=3타
+                const target = frontTarget;
+                for (let i = 0; i < hits && target.alive; i++) {
+                    target.hp -= baseDmg * (p.multiHitMult ?? 1.5);
+                }
+                // ★3 즉사 확률
+                if (unit.star >= 3 && p.instantKillChance && !target.isBoss) {
+                    if (Math.random() < p.instantKillChance) {
+                        target.hp = 0;
+                        this.combat.totalGoldEarned += p.instantKillGold ?? 5;
+                    }
+                }
+            }
+            // 🧊 다수 슬로우 + 트루뎀 디버프 (gareth 차트 분석 — slowTargets + trueDmgDebuff)
+            if (p.slowPct && (p.slowDuration || p.duration) && p.slowTargets) {
+                const targets = (p.slowTargets - 1) + unit.star;  // ★ 스케일링
+                const dur = p.slowDuration ?? p.duration ?? 2;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.debuffs) t.debuffs = [];
+                    t.debuffs.push({ type: 'slow', slowPct: p.slowPct * unit.star * 0.5, remaining: dur + unit.star });
+                }
+            }
+            // ⚙️ 영구 공속 누적 (tradebot 초단타 — permAtkSpdBonus)
+            if (p.atkSpdBuff && p.buffDuration && !p.buffRange && !p.rangeBonus && p.permAtkSpdBonus) {
+                // 즉시 공속 버프
+                unit.attackCooldown = Math.max(0, (unit.attackCooldown ?? 0) * (1 - p.atkSpdBuff * unit.star));
+                // ★3: 영구 공속 누적
+                if (unit.star >= 3) {
+                    unit.skillStacks = (unit.skillStacks ?? 0) + 1;
+                }
+            }
+            // 📢 Social 마나 충전 (kol 선동 — socialManaCharge)
+            if (p.socialManaCharge && unit.star >= 3) {
+                for (const ally of boardUnits) {
+                    if (ally === unit) continue;
+                    const allyDef = UNIT_MAP[ally.unitId];
+                    if (allyDef?.origin === 'Social' && allyDef?.skill?.type === 'active') {
+                        const allyMaxMana = allyDef.maxMana ?? 100;
+                        ally.currentMana = allyMaxMana;
+                    }
+                }
+            }
+            // 👔 다수 물방 깎기 + 스턴 (a16zintern 리서치 — defShredTargets)
+            if (p.defShred && p.defShredTargets) {
+                const targets = (p.defShredTargets - 1) + unit.star;  // ★ 스케일링
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    t.def = Math.max(0, t.def - p.defShred * unit.star);
+                    // ★3 스턴
+                    if (unit.star >= 3 && p.stunDuration) {
+                        if (!t.debuffs) t.debuffs = [];
+                        const sDur = t.isBoss ? p.stunDuration * 0.3 : p.stunDuration;
+                        t.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: sDur });
+                    }
+                }
+            }
+            // 🐻 HP비례 도트 + 최대HP 삭제 (roubini 둠세이어 — hpPctDot + maxHpShred)
+            if (p.hpPctDot) {
+                const targets = Math.min(alive.length, unit.star >= 2 ? 3 : 1);
+                const selected = alive.sort((a, b) => b.hp - a.hp).slice(0, targets);
+                for (const t of selected) {
+                    const dotDps = t.maxHp * p.hpPctDot;
+                    if (!t.dots) t.dots = [];
+                    t.dots.push({ dps: dotDps, remaining: p.dotDuration ?? 3 });
+                    // ★3: 최대HP 영구 삭제
+                    if (unit.star >= 3 && p.maxHpShred) {
+                        t.maxHp = Math.max(1, t.maxHp * (1 - p.maxHpShred));
+                    }
+                }
+            }
+            // 🐕 체인 + 킬 마나 페이백 (memecoin 하이프 — chainKillManaPayback)
+            if (p.chainTargets && p.chainPct && p.chainKillManaPayback) {
+                const target = frontTarget;
+                const chainCount = (p.chainTargets - 1) + unit.star;  // ★ 스케일링
+                target.hp -= baseDmg;
+                const tPos = getPositionOnPath(target.pathProgress);
+                const nearby = alive
+                    .filter(m => m !== target)
+                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
+                    .sort((a, b) => a.d - b.d)
+                    .slice(0, chainCount);
+                for (const { m } of nearby) {
+                    m.hp -= baseDmg * p.chainPct;
+                    // 킬 시 마나 페이백
+                    if (m.hp <= 0 && m.alive) {
+                        unit.currentMana = (unit.currentMana ?? 0) + maxMana * p.chainKillManaPayback;
+                    }
+                }
+                if (target.hp <= 0 && target.alive) {
+                    unit.currentMana = (unit.currentMana ?? 0) + maxMana * p.chainKillManaPayback;
+                }
+            }
+            // 📺 빙결 + ★3 역주행 (cramer 인버스 — reverseMove)
+            if (p.freezeTargets && p.freezeDuration && p.reverseMove !== undefined && p.frozenBonusDmg === undefined) {
+                const targets = p.freezeTargets * unit.star;
+                const dur = p.freezeDuration + (unit.star - 1) * 0.5;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.debuffs) t.debuffs = [];
+                    const bossDur = t.isBoss ? dur * 0.3 : dur;
+                    t.debuffs.push({ type: 'freeze', slowPct: p.freezeSlow ?? 0.90, remaining: bossDur });
+                    // ★3: 역주행 (경로 후퇴)
+                    if (unit.star >= 3) {
+                        t.pathProgress = Math.max(0, t.pathProgress - 0.15);
+                    }
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)
