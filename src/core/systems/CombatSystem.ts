@@ -741,18 +741,60 @@ export class CombatSystem {
                 const target = hpTarget;
                 target.hp -= baseDmg * p.burstMult;
             }
-            // 체인 (Vitalik 이더 번개, Marc — chainTargets + chainPct)
+            // ⚡ 체인 라이트닝 (Vitalik, Marc — chainTargets + chainPct)
+            // 진짜 연쇄: 맞은 적 기준으로 가장 가까운 미타격 적에게 튕김
             if (p.chainTargets && p.chainPct && !p.pierceTargets) {
-                const target = frontTarget;
-                target.hp -= baseDmg;
-                const tPos = getPositionOnPath(target.pathProgress);
-                const nearby = alive
-                    .filter(m => m !== target)
-                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
-                    .sort((a, b) => a.d - b.d)
-                    .slice(0, p.chainTargets);
-                for (const { m } of nearby) {
-                    m.hp -= baseDmg * p.chainPct;
+                const maxBounces = p.chainTargets;
+                const bounceRange = 3.0; // 튕기는 최대 거리 (타일)
+                const dmgAmp = 1.2; // 튕길 때마다 20% 증폭
+
+                let currentTarget = frontTarget;
+                let currentDmg = baseDmg;
+                const hitSet = new Set<Monster>();
+
+                // 첫 타격
+                currentTarget.hp -= currentDmg;
+                hitSet.add(currentTarget);
+
+                // 연쇄 튕기기
+                for (let bounce = 0; bounce < maxBounces - 1; bounce++) {
+                    const curPos = getPositionOnPath(currentTarget.pathProgress);
+                    let nextTarget: Monster | null = null;
+                    let minDist = Infinity;
+
+                    // 현재 타겟 기준 가장 가까운 미타격 적 탐색
+                    for (const m of alive) {
+                        if (!m.alive || hitSet.has(m)) continue;
+                        const mPos = getPositionOnPath(m.pathProgress);
+                        const dist = Math.sqrt(
+                            (mPos.px - curPos.px) ** 2 + (mPos.py - curPos.py) ** 2
+                        );
+                        if (dist <= bounceRange && dist < minDist) {
+                            minDist = dist;
+                            nextTarget = m;
+                        }
+                    }
+
+                    if (!nextTarget) break; // 주변에 더 튕길 적 없음
+
+                    // 튕길 때마다 데미지 증폭
+                    currentDmg *= dmgAmp;
+                    nextTarget.hp -= currentDmg;
+
+                    // ⚡ 체인 VFX: 이전 타겟 → 다음 타겟 연결선
+                    const nextPos = getPositionOnPath(nextTarget.pathProgress);
+                    this.combat.effects.push({
+                        id: this.effectIdCounter++,
+                        type: 'skill_chain',
+                        x: nextPos.px, y: nextPos.py,
+                        value: Math.round(currentDmg),
+                        startTime: performance.now(),
+                        duration: 400,
+                        frameIndex: bounce,
+                    });
+
+                    hitSet.add(nextTarget);
+                    currentTarget = nextTarget;
                 }
             }
             // 적 HP-% (Justin Sun)
@@ -2055,16 +2097,28 @@ export class CombatSystem {
                                 sorted[i].hp -= dmg * sp.piercePct;
                             }
                         }
-                        // 체인 (chainTargets + chainPct: 근처 적에게 번짐)
+                        // ⚡ 체인 (chainTargets + chainPct: 연쇄 튕김)
                         if (sp.chainTargets && sp.chainPct) {
-                            const targetPos = getPositionOnPath(target.pathProgress);
-                            const nearby = this.combat.monsters
-                                .filter(m => m.alive && m !== target)
-                                .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - targetPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - targetPos.py) ** 2) }))
-                                .sort((a, b) => a.d - b.d)
-                                .slice(0, sp.chainTargets);
-                            for (const { m } of nearby) {
-                                if (m.alive) m.hp -= dmg * sp.chainPct;
+                            let curTarget = target;
+                            let curDmg = dmg * sp.chainPct;
+                            const hitChain = new Set<Monster>();
+                            hitChain.add(target);
+
+                            for (let b = 0; b < sp.chainTargets; b++) {
+                                const cPos = getPositionOnPath(curTarget.pathProgress);
+                                let next: Monster | null = null;
+                                let best = Infinity;
+                                for (const m of this.combat.monsters) {
+                                    if (!m.alive || hitChain.has(m)) continue;
+                                    const mP = getPositionOnPath(m.pathProgress);
+                                    const d = Math.sqrt((mP.px - cPos.px) ** 2 + (mP.py - cPos.py) ** 2);
+                                    if (d <= 3.0 && d < best) { best = d; next = m; }
+                                }
+                                if (!next) break;
+                                curDmg *= 1.1; // 평타 체인: 10% 증폭
+                                next.hp -= curDmg;
+                                hitChain.add(next);
+                                curTarget = next;
                             }
                         }
                         // DoT (dotPct + dotDuration: 초당 baseDmg의 n% 지속피해)
