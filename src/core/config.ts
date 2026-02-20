@@ -140,12 +140,12 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'passive', name: '빙결 폭풍', desc: '4번째 공격마다 주변 적 ❄️빙결 (15% 감속)', params: { nthHit: 4, freezeDuration: 1.2, freezeSlow: 0.15, bossFreezeDuration: 0.4 } }
     },
     {
-        id: 'etf', name: '현물 ETF', emoji: '📈', cost: 4,
+        id: 'hyperliquid', name: 'Hyperliquid', emoji: '💧', cost: 4,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.05, attackRange: 3,
         maxMana: 100, startingMana: 15,
-        skill: { type: 'active', name: '기관 빔', desc: '마나 충전 시 관통 레이저 + ★3 무한 빔', cooldown: 5, params: { pierceTargets: 3, piercePct: 0.55, infiniteBeam: 1 } }
+        skill: { type: 'active', name: 'Perp Beam', desc: 'Pierce laser + ★3 infinite beam', cooldown: 5, params: { pierceTargets: 3, piercePct: 0.55, infiniteBeam: 1 } }
     },
     {
         id: 'aave', name: 'AAVE', emoji: '🏦', cost: 4,
@@ -158,11 +158,11 @@ export const UNITS: UnitDef[] = [
 
     // ═══ 4코 — 프로젝트 (10종) ═══
     {
-        id: 'chainlink', name: 'Chainlink', emoji: '⛓️', cost: 4,
+        id: 'ethereum', name: 'Ethereum', emoji: '⬟', cost: 4,
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.11, attackRange: 3,
-        skill: { type: 'passive', name: '오라클 피드', desc: '3번째 공격마다 대상 🛡️물방 삭감', params: { nthHit: 3, defShred: 10, debuffDuration: 4 } }
+        skill: { type: 'passive', name: 'Oracle Feed', desc: '3rd hit shreds target DEF', params: { nthHit: 3, defShred: 10, debuffDuration: 4 } }
     },
     {
         id: 'uniswap', name: 'Uniswap', emoji: '🦄', cost: 4,
@@ -181,12 +181,12 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: '초고속 TPS', desc: '마나 충전 시 체인 + ★3 HP스왑', cooldown: 5, params: { chainTargets: 3, chainPct: 0.40, hpSwap: 1, mdefIgnore: 1 } }
     },
     {
-        id: 'toncoin', name: 'Toncoin', emoji: '💎', cost: 4,
+        id: 'optimism', name: 'Optimism', emoji: '🔴', cost: 4,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.04, attackRange: 3,
         maxMana: 90, startingMana: 20,
-        skill: { type: 'active', name: '텔레그램 연동', desc: '마나 충전 시 체인 + ★3 포탑 소환', cooldown: 5, params: { chainTargets: 3, chainPct: 0.45, turretSummon: 1 } }
+        skill: { type: 'active', name: 'Optimistic Rollup', desc: 'Chain lightning + ★3 turret summon', cooldown: 5, params: { chainTargets: 3, chainPct: 0.45, turretSummon: 1 } }
     },
     {
         id: 'arbitrum', name: 'Arbitrum', emoji: '🔵', cost: 4,
@@ -197,12 +197,12 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: '롤업 압축', desc: '마나 충전 시 보스 저격 + ★3 트루딜+마나페이백', cooldown: 5, params: { sniperShots: 3, sniperMult: 1.0, defIgnore: 0.0, killManaPayback: 0 } }
     },
     {
-        id: 'aptos', name: 'Aptos', emoji: '🟢', cost: 4,
-        origin: Origin.FUD,
+        id: 'bnb', name: 'BNB Chain', emoji: '🟡', cost: 4,
+        origin: Origin.Exchange,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.47, attackRange: 3,
         maxMana: 110, startingMana: 20,
-        skill: { type: 'active', name: 'Move VM', desc: '마나 충전 시 광역 기절 + ★3 넥서스 힐', cooldown: 5, params: { stunDuration: 2, stunTargets: 3, dotPct: 0.04, dotDuration: 3, nexusHeal: 2 } }
+        skill: { type: 'active', name: 'BNB Burn', desc: 'AoE stun + ★3 Nexus heal', cooldown: 5, params: { stunDuration: 2, stunTargets: 3, dotPct: 0.04, dotDuration: 3, nexusHeal: 2 } }
     },
     {
         id: 'base', name: 'Base', emoji: '🔷', cost: 4,
@@ -355,28 +355,28 @@ export const UNITS: UnitDef[] = [
 
     // ═══ 1코 (8종) ═══
     {
-        id: 'pcminer', name: 'PC방 채굴자', emoji: '⛏️', cost: 1,
+        id: 'pcminer', name: 'PC Bang Miner', emoji: '⛏️', cost: 1,
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.65, attackRange: 2,
         maxMana: 40, startingMana: 0,
-        skill: { type: 'active', name: '해시레이트 공유', desc: '마나 충전 시 인접 아군 마나 회복', cooldown: 5, params: { allyManaHeal: 15, allyManaHealRange: 1, allyManaTargets: 1 } }
+        skill: { type: 'active', name: 'Hashrate Share', desc: 'Restore ally mana nearby', cooldown: 5, params: { allyManaHeal: 15, allyManaHealRange: 1, allyManaTargets: 1 } }
     },
     {
-        id: 'metamask', name: '메타마스크 유저', emoji: '🦊', cost: 1,
+        id: 'metamask', name: 'Metamask User', emoji: '🦊', cost: 1,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.78, attackRange: 3,
         maxMana: 30, startingMana: 0,
-        skill: { type: 'active', name: '가스비 폭발', desc: '마나 충전 시 자신+인접 아군 공속↑', cooldown: 5, params: { atkSpdBuff: 0.30, buffDuration: 3, buffRange: 1, buffTargets: 1 } }
+        skill: { type: 'active', name: 'Gas Explosion', desc: 'Buff self + ally ATK speed', cooldown: 5, params: { atkSpdBuff: 0.30, buffDuration: 3, buffRange: 1, buffTargets: 1 } }
     },
     {
-        id: 'scamdev', name: '스캠 개발자', emoji: '🚩', cost: 1,
+        id: 'scamdev', name: 'Scam Dev', emoji: '🚩', cost: 1,
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.78, attackRange: 3,
         maxMana: 50, startingMana: 0,
-        skill: { type: 'active', name: '퍼드 전염', desc: '마나 충전 시 적에게 전이 도트딜', cooldown: 5, params: { dotPct: 0.04, dotDuration: 3, spreadOnKill: 1 } }
+        skill: { type: 'active', name: 'FUD Spread', desc: 'Contagious DoT on enemies', cooldown: 5, params: { dotPct: 0.04, dotDuration: 3, spreadOnKill: 1 } }
     },
     {
         id: 'perpdex', name: 'PerpDEX', emoji: '🏦', cost: 1,
@@ -395,12 +395,12 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: '다이아몬드 핸드', desc: '마나 충전 시 확정 크리 + 영구 크리DMG 누적', cooldown: 5, params: { guaranteedCrit: 1, permCritDmgBonus: 0.10 } }
     },
     {
-        id: 'fudspreader', name: 'FUD 유포자', emoji: '💀', cost: 1,
+        id: 'fudspreader', name: 'FUD Spreader', emoji: '💀', cost: 1,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.89, attackRange: 3,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '공포 전염', desc: '마나 충전 시 도트딜 + 사망 시 마나 구슬 드랍', cooldown: 5, params: { dotPct: 0.04, dotDuration: 4, dotManaOrb: 30 } }
+        skill: { type: 'active', name: 'Fear Contagion', desc: 'DoT + mana orb on kill', cooldown: 5, params: { dotPct: 0.04, dotDuration: 4, dotManaOrb: 30 } }
     },
     {
         id: 'piuser', name: 'PI User', emoji: '📱', cost: 1,
@@ -433,19 +433,12 @@ export const UNITS: UnitDef[] = [
 
     // ── DeFi +2 ──
     {
-        id: 'airdrophunter', name: '에어드랍 헌터', emoji: '🪂', cost: 1,
+        id: 'airdrophunter', name: 'Airdrop Hunter', emoji: '🪂', cost: 1,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.82, attackRange: 3,
         maxMana: 50, startingMana: 0,
-        skill: { type: 'active', name: '파밍 러시', desc: '마나 충전 시 스플래시 폭발', cooldown: 5, params: { splashPct: 0.40, splashTargets: 3 } }
-    },
-    {
-        id: 'sushiswap', name: 'Sushi Swap', emoji: '🍣', cost: 3,
-        origin: Origin.DeFi,
-        dmgType: 'magic' as const,
-        baseDmg: 28, attackSpeed: 0.92, attackRange: 3,
-        skill: { type: 'passive', name: '스시 스왕', desc: '3번째 공격마다 ⚡체인 1 + 🔥도트', params: { nthHit: 3, chainTargets: 1, chainPct: 0.35, dotPct: 0.02, dotDuration: 2 } }
+        skill: { type: 'active', name: 'Farm Rush', desc: 'Splash explosion', cooldown: 5, params: { splashPct: 0.40, splashTargets: 3 } }
     },
 
     // ── Social +2 ──
@@ -468,12 +461,12 @@ export const UNITS: UnitDef[] = [
 
     // ── Exchange +2 ──
     {
-        id: 'tradebot', name: '거래봇', emoji: '⚙️', cost: 1,
+        id: 'tradebot', name: 'Trade Bot', emoji: '⚙️', cost: 1,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.90, attackRange: 3,
         maxMana: 20, startingMana: 0,
-        skill: { type: 'active', name: '초단타', desc: '마나 충전 시 공속 폭발 + 영구 공속 누적', cooldown: 5, params: { atkSpdBuff: 0.50, buffDuration: 3, permAtkSpdBonus: 0.05 } }
+        skill: { type: 'active', name: 'Scalping', desc: 'ATK speed burst + permanent stacking', cooldown: 5, params: { atkSpdBuff: 0.50, buffDuration: 3, permAtkSpdBonus: 0.05 } }
     },
     {
         id: 'kris', name: 'Kris Marszalek', emoji: '💳', cost: 2,
@@ -512,12 +505,12 @@ export const UNITS: UnitDef[] = [
 
     // ── FUD +2 ──
     {
-        id: 'chartchung', name: '차트충', emoji: '📊', cost: 1,
+        id: 'chartsexer', name: 'Chart Sexer', emoji: '📊', cost: 1,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.83, attackRange: 3,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '둘세이어', desc: '마나 충전 시 HP비례 도트 + ★3 최대HP 삭제', cooldown: 5, params: { hpPctDot: 0.05, dotDuration: 3, maxHpShred: 0.30 } }
+        skill: { type: 'active', name: 'Doomsayer', desc: 'HP% DoT + ★3 max HP shred', cooldown: 5, params: { hpPctDot: 0.05, dotDuration: 3, maxHpShred: 0.30 } }
     },
     {
         id: 'warren', name: 'Elizabeth Warren', emoji: '⚖️', cost: 3,
@@ -530,12 +523,12 @@ export const UNITS: UnitDef[] = [
 
     // ── Rugpull +3 ──
     {
-        id: 'memecoin', name: '밈코인 발행자', emoji: '🐕', cost: 1,
+        id: 'memecoin', name: 'Memecoin Maker', emoji: '🐕', cost: 1,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.88, attackRange: 3,
         maxMana: 40, startingMana: 0,
-        skill: { type: 'active', name: '하이프', desc: '마나 충전 시 체인 번개 + 킬 시 마나 페이백', cooldown: 5, params: { chainTargets: 2, chainPct: 0.40, chainKillManaPayback: 1.0 } }
+        skill: { type: 'active', name: 'Hype', desc: 'Chain lightning + mana payback on kill', cooldown: 5, params: { chainTargets: 2, chainPct: 0.40, chainKillManaPayback: 1.0 } }
     },
     {
         id: 'ruja', name: 'Ruja Ignatova', emoji: '👸', cost: 2,
@@ -554,12 +547,12 @@ export const UNITS: UnitDef[] = [
 
     // ── Bear +3 ──
     {
-        id: 'levgambler', name: '레버리지 도박꾼', emoji: '🎰', cost: 1,
+        id: 've33user', name: 'Ve(3,3) User', emoji: '🎰', cost: 1,
         origin: Origin.Bear,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.84, attackRange: 4,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '100배 롱', desc: '마나 충전 시 적 빙결 + ★3 역주행', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 1.5, freezeSlow: 0.90, reverseMove: 0 } }
+        skill: { type: 'active', name: 'Lock & Boost', desc: 'Freeze enemy + ★3 reverse', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 1.5, freezeSlow: 0.90, reverseMove: 0 } }
     },
     {
         id: 'kashkari', name: 'Kashkari', emoji: '🏛️', cost: 2,
@@ -585,14 +578,6 @@ export const UNITS: UnitDef[] = [
         baseDmg: 16, attackSpeed: 0.85, attackRange: 3,
         maxMana: 60, startingMana: 0,
         skill: { type: 'active', name: '차트 분석', desc: '마나 충전 시 광역 슬로우 + 트루데미지', cooldown: 5, params: { slowPct: 0.30, slowDuration: 3, slowTargets: 2, trueDmgDebuff: 1 } }
-    },
-    {
-        id: 'roubini', name: 'Roubini', emoji: '🐻', cost: 2,
-        origin: Origin.FUD,
-        dmgType: 'magic' as const,
-        baseDmg: 16, attackSpeed: 0.88, attackRange: 3,
-        maxMana: 70, startingMana: 0,
-        skill: { type: 'active', name: '둠세이어', desc: '마나 충전 시 HP비례 도트 + ★3 최대HP 삭제', cooldown: 5, params: { hpPctDot: 0.05, dotDuration: 3, maxHpShred: 0.30 } }
     },
     {
         id: 'cramer', name: 'Jim Cramer', emoji: '📺', cost: 2,
