@@ -509,6 +509,11 @@ export class CombatSystem {
             if (unit.currentMana < maxMana) continue;
             // 마나 충전 완료 → 스킬 발동!
             unit.currentMana = 0;
+            // 💧 DeFi 시너지: 마나 환급 (manaPayback)
+            const payback = this.buffs?.manaPayback ?? 0;
+            if (payback > 0) {
+                unit.currentMana += maxMana * payback;
+            }
 
             const p = s.params;
             const starMult = STAR_MULTIPLIER[unit.star];
@@ -1047,9 +1052,10 @@ export class CombatSystem {
                 const attackTargetPos = getPositionOnPath(target.pathProgress);
                 unit.lastTargetX = attackTargetPos.px;
 
-                // 💧 평타 마나 회복 +10
+                // 💧 평타 마나 회복 +10 (+DeFi 시너지 보너스)
                 if (UNIT_MAP[unit.unitId]?.skill?.type === 'active') {
-                    unit.currentMana = (unit.currentMana ?? 0) + 10;
+                    const manaBonus = this.buffs?.manaRegenBonus ?? 0;
+                    unit.currentMana = (unit.currentMana ?? 0) + 10 + manaBonus;
                 }
 
                 // 투사체 + 피격 이펙트

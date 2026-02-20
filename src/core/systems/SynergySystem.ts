@@ -21,8 +21,10 @@ export interface SynergyBuffs {
     critDmgMultiplier: number;   // 크리 DMG 배수 (기본 2.0)
     bossDmgMultiplier: number;   // 보스 DMG 배수 (기본 1.0)
 
-    // 쿨다운
-    skillCooldownReduction: number; // 스킬 쿨타임 감소 (0~1)
+    // 쿨다운 → 마나
+    skillCooldownReduction: number; // (레거시, 미사용)
+    manaRegenBonus: number;         // 💧 평타 마나 회복 추가량 (DeFi)
+    manaPayback: number;            // 💧 스킬 시전 시 마나 환급 비율 (0~1)
 
     // 특수
     armorIgnore: number;         // 방어 무시 (0~1)
@@ -52,6 +54,8 @@ function defaultBuffs(): SynergyBuffs {
         critDmgMultiplier: 2.0,
         bossDmgMultiplier: 1.0,
         skillCooldownReduction: 0,
+        manaRegenBonus: 0,
+        manaPayback: 0,
         armorIgnore: 0,
         armorReduce: 0,
         stunChance: 0,
@@ -127,12 +131,10 @@ export class SynergySystem {
                     if (level >= 3) buffs.critChance += 0.20;
                     break;
 
-                // ── DeFi: DMG + SkillCDR + SkillDMG ──
+                // ── DeFi: 마나 회복 부스트 + 환급 ──
                 case 'origin_defi':
-                    buffs.dmgMultiplier += [0.15, 0.25, 0.40, 0.60][level] ?? 0.60;
-                    buffs.atkSpeedMultiplier += [0.05, 0.05, 0.05, 0.05][level] ?? 0.05;  // 2세트부터 공속+5%
-                    if (level >= 1) buffs.skillCooldownReduction = [0, 0.20, 0.35, 0.50][level] ?? 0.50;
-                    if (level >= 2) buffs.skillDmgMultiplier += [0, 0, 0.30, 0.60][level] ?? 0.60;
+                    buffs.manaRegenBonus += [2, 5, 8, 15][level] ?? 15;
+                    if (level >= 2) buffs.manaPayback = [0, 0, 0.20, 0.50][level] ?? 0.50;
                     break;
 
                 // ── Social: AtkSpd + DMG + RoundGold ──

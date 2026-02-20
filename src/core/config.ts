@@ -608,10 +608,10 @@ export const SYNERGIES: SynergyDef[] = [
         id: 'origin_defi', type: 'origin', cryptoName: 'DeFi', fantasyName: '추방자',
         emoji: '🔓', totalUnits: 8,
         breakpoints: [
-            { count: 2, effect: '[전체] DMG+15%, 공속+5%' },
-            { count: 4, effect: '[전체] DMG+25%, 스킬CDR-20%' },
-            { count: 6, effect: '[전체] DMG+40%, 스킬CDR-35%, 스킬DMG+30%' },
-            { count: 8, effect: '[전체] DMG+60%, 스킬CDR-50%, 스킬DMG+60%' },
+            { count: 2, effect: '[전체] 평타 마나회복+2' },
+            { count: 4, effect: '[전체] 평타 마나회복+5' },
+            { count: 6, effect: '[전체] 평타 마나회복+8, 스킬시 마나20% 환급' },
+            { count: 8, effect: '[전체] 평타 마나회복+15, 스킬시 마나50% 환급' },
         ]
     },
     {
