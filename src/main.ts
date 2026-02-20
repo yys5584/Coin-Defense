@@ -3787,7 +3787,19 @@ function renderCraftPanel(): void {
         const isExpanded = craftPanelExpandedRecipe === targetId;
         const craftableClass = check.isCraftable ? ' craft-ready' : '';
 
-        html += `<div class="craft-recipe-row${craftableClass}" data-target="${targetId}">`;
+        html += `<div class="craft-recipe-row${craftableClass} has-tooltip" data-target="${targetId}">`;
+
+        // 호버 툴팁 (펼친 상태에서도 표시)
+        const expTooltip = check.ingredients.map(ing => {
+          const iDef2 = UNIT_MAP[ing.id];
+          const star2 = ing.star > 1 ? `★${ing.star} ` : '';
+          const mark2 = ing.owned ? '✔' : 'X';
+          const clr2 = ing.owned ? '#00ff00' : '#ff4444';
+          const cc2 = getCostColor(iDef2?.cost ?? 1);
+          return `<span style="color:${clr2}">[${mark2}]</span> <span style="color:${cc2}">${iDef2?.cost ?? 1}코</span> ${star2}${iDef2?.name ?? ing.id}`;
+        }).join('<br>');
+        html += `<div class="craft-tooltip">${expTooltip}</div>`;
+
         html += `<div class="craft-recipe-header" data-target="${targetId}">`;
         html += `<span class="craft-recipe-name">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId}</span>`;
         if (check.isCraftable) {
