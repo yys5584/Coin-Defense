@@ -519,7 +519,9 @@ export class CombatSystem {
             const def = UNIT_MAP[unit.unitId];
             if (!def?.skill || def.skill.type !== 'active') continue;
             const s = def.skill;
-            const maxMana = def.maxMana ?? 100;
+            // permManaReduce: skillStacks만큼 maxMana 축소 (akang ★3)
+            const manaReduction = (def.skill.params?.permManaReduce && unit.star >= 3) ? (unit.skillStacks ?? 0) : 0;
+            const maxMana = Math.max(10, (def.maxMana ?? 100) - manaReduction);
 
             // 초당 자연 마나 회복 +5/s
             unit.currentMana = (unit.currentMana ?? 0) + 5 * dt;
@@ -1062,6 +1064,95 @@ export class CombatSystem {
                 }
                 if (unit.star >= 3 && p.freezeGold) {
                     this.combat.totalGoldEarned += 1;
+                }
+            }
+            // ⛏️ 관통 + ★3 전체 넉백 (rogerver 빅 블록 — knockback)
+            if (p.pierceTargets && p.piercePct && p.knockback !== undefined && !p.pierceManaPer && !p.hpRewind) {
+                const target = frontTarget;
+                const pierceCount = (p.pierceTargets - 1) + unit.star;
+                target.hp -= baseDmg;
+                const sorted = alive
+                    .filter(m => m !== target)
+                    .sort((a, b) => b.pathProgress - a.pathProgress)
+                    .slice(0, pierceCount);
+                for (const m of sorted) { m.hp -= baseDmg * p.piercePct; }
+                // ★3: 경로상 전체 적 넉백 + 기절
+                if (unit.star >= 3) {
+                    for (const m of alive) {
+                        m.pathProgress = Math.max(0, m.pathProgress - 0.25);
+                        if (!m.debuffs) m.debuffs = [];
+                        const stunDur = m.isBoss ? 0.5 : 1.5;
+                        m.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: stunDur });
+                    }
+                }
+            }
+            // 🤖 광역 + ★3 HP 절반 (wintermute 마켓 메이킹 — hpHalve)
+            if (p.splashPct && p.splashTargets && p.hpHalve !== undefined) {
+                const target = frontTarget;
+                const splashCount = (p.splashTargets - 1) + unit.star;
+                target.hp -= baseDmg;
+                const tPos = getPositionOnPath(target.pathProgress);
+                const nearby = alive
+                    .filter(m => m !== target)
+                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
+                    .sort((a, b) => a.d - b.d)
+                    .slice(0, splashCount);
+                for (const { m } of nearby) { m.hp -= baseDmg * p.splashPct; }
+                // ★3: 넓은 범위 모든 적 HP 50%
+                if (unit.star >= 3) {
+                    for (const m of alive) {
+                        m.hp = Math.max(1, m.hp * 0.5);
+                    }
+                }
+            }
+            // 🎯 확정크리 (높은 배율) + ★3 영구 아군 공↑ (simon 시드 투자 — critMultiplier + allyPermDmgBuff)
+            if (p.guaranteedCrit && p.critMultiplier && p.allyPermDmgBuff !== undefined) {
+                const target = frontTarget;
+                const mult = unit.star >= 2 ? p.critMultiplier * 2 : p.critMultiplier;
+                const dmg = baseDmg * mult;
+                target.hp -= dmg;
+                // ★3: 입힌 피해의 10%만큼 주변 아군 영구 공격력 증가 (공속 영구↑으로 구현)
+                if (unit.star >= 3 && p.allyPermDmgBuff > 0) {
+                    for (const ally of boardUnits) {
+                        if (ally !== unit && ally.position) {
+                            ally.skillStacks = (ally.skillStacks ?? 0) + 1;
+                        }
+                    }
+                }
+            }
+            // 🧊 기절 + ★3 황금동상 (peterschiff 골드 버그 — stunTargets + goldStatue)
+            if (p.stunDuration && p.stunTargets && !p.defShredTargets && !p.defShred) {
+                const targets = (p.stunTargets - 1) + unit.star;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.debuffs) t.debuffs = [];
+                    // ★3: 황금동상 = 5초 기절
+                    const dur = unit.star >= 3 ? 5.0 : p.stunDuration;
+                    const bossDur = t.isBoss ? dur * 0.2 : dur;
+                    t.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: bossDur });
+                    // 황금동상 처치 시 골드 (간접: 직접 처치 보상 추가)
+                    if (unit.star >= 3) {
+                        // 스턴된 적에게 표시 (killGold 보상)
+                        t.def = Math.max(0, t.def - 10);
+                    }
+                }
+            }
+            // 🦈 광역 빙결 + ★3 영구 마나통 축소 (akang 풀 레버리지 숏 — permManaReduce)
+            if (p.freezeTargets && p.freezeDuration && p.permManaReduce !== undefined && p.frozenBonusDmg === undefined && p.reverseMove === undefined) {
+                const targets = (p.freezeTargets - 1) + unit.star;  // ★1=3, ★2=4, ★3=5
+                const dur = p.freezeDuration + unit.star;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.debuffs) t.debuffs = [];
+                    const bossDur = t.isBoss ? dur * 0.3 : dur;
+                    t.debuffs.push({ type: 'freeze', slowPct: p.freezeSlow ?? 0.90, remaining: bossDur });
+                }
+                // ★3: 영구 maxMana 축소 (최소 10까지)
+                if (unit.star >= 3) {
+                    const uDef = UNIT_MAP[unit.unitId];
+                    const currentMax = uDef?.maxMana ?? 80;
+                    // skillStacks로 축소량 추적
+                    unit.skillStacks = (unit.skillStacks ?? 0) + 1;
                 }
             }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)

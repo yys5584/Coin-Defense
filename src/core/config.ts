@@ -203,7 +203,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
         baseDmg: 28, attackSpeed: 0.88, attackRange: 3,
-        skill: { type: 'passive', name: 'BCH 링크', desc: '인접 ₿ 있으면 둘 다 🔫관통 1', params: { pierceTargets: 1, piercePct: 0.50, buffRange: 1 } }
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '빅 블록', desc: '마나 충전 시 관통 레이저 + ★3 전체 넥백', cooldown: 5, params: { pierceTargets: 3, piercePct: 0.60, knockback: 1 } }
     },
     {
         id: 'andre', name: 'Andre Cronje', emoji: '🧙', cost: 3,
@@ -224,21 +225,24 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 28, attackSpeed: 0.97, attackRange: 3,
-        skill: { type: 'passive', name: '알고리즘 매매', desc: '3번째 공격마다 💥광역', params: { nthHit: 3, splashPct: 0.40 } }
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '마켓 메이킹', desc: '마나 충전 시 광역 폭발 + ★3 HP 절반', cooldown: 5, params: { splashPct: 0.50, splashTargets: 3, hpHalve: 1 } }
     },
     {
         id: 'simon', name: 'Simon', emoji: '🎯', cost: 3,
         origin: Origin.VC,
         dmgType: 'physical' as const,
         baseDmg: 28, attackSpeed: 1.06, attackRange: 3,
-        skill: { type: 'passive', name: '정밀 사격', desc: '3번째 공격 크리 확정', params: { nthHit: 3 } }
+        maxMana: 50, startingMana: 0,
+        skill: { type: 'active', name: '시드 투자', desc: '마나 충전 시 확정크리 + ★3 아군 영구 공↑', cooldown: 5, params: { guaranteedCrit: 1, critMultiplier: 3.0, allyPermDmgBuff: 0.10 } }
     },
     {
         id: 'peterschiff', name: 'Peter Schiff', emoji: '🧊', cost: 3,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 28, attackSpeed: 0.94, attackRange: 3,
-        skill: { type: 'passive', name: '금 본위제', desc: '3번째 공격 ⏸️스턴', params: { nthHit: 3, stunDuration: 0.8, bossStunDuration: 0.3 } }
+        maxMana: 70, startingMana: 0,
+        skill: { type: 'active', name: '골드 버그', desc: '마나 충전 시 기절 + ★3 황금동상 5초기절+골드', cooldown: 5, params: { stunDuration: 1.5, stunTargets: 1, goldStatue: 1 } }
     },
     {
         id: 'gcr', name: 'GCR', emoji: '🐸', cost: 3,
@@ -252,7 +256,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bear,
         dmgType: 'magic' as const,
         baseDmg: 28, attackSpeed: 0.77, attackRange: 3,
-        skill: { type: 'passive', name: '고래 덤핑', desc: '5번째 공격마다 주변 적 ❄️빙결 (15% 감속)', params: { nthHit: 5, freezeDuration: 0.9, freezeSlow: 0.15, bossFreezeDuration: 0.3 } }
+        maxMana: 80, startingMana: 0,
+        skill: { type: 'active', name: '풀 레버리지 숏', desc: '마나 충전 시 광역 빙결 + ★3 마나통 영구 축소', cooldown: 5, params: { freezeTargets: 3, freezeDuration: 2, freezeSlow: 0.90, permManaReduce: 1 } }
     },
 
     // ═══ 2코 (8종) ═══
