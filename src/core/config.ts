@@ -32,8 +32,9 @@ export const UNITS: UnitDef[] = [
         dmgType: 'magic' as const,
         baseDmg: 167, attackSpeed: 1.95, attackRange: 4,
         uniqueTrait: UniqueTrait.Creator,
-        uniqueEffect: '8초마다 ⚡체인 번개(체인 3)',
-        skill: { type: 'active', name: '이더 번개', desc: '8초마다 ⚡체인 3', cooldown: 8, params: { chainTargets: 3, chainPct: 0.40 } }
+        uniqueEffect: '마나 충전 시 ⚡체인 번개(체인 3)',
+        maxMana: 120, startingMana: 30,
+        skill: { type: 'active', name: '이더 번개', desc: '마나 충전 시 ⚡체인 3', cooldown: 8, params: { chainTargets: 3, chainPct: 0.40 } }
     },
     {
         id: 'cz', name: 'CZ', emoji: '🐋', cost: 7,
@@ -68,8 +69,9 @@ export const UNITS: UnitDef[] = [
         dmgType: 'magic' as const,
         baseDmg: 167, attackSpeed: 1.69, attackRange: 4,
         uniqueTrait: UniqueTrait.GoodAfternoon,
-        uniqueEffect: '8초마다 적 전체 슬로우 (보스는 효과 감소)',
-        skill: { type: 'active', name: '규제 집행', desc: '8초마다 적 전체 슬로우(이속↓), 보스 효과 감소', cooldown: 8, params: { slowPct: 0.25, slowDuration: 2, bossSlowPct: 0.10 } }
+        uniqueEffect: '마나 충전 시 적 전체 슬로우 (보스는 효과 감소)',
+        maxMana: 120, startingMana: 30,
+        skill: { type: 'active', name: '규제 집행', desc: '마나 충전 시 적 전체 슬로우(이속↓), 보스 효과 감소', cooldown: 8, params: { slowPct: 0.25, slowDuration: 2, bossSlowPct: 0.10 } }
     },
 
     // ═══ 5코 (8종) ═══
@@ -116,7 +118,8 @@ export const UNITS: UnitDef[] = [
         dmgType: 'magic' as const,
         baseDmg: 75, attackSpeed: 1.43, attackRange: 3,
         uniqueTrait: UniqueTrait.Depeg,
-        skill: { type: 'active', name: '디페그', desc: '6초마다 "디페그": 🔥도트 + 방어무시', cooldown: 6, params: { dotPct: 0.03, dotDuration: 3, armorIgnore: 1.0 } }
+        maxMana: 80, startingMana: 20,
+        skill: { type: 'active', name: '디페그', desc: '마나 충전 시 "디페그": 🔥도트 + 방어무시', cooldown: 6, params: { dotPct: 0.03, dotDuration: 3, armorIgnore: 1.0 } }
     },
     {
         id: 'sbf', name: 'SBF', emoji: '🚩', cost: 5,
@@ -168,7 +171,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.VC,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.21, attackRange: 4,
-        skill: { type: 'active', name: '100만불 배팅', desc: '8초마다 최대HP 적 저격(큰 피해)', cooldown: 8, params: { burstMult: 3.0 } }
+        maxMana: 80, startingMana: 20,
+        skill: { type: 'active', name: '100만불 배팅', desc: '마나 충전 시 최대HP 적 저격(큰 피해)', cooldown: 8, params: { burstMult: 3.0 } }
     },
     {
         id: 'lazarus', name: 'Lazarus', emoji: '💀', cost: 4,
@@ -182,7 +186,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.48, attackRange: 3,
-        skill: { type: 'active', name: '3AC 청산', desc: '8초마다 최대HP 적 💥광역 폭발', cooldown: 8, params: { splashPct: 0.50, splashTargets: 2 } }
+        maxMana: 80, startingMana: 20,
+        skill: { type: 'active', name: '3AC 청산', desc: '마나 충전 시 최대HP 적 💥광역 폭발', cooldown: 8, params: { splashPct: 0.50, splashTargets: 2 } }
     },
     {
         id: 'anatoly', name: 'Anatoly', emoji: '⚡', cost: 4,
@@ -270,7 +275,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.98, attackRange: 3,
-        skill: { type: 'active', name: '풀매수', desc: '8초마다 자신 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.30, buffDuration: 3 } }
+        maxMana: 80, startingMana: 20,
+        skill: { type: 'active', name: '풀매수', desc: '마나 충전 시 자신 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.30, buffDuration: 3 } }
     },
     {
         id: 'jessepowell', name: 'Jesse Powell', emoji: '🛡️', cost: 2,
@@ -291,7 +297,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.89, attackRange: 3,
-        skill: { type: 'active', name: '소송 폭탄', desc: '8초마다 🔥도트', cooldown: 8, params: { dotPct: 0.03, dotDuration: 3 } }
+        maxMana: 80, startingMana: 20,
+        skill: { type: 'active', name: '소송 폭탄', desc: '마나 충전 시 🔥도트', cooldown: 8, params: { dotPct: 0.03, dotDuration: 3 } }
     },
     {
         id: 'daniele', name: 'Daniele Sesta', emoji: '👻', cost: 2,
@@ -349,7 +356,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.89, attackRange: 3,
-        skill: { type: 'active', name: '가짜 뉴스', desc: '8초마다 🔥도트', cooldown: 8, params: { dotPct: 0.02, dotDuration: 3 } }
+        maxMana: 100, startingMana: 0,
+        skill: { type: 'active', name: '가짜 뉴스', desc: '마나 충전 시 🔥도트', cooldown: 8, params: { dotPct: 0.02, dotDuration: 3 } }
     },
     {
         id: 'piuser', name: 'PI User', emoji: '📱', cost: 1,
@@ -363,7 +371,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bear,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.77, attackRange: 3,
-        skill: { type: 'active', name: '숏 포지션', desc: '8초마다 슬로우', cooldown: 8, params: { slowPct: 0.30, slowDuration: 2 } }
+        maxMana: 100, startingMana: 0,
+        skill: { type: 'active', name: '숏 포지션', desc: '마나 충전 시 슬로우', cooldown: 8, params: { slowPct: 0.30, slowDuration: 2 } }
     },
 
     // ═══ 추가 유닛 (8세트 달성용) ═══
@@ -399,14 +408,16 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.85, attackRange: 4,
-        skill: { type: 'active', name: '샤우팅', desc: '8초마다 Social 아군 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.15, buffDuration: 3 } }
+        maxMana: 100, startingMana: 0,
+        skill: { type: 'active', name: '샤우팅', desc: '마나 충전 시 Social 아군 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.15, buffDuration: 3 } }
     },
     {
         id: 'cobie', name: 'Cobie', emoji: '🎩', cost: 3,
         origin: Origin.Social,
         dmgType: 'physical' as const,
         baseDmg: 28, attackSpeed: 1.05, attackRange: 3,
-        skill: { type: 'active', name: '알파 콜', desc: '8초마다 아군 1명 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.25, buffDuration: 3 } }
+        maxMana: 80, startingMana: 30,
+        skill: { type: 'active', name: '알파 콜', desc: '마나 충전 시 아군 1명 공속↑(짧게)', cooldown: 8, params: { atkSpdBuff: 0.25, buffDuration: 3 } }
     },
 
     // ── Exchange +2 ──
@@ -431,7 +442,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.VC,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.80, attackRange: 3,
-        skill: { type: 'active', name: 'DD 리포트', desc: '8초마다 VC 아군 크리↑(짧게)', cooldown: 8, params: { critBonus: 0.10, buffDuration: 3 } }
+        maxMana: 100, startingMana: 0,
+        skill: { type: 'active', name: 'DD 리포트', desc: '마나 충전 시 VC 아군 크리↑(짧게)', cooldown: 8, params: { critBonus: 0.10, buffDuration: 3 } }
     },
     {
         id: 'cdixon', name: 'Chris Dixon', emoji: '📖', cost: 2,
@@ -445,7 +457,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.VC,
         dmgType: 'physical' as const,
         baseDmg: 28, attackSpeed: 1.00, attackRange: 4,
-        skill: { type: 'active', name: 'ARK 리밸런싱', desc: '8초마다 뒤쪽 적 저격(크리 확정)', cooldown: 8, params: {} }
+        maxMana: 80, startingMana: 30,
+        skill: { type: 'active', name: 'ARK 리밸런싱', desc: '마나 충전 시 뒤쪽 적 저격(크리 확정)', cooldown: 8, params: {} }
     },
 
     // ── FUD +2 ──
@@ -461,7 +474,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 28, attackSpeed: 0.90, attackRange: 3,
-        skill: { type: 'active', name: '반크립토 법안', desc: '8초마다 적 1기 🔥도트 + 슬로우', cooldown: 8, params: { dotPct: 0.03, dotDuration: 3, slowPct: 0.25, slowDuration: 2 } }
+        maxMana: 80, startingMana: 30,
+        skill: { type: 'active', name: '반크립토 법안', desc: '마나 충전 시 적 1기 🔥도트 + 슬로우', cooldown: 8, params: { dotPct: 0.03, dotDuration: 3, slowPct: 0.25, slowDuration: 2 } }
     },
 
     // ── Rugpull +3 ──
@@ -877,11 +891,7 @@ export const AUGMENTS: AugmentDef[] = [
         minRound: 30,
         effect: '모든 활성 시너지 유닛 수 +1 카운트'
     },
-    {
-        id: 'aug_sell_profit', name: '환매왕', emoji: '💸',
-        minRound: 10,
-        effect: '유닛 판매 시 코스트 +1 추가 골드'
-    },
+
     {
         id: 'aug_monster_slow', name: '모래시계', emoji: '⏳',
         minRound: 30,

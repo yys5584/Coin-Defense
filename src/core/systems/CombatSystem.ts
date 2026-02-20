@@ -267,6 +267,14 @@ export class CombatSystem {
         // 증강 적용한 후 몬스터 속도 재계산에 반영하기 위해 저장
         this._augments = augs;
 
+        // 💧 마나 초기화: active 스킬 유닛의 currentMana = startingMana
+        for (const unit of player.board) {
+            const udef = UNIT_MAP[unit.unitId];
+            if (udef?.skill?.type === 'active') {
+                unit.currentMana = udef.startingMana ?? 0;
+            }
+        }
+
         this.events.emit('combat:start', { round });
 
         // 시뮬레이션 루프
@@ -485,18 +493,22 @@ export class CombatSystem {
         this.combat.spawnQueue--;
     }
 
-    /** active 스킬 타이머 처리 (쿨다운 자동 시전) */
+    /** active 스킬 마나 처리 (마나 충전 시 발동) */
     private processActiveSkills(boardUnits: UnitInstance[], dt: number, player: PlayerState): void {
         for (const unit of boardUnits) {
             if (!unit.position) continue;
             const def = UNIT_MAP[unit.unitId];
             if (!def?.skill || def.skill.type !== 'active') continue;
             const s = def.skill;
-            const cd = s.cooldown ?? 5;
+            const maxMana = def.maxMana ?? 100;
 
-            unit.skillTimer = (unit.skillTimer ?? 0) + dt;
-            if (unit.skillTimer < cd) continue;
-            unit.skillTimer -= cd;
+            // 초당 자연 마나 회복 +5/s
+            unit.currentMana = (unit.currentMana ?? 0) + 5 * dt;
+
+            // 마나 부족 → 스킬 미발동
+            if (unit.currentMana < maxMana) continue;
+            // 마나 충전 완료 → 스킬 발동!
+            unit.currentMana = 0;
 
             const p = s.params;
             const starMult = STAR_MULTIPLIER[unit.star];
@@ -1035,6 +1047,11 @@ export class CombatSystem {
                 const attackTargetPos = getPositionOnPath(target.pathProgress);
                 unit.lastTargetX = attackTargetPos.px;
 
+                // 💧 평타 마나 회복 +10
+                if (UNIT_MAP[unit.unitId]?.skill?.type === 'active') {
+                    unit.currentMana = (unit.currentMana ?? 0) + 10;
+                }
+
                 // 투사체 + 피격 이펙트
                 if (dmg > 0 && unit.position) {
                     const tPos = getPositionOnPath(target.pathProgress);
@@ -1063,6 +1080,10 @@ export class CombatSystem {
 
                 // ── 킬 체크 + onKill 스킬 ──
                 if (target.hp <= 0 && target.alive) {
+                    // 💧 킬 마나 회복 +30 (막타 유닛)
+                    if (UNIT_MAP[unit.unitId]?.skill?.type === 'active') {
+                        unit.currentMana = (unit.currentMana ?? 0) + 30;
+                    }
                     // Anthropic 킬 카운트
                     const anthropicSkill = def.skill;
                     if (anthropicSkill?.type === 'passive' && anthropicSkill.params.killsPerStack) {

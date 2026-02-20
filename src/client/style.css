@@ -2529,6 +2529,46 @@ body {
     transform: scale(0.95);
 }
 
+/* ── 💧 마나 바 ── */
+.mana-bar-wrap {
+    position: absolute;
+    bottom: -1px;
+    left: 10%;
+    width: 80%;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    overflow: hidden;
+    z-index: 15;
+}
+
+.mana-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 2px;
+    transition: width 0.15s ease-out;
+}
+
+.mana-bar-fill.mana-ready {
+    background: linear-gradient(90deg, #60a5fa, #93c5fd);
+    box-shadow: 0 0 6px rgba(96, 165, 250, 0.8), 0 0 12px rgba(96, 165, 250, 0.4);
+    animation: mana-pulse 0.6s ease-in-out infinite;
+}
+
+@keyframes mana-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+
 .board-cell.drag-over,
 .bench-slot.drag-over {
     background: rgba(59, 130, 246, .2) !important;

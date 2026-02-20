@@ -83,6 +83,9 @@ export interface UnitDef {
     uniqueEffect?: string;
     // 개별 스킬
     skill?: UnitSkill;
+    // 💧 마나 시스템
+    maxMana?: number;       // 스킬 발동에 필요한 마나 (기본 100)
+    startingMana?: number;  // 웨이브 시작 시 초기 마나 (기본 0)
 }
 
 /** 유닛 인스턴스 (게임 내 실제 유닛) — 상태 가변 */
@@ -99,6 +102,8 @@ export interface UnitInstance {
     attackCount?: number;        // 공격 카운트 (nthHit 판정용)
     lastAttackTime?: number;     // 마지막 공격 시각 (performance.now ms)
     lastTargetX?: number;        // 마지막 타겟 X 좌표 (시선 방향용)
+    // 💧 마나
+    currentMana?: number;        // 현재 마나 (런타임)
 }
 
 export interface Position {

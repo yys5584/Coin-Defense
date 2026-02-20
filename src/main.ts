@@ -973,6 +973,24 @@ setInterval(() => {
       const facingLeft = unit.lastTargetX < unit.position.x;
       sprite.style.transform = facingLeft ? 'scaleX(-1)' : 'scaleX(1)';
     }
+
+    // 💧 마나바 업데이트
+    const udef = UNIT_MAP[unit.unitId];
+    if (udef?.skill?.type === 'active') {
+      const manaBar = card.querySelector('[data-mana-bar]') as HTMLElement | null;
+      if (manaBar) {
+        const maxMana = udef.maxMana ?? 100;
+        const currentMana = Math.min(unit.currentMana ?? 0, maxMana);
+        const pct = (currentMana / maxMana) * 100;
+        manaBar.style.width = `${pct}%`;
+        // 마나 거의 찬 때 밝게 발광
+        if (pct >= 80) {
+          manaBar.classList.add('mana-ready');
+        } else {
+          manaBar.classList.remove('mana-ready');
+        }
+      }
+    }
   }
 }, 50); // 20fps 충분
 const synergy = new SynergySystem(events);
@@ -1982,10 +2000,14 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
   const stars = '⭐'.repeat(unit.star);
 
   if (location === 'board') {
-    // 보드: 스프라이트만 (별/코스트 숨김) + idle 애니메이션
+    // 보드: 스프라이트만 (별/코스트 숨김) + idle 애니메이션 + 마나바
     const spriteInfo = getUnitSpriteInfo(unit.unitId, def.origin, def.cost);
     const ss = getUnitSpriteSheet(unit.unitId, def.origin, def.cost);
-    card.innerHTML = `<div class="unit-sprite-icon board-icon" data-cols="${ss.cols}" style="background-image:url('${spriteInfo.url}');background-size:${spriteInfo.bgSize}"></div>`;
+    const hasMana = def.skill?.type === 'active';
+    const manaBarHtml = hasMana
+      ? `<div class="mana-bar-wrap"><div class="mana-bar-fill" data-mana-bar></div></div>`
+      : '';
+    card.innerHTML = `<div class="unit-sprite-icon board-icon" data-cols="${ss.cols}" style="background-image:url('${spriteInfo.url}');background-size:${spriteInfo.bgSize}"></div>${manaBarHtml}`;
   } else {
     // 벤치: 이모지 + 이름
     card.innerHTML = `<span class="unit-emoji">${def.emoji}</span><span class="name">${def.name}</span><span class="star">${stars}</span><span class="cost-badge">${def.cost}</span>`;
