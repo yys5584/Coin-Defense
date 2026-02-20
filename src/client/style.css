@@ -2532,14 +2532,15 @@ body {
 /* ── 💧 마나 바 ── */
 .mana-bar-wrap {
     position: absolute;
-    bottom: -1px;
-    left: 10%;
-    width: 80%;
-    height: 3px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 2px;
+    bottom: 2px;
+    left: 5%;
+    width: 90%;
+    height: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 3px;
     overflow: hidden;
-    z-index: 15;
+    z-index: 25;
+    border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
 .mana-bar-fill {
