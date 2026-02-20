@@ -1150,6 +1150,31 @@ if (typeof window !== 'undefined') {
         freeRerolls: p.freeRerolls || 0,
       };
     },
+    // 디버그: 특정 유닛을 특정 별로 벤치에 소환
+    spawnUnit: (unitId: string, star: number = 1) => {
+      const p = player();
+      const def = UNIT_MAP[unitId];
+      if (!def) { console.error(`Unknown unit: ${unitId}`); return null; }
+      const unit = createUnitInstance(unitId);
+      unit.star = star as 1 | 2 | 3;
+      p.bench.push(unit);
+      autoMergeAll(p);
+      render();
+      console.log(`Spawned ${def.emoji} ${def.name} ★${star} (${unit.instanceId})`);
+      return unit;
+    },
+    // 디버그: 레시피 합성 실행
+    craftRecipe: (targetId: string) => {
+      return executeRecipe(targetId);
+    },
+    // 디버그: 합성 가능 레시피 확인
+    getRecipes: () => {
+      return scanForRecipes().map(r => ({
+        target: r.targetId,
+        targetName: UNIT_MAP[r.targetId]?.name,
+        ingredients: r.ingredients.map(i => `${UNIT_MAP[i.id]?.name ?? i.id}:★${i.star}`),
+      }));
+    },
   };
 }
 
