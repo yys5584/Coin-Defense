@@ -677,7 +677,6 @@ export class CombatSystem {
                 let healed = 0;
                 for (const ally of boardUnits) {
                     if (ally === unit || !ally.position || !unit.position) continue;
-                    if (UNIT_MAP[ally.unitId]?.skill?.type !== 'active') continue;
                     const dx = Math.abs(ally.position.x - unit.position.x);
                     const dy = Math.abs(ally.position.y - unit.position.y);
                     // ★3: 주변 8칸 모든 아군 (range 무시)

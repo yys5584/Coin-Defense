@@ -322,7 +322,7 @@ export const UNITS: UnitDef[] = [
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.65, attackRange: 2,
         maxMana: 40, startingMana: 0,
-        skill: { type: 'active', name: '해시레이트 공유', desc: '마나 충전 시 인접 ₿ 아군 마나 회복', cooldown: 5, params: { allyManaHeal: 15, allyManaHealRange: 1, allyManaTargets: 1 } }
+        skill: { type: 'active', name: '해시레이트 공유', desc: '마나 충전 시 인접 아군 마나 회복', cooldown: 5, params: { allyManaHeal: 15, allyManaHealRange: 1, allyManaTargets: 1 } }
     },
     {
         id: 'metamask', name: '메타마스크 유저', emoji: '🦊', cost: 1,
