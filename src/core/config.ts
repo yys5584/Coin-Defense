@@ -21,8 +21,9 @@ export const UNITS: UnitDef[] = [
         dmgType: 'physical' as const,
         baseDmg: 233, attackSpeed: 3.64, attackRange: 4,
         uniqueTrait: UniqueTrait.Anon,
-        uniqueEffect: '12초마다 앞쪽에 💥광역 + ⏸️짧은 스턴',
-        skill: { type: 'passive', name: '블록 낙하', desc: '3번째 공격마다 💥광역 + ⏸️스턴', params: { nthHit: 3, splashPct: 0.50, stunDuration: 0.8, bossStunDuration: 0.3 } }
+        uniqueEffect: '마나 충전 시 제네시스 블록: 전체적 HP50% + 보스 제외 즉사',
+        maxMana: 200, startingMana: 0,
+        skill: { type: 'active', name: '제네시스 블록', desc: '마나 충전 시 전적 HP50% 트루딜 + 잡몹 즉사', cooldown: 5, params: { genesisBlock: 1, hpCutPct: 0.50, nonBossKill: 1 } }
     },
 
     // ═══ 7코 히든 (5종) ═══
@@ -32,9 +33,9 @@ export const UNITS: UnitDef[] = [
         dmgType: 'magic' as const,
         baseDmg: 167, attackSpeed: 1.95, attackRange: 4,
         uniqueTrait: UniqueTrait.Creator,
-        uniqueEffect: '마나 충전 시 ⚡체인 번개(체인 3)',
-        maxMana: 120, startingMana: 30,
-        skill: { type: 'active', name: '이더 번개', desc: '마나 충전 시 ⚡체인 3', cooldown: 8, params: { chainTargets: 3, chainPct: 0.40 } }
+        uniqueEffect: '마나 충전 시 더 머지: 폭발 + 전아군 마나 100% 충전',
+        maxMana: 150, startingMana: 30,
+        skill: { type: 'active', name: '더 머지', desc: '마나 충전 시 거대 마법 폭발 + 전아군 마나 충전', cooldown: 5, params: { splashPct: 0.60, splashTargets: 5, theMerge: 1 } }
     },
     {
         id: 'cz', name: 'CZ', emoji: '🐋', cost: 7,
@@ -42,17 +43,19 @@ export const UNITS: UnitDef[] = [
         dmgType: 'physical' as const,
         baseDmg: 167, attackSpeed: 1.63, attackRange: 3,
         uniqueTrait: UniqueTrait.SAFU,
-        uniqueEffect: 'CZ 칸에 유닛 1명 추가 배치 가능 (둘 다 사거리 -1)',
-        skill: { type: 'passive', name: 'SAFU 커스터디', desc: 'CZ 칸에 유닛 1명 추가 배치 (둘 다 사거리-1)', params: { stackRangePenalty: 1 } }
+        uniqueEffect: '마나 충전 시 블랙홀: 적 흡입 + 영구 스턴',
+        maxMana: 120, startingMana: 20,
+        skill: { type: 'active', name: '런치패드 블랙홀', desc: '마나 충전 시 적 흡입 + 영구 스턴', cooldown: 5, params: { blackhole: 1, pullStrength: 0.30, stunDuration: 3 } }
     },
     {
-        id: 'elon', name: 'Elon', emoji: '🐸', cost: 7,
+        id: 'elon', name: 'Elon', emoji: '🚀', cost: 7,
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 167, attackSpeed: 1.76, attackRange: 4,
         uniqueTrait: UniqueTrait.Mars,
-        uniqueEffect: '3번째 공격마다 💥광역(45%) + ⏸️짧은 스턴',
-        skill: { type: 'passive', name: '트윗 폭격', desc: '3번째 공격마다 💥광역(45%) + ⏸️스턴', params: { nthHit: 3, splashPct: 0.45, stunDuration: 0.5, bossStunDuration: 0.15 } }
+        uniqueEffect: '마나 충전 시 로켓: 전체 넥백 + 아군 광분',
+        maxMana: 150, startingMana: 30,
+        skill: { type: 'active', name: '화성 갈끄니까', desc: '마나 충전 시 전체 넥백 + 아군 공속 200%', cooldown: 5, params: { marsRocket: 1, knockbackAll: 0.40, allyFrenzyDuration: 10, allyFrenzyAtkSpd: 2.0 } }
     },
     {
         id: 'trump', name: 'Donald Trump', emoji: '⛏️', cost: 7,

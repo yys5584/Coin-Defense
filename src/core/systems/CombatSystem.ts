@@ -1284,6 +1284,76 @@ export class CombatSystem {
                     bossTarget.hp -= spiritBomb;
                 }
             }
+            // 🌟 제네시스 블록 (satoshi — genesisBlock: 전적 HP50% + 잡몹 즉사)
+            if (p.genesisBlock) {
+                // 전체 적 현재 HP의 50% 트루 데미지
+                for (const m of alive) {
+                    const trueDmg = m.hp * (p.hpCutPct ?? 0.50);
+                    m.hp -= trueDmg;
+                    // 보스 제외 즉사
+                    if (!m.isBoss && p.nonBossKill) {
+                        m.hp = 0;
+                    }
+                }
+                // 전체 적 스턴
+                for (const m of alive) {
+                    if (!m.debuffs) m.debuffs = [];
+                    m.debuffs.push({ type: 'stun', slowPct: 1.0, remaining: m.isBoss ? 1.0 : 2.0 });
+                }
+            }
+            // 🔮 더 머지 (vitalik — theMerge: 광역 폭발 + 전아군 마나 100%)
+            if (p.splashPct && p.splashTargets && p.theMerge !== undefined && !p.hpHalve) {
+                const target = frontTarget;
+                const splashCount = (p.splashTargets - 1) + unit.star;
+                target.hp -= baseDmg * 2;
+                const tPos = getPositionOnPath(target.pathProgress);
+                const nearby = alive
+                    .filter(m => m !== target)
+                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
+                    .sort((a, b) => a.d - b.d)
+                    .slice(0, splashCount);
+                for (const { m } of nearby) { m.hp -= baseDmg * p.splashPct; }
+                // ✨ 핵심: 맵 위 모든 아군 마나 100% 충전
+                for (const ally of boardUnits) {
+                    if (ally === unit) continue;
+                    const allyDef = UNIT_MAP[ally.unitId];
+                    if (allyDef?.skill?.type === 'active') {
+                        ally.currentMana = allyDef.maxMana ?? 100;
+                    }
+                }
+            }
+            // 🐋 블랙홀 (cz — blackhole: 적 흡입 + 스턴)
+            if (p.blackhole) {
+                // 모든 적을 맵 중앙으로 흡입 (pathProgress → 0.5)
+                for (const m of alive) {
+                    const pull = p.pullStrength ?? 0.30;
+                    const center = 0.5;
+                    m.pathProgress = m.pathProgress + (center - m.pathProgress) * pull;
+                    // 스턴
+                    if (!m.debuffs) m.debuffs = [];
+                    const dur = m.isBoss ? (p.stunDuration ?? 3) * 0.3 : (p.stunDuration ?? 3);
+                    m.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: dur });
+                }
+                // 중앙에 피해
+                const centerDmg = baseDmg * 1.5;
+                for (const m of alive) { m.hp -= centerDmg; }
+            }
+            // 🚀 화성 로켓 (elon — marsRocket: 전체 넉백 + 아군 광분)
+            if (p.marsRocket) {
+                // 전체 적 넉백 (스폰 지역으로)
+                const knockback = p.knockbackAll ?? 0.40;
+                for (const m of alive) {
+                    m.pathProgress = Math.max(0, m.pathProgress - knockback);
+                    if (!m.debuffs) m.debuffs = [];
+                    const stunDur = m.isBoss ? 1.0 : 2.0;
+                    m.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: stunDur });
+                }
+                // 아군 전체 광분: 공속 대폭↑
+                const frenzyMult = p.allyFrenzyAtkSpd ?? 2.0;
+                for (const ally of boardUnits) {
+                    ally.attackCooldown = Math.max(0, (ally.attackCooldown ?? 0) * (1 - frenzyMult * 0.3));
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)
