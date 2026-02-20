@@ -156,69 +156,69 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: '플래시 론', desc: '마나 충전 시 방깎 흡수 + ★3 원기옥', cooldown: 5, params: { defAbsorb: 0.20, defAbsorbTargets: 1, flashLoan: 1 } }
     },
 
-    // ═══ 4코 (8종) ═══
+    // ═══ 4코 — 프로젝트 (10종) ═══
     {
-        id: 'stani', name: 'Stani Kulechov', emoji: '🔒', cost: 4,
+        id: 'chainlink', name: 'Chainlink', emoji: '⛓️', cost: 4,
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.11, attackRange: 3,
-        skill: { type: 'passive', name: '렌딩 프로토콜', desc: '3번째 공격마다 대상 🛡️물방 삭감', params: { nthHit: 3, defShred: 10, debuffDuration: 4 } }
+        skill: { type: 'passive', name: '오라클 피드', desc: '3번째 공격마다 대상 🛡️물방 삭감', params: { nthHit: 3, defShred: 10, debuffDuration: 4 } }
     },
     {
-        id: 'gavin', name: 'Gavin Wood', emoji: '🔗', cost: 4,
+        id: 'uniswap', name: 'Uniswap', emoji: '🦄', cost: 4,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.36, attackRange: 3,
         maxMana: 110, startingMana: 20,
-        skill: { type: 'active', name: '파라체인 연결', desc: '마나 충전 시 아군 스킬 2연속 + ★3 전체', cooldown: 5, params: { doubleCast: 1, doubleCastRange: 1, doubleCastPenalty: 0.50 } }
+        skill: { type: 'active', name: 'AMM 스왑', desc: '마나 충전 시 아군 스킬 2연속 + ★3 전체', cooldown: 5, params: { doubleCast: 1, doubleCastRange: 1, doubleCastPenalty: 0.50 } }
     },
     {
-        id: 'hayden', name: 'Hayden Adams', emoji: '🦄', cost: 4,
+        id: 'solana', name: 'Solana', emoji: '☀️', cost: 4,
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.16, attackRange: 3,
         maxMana: 100, startingMana: 20,
-        skill: { type: 'active', name: 'AMM 스왕', desc: '마나 충전 시 체인 + ★3 HP스왕', cooldown: 5, params: { chainTargets: 3, chainPct: 0.40, hpSwap: 1, mdefIgnore: 1 } }
+        skill: { type: 'active', name: '초고속 TPS', desc: '마나 충전 시 체인 + ★3 HP스왑', cooldown: 5, params: { chainTargets: 3, chainPct: 0.40, hpSwap: 1, mdefIgnore: 1 } }
     },
     {
-        id: 'marc', name: 'Marc Andreessen', emoji: '💰', cost: 4,
+        id: 'toncoin', name: 'Toncoin', emoji: '💎', cost: 4,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.04, attackRange: 3,
         maxMana: 90, startingMana: 20,
-        skill: { type: 'active', name: 'a16z 펀드', desc: '마나 충전 시 체인 + ★3 포탑 소환', cooldown: 5, params: { chainTargets: 3, chainPct: 0.45, turretSummon: 1 } }
+        skill: { type: 'active', name: '텔레그램 연동', desc: '마나 충전 시 체인 + ★3 포탑 소환', cooldown: 5, params: { chainTargets: 3, chainPct: 0.45, turretSummon: 1 } }
     },
     {
-        id: 'balaji', name: 'Balaji', emoji: '🎯', cost: 4,
+        id: 'arbitrum', name: 'Arbitrum', emoji: '🔵', cost: 4,
         origin: Origin.VC,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.21, attackRange: 4,
         maxMana: 80, startingMana: 20,
-        skill: { type: 'active', name: '백만불 베팅', desc: '마나 충전 시 보스 저격 + ★3 트루딜+마나페이백', cooldown: 5, params: { sniperShots: 3, sniperMult: 1.0, defIgnore: 0.0, killManaPayback: 0 } }
+        skill: { type: 'active', name: '롤업 압축', desc: '마나 충전 시 보스 저격 + ★3 트루딜+마나페이백', cooldown: 5, params: { sniperShots: 3, sniperMult: 1.0, defIgnore: 0.0, killManaPayback: 0 } }
     },
     {
-        id: 'lazarus', name: 'Lazarus', emoji: '💀', cost: 4,
+        id: 'aptos', name: 'Aptos', emoji: '🟢', cost: 4,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.47, attackRange: 3,
         maxMana: 110, startingMana: 20,
-        skill: { type: 'active', name: '브릿지 해킹', desc: '마나 충전 시 광역 기절 + ★3 넥서스 힐', cooldown: 5, params: { stunDuration: 2, stunTargets: 3, dotPct: 0.04, dotDuration: 3, nexusHeal: 2 } }
+        skill: { type: 'active', name: 'Move VM', desc: '마나 충전 시 광역 기절 + ★3 넥서스 힐', cooldown: 5, params: { stunDuration: 2, stunTargets: 3, dotPct: 0.04, dotDuration: 3, nexusHeal: 2 } }
     },
     {
-        id: 'zhusu', name: 'Zhu Su', emoji: '📉', cost: 4,
+        id: 'base', name: 'Base', emoji: '🔷', cost: 4,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.48, attackRange: 3,
         maxMana: 100, startingMana: 20,
-        skill: { type: 'active', name: '슈퍼사이클 청산', desc: '마나 충전 시 블랙홀 몹몰이 + 대폭발', cooldown: 5, params: { superCycle: 1, pullDuration: 1, burstDmg: 400 } }
+        skill: { type: 'active', name: '온체인 서머', desc: '마나 충전 시 블랙홀 몹몰이 + 대폭발', cooldown: 5, params: { superCycle: 1, pullDuration: 1, burstDmg: 400 } }
     },
     {
-        id: 'anatoly', name: 'Anatoly', emoji: '⚡', cost: 4,
+        id: 'avalanche', name: 'Avalanche', emoji: '🔺', cost: 4,
         origin: Origin.Bear,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.27, attackRange: 3,
         maxMana: 80, startingMana: 0,
-        skill: { type: 'active', name: '네트워크 지연', desc: '마나 충전 시 기절 + ★3 시간 정지', cooldown: 5, params: { stunDuration: 1, stunTargets: 1, timeStop: 4 } }
+        skill: { type: 'active', name: '서브넷 동결', desc: '마나 충전 시 기절 + ★3 시간 정지', cooldown: 5, params: { stunDuration: 1, stunTargets: 1, timeStop: 4 } }
     },
 
     // ═══ 3코 (8종) ═══
@@ -411,12 +411,12 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: '폰 채굴', desc: '마나 충전 시 다연속 강타 + 즉사 확률', cooldown: 5, params: { multiHit: 2, multiHitMult: 1.5, instantKillChance: 0.01, instantKillGold: 5 } }
     },
     {
-        id: 'gareth', name: 'Gareth Soloway', emoji: '🧊', cost: 1,
-        origin: Origin.Bear,
+        id: 'yapper', name: 'Yapper', emoji: '🗣️', cost: 1,
+        origin: Origin.Social,
         dmgType: 'magic' as const,
-        baseDmg: 9, attackSpeed: 0.77, attackRange: 3,
-        maxMana: 50, startingMana: 0,
-        skill: { type: 'active', name: '차트 분석', desc: '마나 충전 시 광역 슬로우 + 트루데미지', cooldown: 5, params: { slowPct: 0.30, slowDuration: 3, slowTargets: 2, trueDmgDebuff: 1 } }
+        baseDmg: 9, attackSpeed: 0.85, attackRange: 3,
+        maxMana: 40, startingMana: 0,
+        skill: { type: 'active', name: '끝없는 수다', desc: '마나 충전 시 광역 슬로우 + 트루데미지', cooldown: 5, params: { slowPct: 0.30, slowDuration: 3, slowTargets: 2, trueDmgDebuff: 1 } }
     },
 
     // ═══ 추가 유닛 (8세트 달성용) ═══
@@ -433,19 +433,19 @@ export const UNITS: UnitDef[] = [
 
     // ── DeFi +2 ──
     {
-        id: 'curve', name: 'Curve Finance', emoji: '🔄', cost: 1,
+        id: 'airdrophunter', name: '에어드랍 헌터', emoji: '🪂', cost: 1,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.82, attackRange: 3,
         maxMana: 50, startingMana: 0,
-        skill: { type: 'active', name: '유동성 풀', desc: '마나 충전 시 스플래시 폭발', cooldown: 5, params: { splashPct: 0.40, splashTargets: 3 } }
+        skill: { type: 'active', name: '파밍 러시', desc: '마나 충전 시 스플래시 폭발', cooldown: 5, params: { splashPct: 0.40, splashTargets: 3 } }
     },
     {
-        id: 'chefnomi', name: 'Chef Nomi', emoji: '🍣', cost: 3,
+        id: 'sushiswap', name: 'Sushi Swap', emoji: '🍣', cost: 3,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 28, attackSpeed: 0.92, attackRange: 3,
-        skill: { type: 'passive', name: '스시 스왑', desc: '3번째 공격마다 ⚡체인 1 + 🔥도트', params: { nthHit: 3, chainTargets: 1, chainPct: 0.35, dotPct: 0.02, dotDuration: 2 } }
+        skill: { type: 'passive', name: '스시 스왕', desc: '3번째 공격마다 ⚡체인 1 + 🔥도트', params: { nthHit: 3, chainTargets: 1, chainPct: 0.35, dotPct: 0.02, dotDuration: 2 } }
     },
 
     // ── Social +2 ──
@@ -512,12 +512,12 @@ export const UNITS: UnitDef[] = [
 
     // ── FUD +2 ──
     {
-        id: 'roubini', name: 'Roubini', emoji: '🐻', cost: 1,
+        id: 'chartchung', name: '차트충', emoji: '📊', cost: 1,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.83, attackRange: 3,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '둠세이어', desc: '마나 충전 시 HP비례 도트 + ★3 최대HP 삭제', cooldown: 5, params: { hpPctDot: 0.05, dotDuration: 3, maxHpShred: 0.30 } }
+        skill: { type: 'active', name: '둘세이어', desc: '마나 충전 시 HP비례 도트 + ★3 최대HP 삭제', cooldown: 5, params: { hpPctDot: 0.05, dotDuration: 3, maxHpShred: 0.30 } }
     },
     {
         id: 'warren', name: 'Elizabeth Warren', emoji: '⚖️', cost: 3,
@@ -554,12 +554,12 @@ export const UNITS: UnitDef[] = [
 
     // ── Bear +3 ──
     {
-        id: 'cramer', name: 'Jim Cramer', emoji: '📺', cost: 1,
+        id: 'levgambler', name: '레버리지 도박꾼', emoji: '🎰', cost: 1,
         origin: Origin.Bear,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.84, attackRange: 4,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '인버스', desc: '마나 충전 시 적 빙결 + ★3 역주행', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 1.5, freezeSlow: 0.90, reverseMove: 0 } }
+        skill: { type: 'active', name: '100배 롱', desc: '마나 충전 시 적 빙결 + ★3 역주행', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 1.5, freezeSlow: 0.90, reverseMove: 0 } }
     },
     {
         id: 'kashkari', name: 'Kashkari', emoji: '🏛️', cost: 2,
@@ -575,6 +575,42 @@ export const UNITS: UnitDef[] = [
         dmgType: 'physical' as const,
         baseDmg: 28, attackSpeed: 0.95, attackRange: 4,
         skill: { type: 'passive', name: '빅숏', desc: 'HP 낮은 적 우선 + 마무리 피해 증가 (피니셔)', params: { hpThreshold: 0.50, dmgMult: 1.8 } }
+    },
+
+    // ── 이동된 유명인 → 2코 ──
+    {
+        id: 'gareth', name: 'Gareth Soloway', emoji: '🧊', cost: 2,
+        origin: Origin.Bear,
+        dmgType: 'magic' as const,
+        baseDmg: 16, attackSpeed: 0.85, attackRange: 3,
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '차트 분석', desc: '마나 충전 시 광역 슬로우 + 트루데미지', cooldown: 5, params: { slowPct: 0.30, slowDuration: 3, slowTargets: 2, trueDmgDebuff: 1 } }
+    },
+    {
+        id: 'roubini', name: 'Roubini', emoji: '🐻', cost: 2,
+        origin: Origin.FUD,
+        dmgType: 'magic' as const,
+        baseDmg: 16, attackSpeed: 0.88, attackRange: 3,
+        maxMana: 70, startingMana: 0,
+        skill: { type: 'active', name: '둠세이어', desc: '마나 충전 시 HP비례 도트 + ★3 최대HP 삭제', cooldown: 5, params: { hpPctDot: 0.05, dotDuration: 3, maxHpShred: 0.30 } }
+    },
+    {
+        id: 'cramer', name: 'Jim Cramer', emoji: '📺', cost: 2,
+        origin: Origin.Rugpull,
+        dmgType: 'physical' as const,
+        baseDmg: 16, attackSpeed: 0.90, attackRange: 3,
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '인버스 크래머', desc: '마나 충전 시 적 빙결 + ★3 역주행', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 1.5, freezeSlow: 0.90, reverseMove: 0 } }
+    },
+
+    // ── 이동된 프로젝트 → 4코 ──
+    {
+        id: 'curve', name: 'Curve Finance', emoji: '🔄', cost: 4,
+        origin: Origin.DeFi,
+        dmgType: 'magic' as const,
+        baseDmg: 42, attackSpeed: 1.15, attackRange: 3,
+        maxMana: 90, startingMana: 15,
+        skill: { type: 'active', name: '유동성 풀', desc: '마나 충전 시 광역 스플래시 + ★3 HP회복', cooldown: 5, params: { splashPct: 0.50, splashTargets: 4 } }
     },
 ];
 
