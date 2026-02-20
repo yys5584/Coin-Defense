@@ -3697,7 +3697,7 @@ function getCostColor(cost: number): string {
     case 2: return '#10b981';
     case 3: return '#3b82f6';
     case 4: return '#8b5cf6';
-    case 5: return '#f59e0b';
+    case 5: return '#ffd700';
     case 7: return '#ef4444';
     case 10: return '#ff6b6b';
     default: return '#cbd5e1';
