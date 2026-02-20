@@ -223,12 +223,12 @@ export const UNITS: UnitDef[] = [
 
     // ═══ 3코 (8종) ═══
     {
-        id: 'rogerver', name: 'Roger Ver', emoji: '⛏️', cost: 3,
+        id: 'gavinwood', name: 'Gavin Wood', emoji: '🔗', cost: 3,
         origin: Origin.Bitcoin,
-        dmgType: 'physical' as const,
-        baseDmg: 28, attackSpeed: 0.88, attackRange: 3,
-        maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '빅 블록', desc: '마나 충전 시 관통 레이저 + ★3 전체 넥백', cooldown: 5, params: { pierceTargets: 3, piercePct: 0.60, knockback: 1 } }
+        dmgType: 'magic' as const,
+        baseDmg: 28, attackSpeed: 0.98, attackRange: 3,
+        maxMana: 70, startingMana: 0,
+        skill: { type: 'active', name: 'Parachain', desc: '마나 충전 시 아군 스킬 2연속 + ★3 전체', cooldown: 5, params: { doubleCast: 1, doubleCastRange: 1, doubleCastPenalty: 0.50 } }
     },
     {
         id: 'andre', name: 'Andre Cronje', emoji: '🧙', cost: 3,
@@ -247,12 +247,12 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: '청산 빔', desc: '마나 충전 시 체력% 이하 적 즉사 + ★3 연쇄처형', cooldown: 5, params: { executeThreshold: 0.20, executeManaRefund: 0.50 } }
     },
     {
-        id: 'wintermute', name: 'Wintermute', emoji: '🤖', cost: 3,
+        id: 'marcandreessen', name: 'Marc Andreessen', emoji: '💰', cost: 3,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 28, attackSpeed: 0.97, attackRange: 3,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '마켓 메이킹', desc: '마나 충전 시 광역 폭발 + ★3 HP 절반', cooldown: 5, params: { splashPct: 0.50, splashTargets: 3, hpHalve: 1 } }
+        skill: { type: 'active', name: 'a16z Fund', desc: '마나 충전 시 광역 폭발 + ★3 HP 절반', cooldown: 5, params: { splashPct: 0.50, splashTargets: 3, hpHalve: 1 } }
     },
     {
         id: 'simon', name: 'Simon', emoji: '🎯', cost: 3,
@@ -263,12 +263,12 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: '시드 투자', desc: '마나 충전 시 확정크리 + ★3 아군 영구 공↑', cooldown: 5, params: { guaranteedCrit: 1, critMultiplier: 3.0, allyPermDmgBuff: 0.10 } }
     },
     {
-        id: 'peterschiff', name: 'Peter Schiff', emoji: '🧊', cost: 3,
+        id: 'anatoly', name: 'Anatoly', emoji: '⚡', cost: 3,
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 28, attackSpeed: 0.94, attackRange: 3,
         maxMana: 70, startingMana: 0,
-        skill: { type: 'active', name: '골드 버그', desc: '마나 충전 시 기절 + ★3 황금동상 5초기절+골드', cooldown: 5, params: { stunDuration: 1.5, stunTargets: 1, goldStatue: 1 } }
+        skill: { type: 'active', name: 'Network Halt', desc: '마나 충전 시 기절 + ★3 황금동상 5초기절+골드', cooldown: 5, params: { stunDuration: 1.5, stunTargets: 1, goldStatue: 1 } }
     },
     {
         id: 'gcr', name: 'GCR', emoji: '🐸', cost: 3,
@@ -320,14 +320,7 @@ export const UNITS: UnitDef[] = [
         maxMana: 60, startingMana: 0,
         skill: { type: 'active', name: '수수료 장사', desc: '마나 충전 시 버스트딜 + 킬 시 골드/마나', cooldown: 5, params: { feeHustle: 1, burstDmg1: 200, burstDmg2: 450, burstDmg3: 1200, killGold1: 1, killGold3: 2, killManaPayback3: 1.0 } }
     },
-    {
-        id: 'opensea', name: 'OpenSea', emoji: '🔍', cost: 2,
-        origin: Origin.VC,
-        dmgType: 'physical' as const,
-        baseDmg: 16, attackSpeed: 0.91, attackRange: 3,
-        maxMana: 80, startingMana: 0,
-        skill: { type: 'active', name: 'NFT 민팅', desc: '마나 충전 시 아군 딜↑ 버프', cooldown: 5, params: { allyDmgBuff: 0.20, allyBuffTargets: 1, buffDuration: 3 } }
-    },
+
     {
         id: 'craigwright', name: 'Craig Wright', emoji: '💀', cost: 2,
         origin: Origin.FUD,
