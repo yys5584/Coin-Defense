@@ -1019,6 +1019,7 @@ body {
 .synergy-row {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
     padding: 5px 8px;
     border-radius: 3px;
@@ -1027,6 +1028,15 @@ body {
     transition: background .15s;
     position: relative;
     color: var(--text);
+}
+
+.synergy-unit-roster {
+    width: 100%;
+    display: flex;
+    gap: 3px;
+    padding-left: 2px;
+    margin-top: -2px;
+    line-height: 1;
 }
 
 .synergy-row:hover {

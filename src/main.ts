@@ -1855,12 +1855,34 @@ function renderSynergies(): void {
 
     const row = document.createElement('div');
     row.className = `synergy-row ${isActive ? 'active' : 'inactive'}`;
+
+    // 해당 시너지에 속하는 전체 유닛 (코스트순)
+    const allSynUnits = Object.values(UNIT_MAP)
+      .filter(d => `origin_${d.origin.toLowerCase()}` === syn.id)
+      .sort((a, b) => a.cost - b.cost);
+
+    // 보드+벤치에 있는 유닛 ID 셋
+    const ownedIds = new Set<string>();
+    for (const u of p.board) ownedIds.add(u.unitId);
+    for (const u of p.bench) ownedIds.add(u.unitId);
+
+    // 유닛 약자 목록: 첫글자(또는 $제거 후 첫글자), 코스트 색상, 보유여부
+    const unitAbbrs = allSynUnits.map(d => {
+      const owned = ownedIds.has(d.id);
+      const cc = getCostColor(d.cost);
+      const initial = d.name.replace(/^\$/, '').charAt(0).toUpperCase();
+      const opacity = owned ? '1' : '0.3';
+      const weight = owned ? '700' : '400';
+      return `<span style="color:${cc};opacity:${opacity};font-weight:${weight};font-size:10px" title="${d.name} (${d.cost}코)">${initial}</span>`;
+    }).join(' ');
+
     row.innerHTML = `
       <span class="synergy-count">${count}</span>
       <span>${syn.emoji}</span>
       <span class="synergy-name">${syn.cryptoName}</span>
       <span class="synergy-progress">(${progressLabel})</span>
       <span class="synergy-bp-nums">${bpNums}</span>
+      <div class="synergy-unit-roster">${unitAbbrs}</div>
     `;
 
     // 시너지 호버 툴팁 — 상세 정보
