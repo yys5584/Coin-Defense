@@ -1155,6 +1155,91 @@ export class CombatSystem {
                     unit.skillStacks = (unit.skillStacks ?? 0) + 1;
                 }
             }
+            // 🦄 체인 + ★3 HP 스왑 (hayden AMM 스왑 — hpSwap)
+            if (p.chainTargets && p.chainPct && p.hpSwap !== undefined && !p.electricField && !p.defiDmgBuff && !p.chainKillManaPayback && !p.turretSummon) {
+                const target = frontTarget;
+                const chainCount = (p.chainTargets - 1) + unit.star;
+                target.hp -= baseDmg;
+                const tPos = getPositionOnPath(target.pathProgress);
+                const nearby = alive
+                    .filter(m => m !== target)
+                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
+                    .sort((a, b) => a.d - b.d)
+                    .slice(0, chainCount);
+                for (const { m } of nearby) { m.hp -= baseDmg * p.chainPct; }
+                // ★3: 최고HP 적과 최저HP 적의 HP% 스왑
+                if (unit.star >= 3 && alive.length >= 2) {
+                    const highest = alive.reduce((a, b) => (b.hp / b.maxHp) > (a.hp / a.maxHp) ? b : a);
+                    const lowest = alive.reduce((a, b) => (b.hp / b.maxHp) < (a.hp / a.maxHp) ? b : a);
+                    if (highest !== lowest) {
+                        const highRatio = highest.hp / highest.maxHp;
+                        const lowRatio = lowest.hp / lowest.maxHp;
+                        highest.hp = highest.maxHp * lowRatio;
+                        lowest.hp = lowest.maxHp * highRatio;
+                    }
+                }
+            }
+            // 💰 체인 + ★3 포탑 소환 (marc a16z 펀드 — turretSummon)
+            if (p.chainTargets && p.chainPct && p.turretSummon !== undefined) {
+                const target = frontTarget;
+                const chainCount = (p.chainTargets - 1) + unit.star;
+                target.hp -= baseDmg;
+                const tPos = getPositionOnPath(target.pathProgress);
+                const nearby = alive
+                    .filter(m => m !== target)
+                    .map(m => ({ m, d: Math.sqrt((getPositionOnPath(m.pathProgress).px - tPos.px) ** 2 + (getPositionOnPath(m.pathProgress).py - tPos.py) ** 2) }))
+                    .sort((a, b) => a.d - b.d)
+                    .slice(0, chainCount);
+                for (const { m } of nearby) { m.hp -= baseDmg * p.chainPct; }
+                // ★2: 물방깎
+                if (unit.star >= 2) {
+                    for (const { m } of nearby) { m.def = Math.max(0, m.def - 5); }
+                }
+                // ★3: 포탑 = 매 초 랜덤 적에게 baseDmg 50% 피해 (간단: 즉시 3명 버스트)
+                if (unit.star >= 3) {
+                    const turretTargets = alive.sort(() => Math.random() - 0.5).slice(0, 3);
+                    for (const t of turretTargets) { t.hp -= baseDmg * 0.5; }
+                    // 마나 5 충전
+                    unit.currentMana = (unit.currentMana ?? 0) + 5;
+                }
+            }
+            // 💀 광역 기절+DoT + ★3 넥서스 힐 (lazarus 브릿지 해킹 — nexusHeal)
+            if (p.stunDuration && p.stunTargets && p.nexusHeal !== undefined) {
+                const targets = (p.stunTargets - 1) + unit.star;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.debuffs) t.debuffs = [];
+                    const dur = t.isBoss ? p.stunDuration * 0.3 : p.stunDuration;
+                    t.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: dur });
+                    // DoT
+                    if (p.dotPct && p.dotDuration) {
+                        if (!t.dots) t.dots = [];
+                        t.dots.push({ dps: baseDmg * p.dotPct, remaining: p.dotDuration });
+                    }
+                }
+                // ★3: 넥서스(기지) HP 회복 (최대 2)
+                if (unit.star >= 3 && p.nexusHeal) {
+                    player.hp = Math.min(player.hp + p.nexusHeal, 100);
+                }
+            }
+            // ⚡ 기절 + ★3 시간 정지 (anatoly 네트워크 지연 — timeStop)
+            if (p.stunDuration && p.stunTargets && p.timeStop !== undefined && p.nexusHeal === undefined) {
+                const targets = (p.stunTargets - 1) + unit.star;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                for (const t of selected) {
+                    if (!t.debuffs) t.debuffs = [];
+                    const dur = t.isBoss ? p.stunDuration * 0.3 : p.stunDuration + unit.star;
+                    t.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: dur });
+                }
+                // ★3: 시간 정지 = 모든 적 4초 빙결 (아군만 공격 가능)
+                if (unit.star >= 3) {
+                    for (const m of alive) {
+                        if (!m.debuffs) m.debuffs = [];
+                        const dur = m.isBoss ? p.timeStop * 0.3 : p.timeStop;
+                        m.debuffs.push({ type: 'freeze', slowPct: 1.0, remaining: dur });
+                    }
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)

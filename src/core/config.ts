@@ -157,14 +157,16 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.16, attackRange: 3,
-        skill: { type: 'passive', name: '유동성 풀', desc: '4번째 공격마다 ⚡체인 2', params: { nthHit: 4, chainTargets: 2, chainPct: 0.35 } }
+        maxMana: 100, startingMana: 20,
+        skill: { type: 'active', name: 'AMM 스왕', desc: '마나 충전 시 체인 + ★3 HP스왕', cooldown: 5, params: { chainTargets: 3, chainPct: 0.40, hpSwap: 1, mdefIgnore: 1 } }
     },
     {
         id: 'marc', name: 'Marc Andreessen', emoji: '💰', cost: 4,
         origin: Origin.Exchange,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.04, attackRange: 3,
-        skill: { type: 'passive', name: '투자 라운드', desc: '3번째 공격마다 ⚡체인 1', params: { nthHit: 3, chainTargets: 1, chainPct: 0.45 } }
+        maxMana: 90, startingMana: 20,
+        skill: { type: 'active', name: 'a16z 펀드', desc: '마나 충전 시 체인 + ★3 포탑 소환', cooldown: 5, params: { chainTargets: 3, chainPct: 0.45, turretSummon: 1 } }
     },
     {
         id: 'balaji', name: 'Balaji', emoji: '🎯', cost: 4,
@@ -179,7 +181,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.FUD,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.47, attackRange: 3,
-        skill: { type: 'passive', name: '해킹 드레인', desc: '4번째 공격마다 ⏸️스턴', params: { nthHit: 4, stunDuration: 0.8, bossStunDuration: 0.3 } }
+        maxMana: 110, startingMana: 20,
+        skill: { type: 'active', name: '브릿지 해킹', desc: '마나 충전 시 광역 기절 + ★3 넥서스 힐', cooldown: 5, params: { stunDuration: 2, stunTargets: 3, dotPct: 0.04, dotDuration: 3, nexusHeal: 2 } }
     },
     {
         id: 'zhusu', name: 'Zhu Su', emoji: '📉', cost: 4,
@@ -194,7 +197,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bear,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.27, attackRange: 3,
-        skill: { type: 'passive', name: '네트워크 정지', desc: '3번째 공격마다 ⏸️스턴', params: { nthHit: 3, stunDuration: 0.8, bossStunDuration: 0.3 } }
+        maxMana: 80, startingMana: 0,
+        skill: { type: 'active', name: '네트워크 지연', desc: '마나 충전 시 기절 + ★3 시간 정지', cooldown: 5, params: { stunDuration: 1, stunTargets: 1, timeStop: 4 } }
     },
 
     // ═══ 3코 (8종) ═══
