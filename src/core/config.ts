@@ -136,6 +136,22 @@ export const UNITS: UnitDef[] = [
         baseDmg: 75, attackSpeed: 1.36, attackRange: 3,
         skill: { type: 'passive', name: '빙결 폭풍', desc: '4번째 공격마다 주변 적 ❄️빙결 (15% 감속)', params: { nthHit: 4, freezeDuration: 1.2, freezeSlow: 0.15, bossFreezeDuration: 0.4 } }
     },
+    {
+        id: 'etf', name: '현물 ETF', emoji: '📈', cost: 5,
+        origin: Origin.Exchange,
+        dmgType: 'physical' as const,
+        baseDmg: 75, attackSpeed: 1.20, attackRange: 4,
+        maxMana: 120, startingMana: 20,
+        skill: { type: 'active', name: '기관 빔', desc: '마나 충전 시 관통 레이저 + ★3 무한 빔', cooldown: 5, params: { pierceTargets: 5, piercePct: 0.70, infiniteBeam: 1 } }
+    },
+    {
+        id: 'aave', name: 'AAVE', emoji: '🏦', cost: 5,
+        origin: Origin.DeFi,
+        dmgType: 'magic' as const,
+        baseDmg: 75, attackSpeed: 1.30, attackRange: 3,
+        maxMana: 100, startingMana: 20,
+        skill: { type: 'active', name: '플래시 론', desc: '마나 충전 시 방깎 흡수 + ★3 원기옥', cooldown: 5, params: { defAbsorb: 0.30, defAbsorbTargets: 2, flashLoan: 1 } }
+    },
 
     // ═══ 4코 (8종) ═══
     {

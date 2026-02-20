@@ -1240,6 +1240,50 @@ export class CombatSystem {
                     }
                 }
             }
+            // 📈 무한 관통 빔 (etf 기관 빔 — infiniteBeam)
+            if (p.pierceTargets && p.piercePct && p.infiniteBeam !== undefined && !p.pierceManaPer && !p.hpRewind && !p.knockback) {
+                const target = frontTarget;
+                // ★3: 무한 관통 (모든 적)
+                const pierceCount = unit.star >= 3 ? alive.length : (p.pierceTargets - 1) + unit.star;
+                // ★2: 딜 2배
+                const dmgMult = unit.star >= 2 ? 2.0 : 1.0;
+                target.hp -= baseDmg * dmgMult;
+                const sorted = alive
+                    .filter(m => m !== target)
+                    .sort((a, b) => b.pathProgress - a.pathProgress)
+                    .slice(0, pierceCount);
+                for (const m of sorted) { m.hp -= baseDmg * p.piercePct * dmgMult; }
+                // ★3: 빔 강도 누적 (스킬 시전마다 +1, 추가 DMG)
+                if (unit.star >= 3) {
+                    unit.skillStacks = (unit.skillStacks ?? 0) + 1;
+                    const stackDmg = baseDmg * 0.05 * unit.skillStacks;
+                    for (const m of alive) { m.hp -= stackDmg; }
+                    // 주변 아군 마나 흡수 → 즉시 마나 25 회복
+                    unit.currentMana = (unit.currentMana ?? 0) + 25;
+                }
+            }
+            // 🏦 방어 흡수 + ★3 원기옥 (aave 플래시 론 — flashLoan)
+            if (p.defAbsorb && p.defAbsorbTargets && p.flashLoan !== undefined) {
+                const targets = (p.defAbsorbTargets - 1) + unit.star;
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, targets);
+                // ★1-2: 방어력 흡수
+                for (const t of selected) {
+                    const absorbed = t.def * p.defAbsorb * unit.star;
+                    t.def = Math.max(0, t.def - absorbed);
+                    t.mdef = Math.max(0, (t.mdef ?? 0) - absorbed * 0.5);
+                }
+                // ★3: 원기옥 — 모든 아군 baseDmg 합산 × 10 → 최고HP 적에게 꽂기
+                if (unit.star >= 3) {
+                    let totalAllyDmg = 0;
+                    for (const ally of boardUnits) {
+                        const ad = UNIT_MAP[ally.unitId];
+                        if (ad) totalAllyDmg += ad.baseDmg * STAR_MULTIPLIER[ally.star];
+                    }
+                    const spiritBomb = totalAllyDmg * 10;
+                    const bossTarget = alive.reduce((a, b) => b.hp > a.hp ? b : a);
+                    bossTarget.hp -= spiritBomb;
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)
