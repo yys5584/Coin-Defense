@@ -5248,3 +5248,94 @@ body {
 .close-modal:hover {
     color: #fff;
 }
+
+/* ─── Craft Panel (✨합성 탭) ─── */
+
+.craft-unit-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px 6px;
+}
+
+.craft-unit-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid #334;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #cbd5e1;
+}
+
+.craft-unit-btn:hover {
+    background: rgba(51, 65, 85, 0.9);
+    border-color: #556;
+}
+
+.craft-unit-btn.selected {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #fff;
+}
+
+.craft-unit-btn.craftable {
+    border-color: rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 6px rgba(0, 255, 255, 0.15);
+}
+
+.craft-detail-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+    margin: 8px 0;
+}
+
+#craft-panel-content .recipe-block {
+    margin: 4px 6px 8px;
+    padding: 8px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+#craft-panel-content .recipe-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #FFD700;
+    margin-bottom: 4px;
+}
+
+#craft-panel-content .req-item {
+    font-size: 12px;
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#craft-panel-content .craft-btn {
+    width: 100%;
+    padding: 6px;
+    margin-top: 6px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    background: #00ffff;
+    border: none;
+    color: black;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+#craft-panel-content .craft-btn:hover:not(:disabled) {
+    background: #33ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+#craft-panel-content .craft-btn:disabled {
+    background: #444;
+    color: #777;
+    cursor: not-allowed;
+}

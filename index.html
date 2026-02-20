@@ -217,8 +217,8 @@
           <!-- Tab Buttons -->
           <div class="right-tabs">
             <button class="right-tab active" data-tab="synergy-section">🧬 시너지</button>
-            <button class="right-tab" data-tab="dps-section">⚔️ DPS</button>
-            <button class="right-tab" data-tab="log-panel">📜 로그</button>
+            <button class="right-tab" data-tab="craft-section">✨ 합성</button>
+            <button class="right-tab" data-tab="dps-log-section">⚔️ DPS/로그</button>
           </div>
           <!-- Tab Content -->
           <div class="right-tab-content">
@@ -226,11 +226,13 @@
               <div style="font-size:11px;color:#f59e0b;padding:2px 8px;opacity:0.8">⚠️ 직업 시너지: 비활성화 (업데이트 중)</div>
               <div id="synergy-list"></div>
             </div>
-            <div id="dps-section" class="tab-pane" style="display:none">
-              <div id="dps-list"></div>
+            <div id="craft-section" class="tab-pane" style="display:none">
+              <div id="craft-panel-content"></div>
             </div>
-            <div id="log-panel" class="tab-pane" style="display:none">
-              <div id="log-content"></div>
+            <div id="dps-log-section" class="tab-pane" style="display:none">
+              <div id="dps-list"></div>
+              <div style="border-top:1px solid rgba(255,255,255,0.08);margin:6px 0;"></div>
+              <div id="log-content" style="max-height:200px;overflow-y:auto;font-size:11px;"></div>
             </div>
           </div>
           <!-- 미니맵: 탭 바깥 하단 고정 -->
