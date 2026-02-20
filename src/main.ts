@@ -12,6 +12,7 @@ import { UNIT_MAP, SYNERGIES, STAR_MULTIPLIER, LEVELS, getBaseIncome, getInteres
 import { UNIT_DICTIONARY } from './core/unitDictionary';
 import { GameState, PlayerState, UnitInstance, CombatState, ActiveSynergy } from './core/types';
 import { createUnitVisual, preloadAllSprites, COST_GLOW, COST_GLOW_SHADOW, hasSpriteFor, hasUnitSprite, getUnitSprite, drawUnitSprite, drawMonsterSprite, getUnitSpriteInfo, getUnitSpriteSheet } from './client/sprites';
+import { t, getLang, setLang, AVAILABLE_LANGS, Lang } from './core/i18n';
 
 import './client/style.css';
 
@@ -1622,7 +1623,7 @@ function renderShop(): void {
 
   const lockBtn = $('btn-lock') as HTMLButtonElement;
   lockBtn.classList.toggle('locked', p.shopLocked);
-  lockBtn.textContent = p.shopLocked ? '🔒 잠금중' : '🔓 잠금해제';
+  lockBtn.textContent = p.shopLocked ? t('hud.locked') : t('hud.lock');
 
   // 보유 유닛 카운트 (합성 감지용)
   const allUnits = [...p.board, ...p.bench];
@@ -2312,11 +2313,11 @@ function showLevelTooltip(targetEl: HTMLElement): void {
   const nextLevel = LEVELS.find(l => l.level === p.level + 1);
   if (!curLevel) return;
 
-  const costLabels = ['1코', '2코', '3코', '4코'];
+  const costLabels = [t('shop.cost1'), t('shop.cost2'), t('shop.cost3'), t('shop.cost4')];
   const costClasses = ['c1', 'c2', 'c3', 'c4'];
 
   // 좌측: 현재 레벨 확률
-  let leftHtml = `<div class="xp-tt-header">현재 Lv.${p.level}</div>`;
+  let leftHtml = `<div class="xp-tt-header">${t('shop.currentLevel')} Lv.${p.level}</div>`;
   for (let i = 0; i < 4; i++) {
     const pct = curLevel.shopOdds[i];
     leftHtml += `
@@ -2330,7 +2331,7 @@ function showLevelTooltip(targetEl: HTMLElement): void {
   // 우측: 다음 레벨 확률 or MAX
   let rightHtml = '';
   if (nextLevel && p.level < 10) {
-    rightHtml = `<div class="xp-tt-header next">다음 Lv.${nextLevel.level}</div>`;
+    rightHtml = `<div class="xp-tt-header next">${t('shop.nextLevel')} Lv.${nextLevel.level}</div>`;
     for (let i = 0; i < 4; i++) {
       const pct = nextLevel.shopOdds[i];
       const diff = pct - curLevel.shopOdds[i];
@@ -4606,6 +4607,9 @@ function openSettings(): void {
   // BGM 슬라이더 현재값 동기화
   ($('settings-bgm') as HTMLInputElement).value = String(Math.round(bgm.volume * 100));
   $('settings-bgm-val').textContent = `${Math.round(bgm.volume * 100)}%`;
+  // 언어 드롭다운 동기화
+  const langSelect = document.getElementById('settings-lang') as HTMLSelectElement;
+  if (langSelect) langSelect.value = getLang();
 }
 
 function closeSettings(): void {
@@ -4618,6 +4622,15 @@ $('settings-close').addEventListener('click', closeSettings);
 $('settings-overlay').addEventListener('click', (e) => {
   if (e.target === $('settings-overlay')) closeSettings();
 });
+
+// 인게임 언어 전환
+const settingsLangEl = document.getElementById('settings-lang') as HTMLSelectElement;
+if (settingsLangEl) {
+  settingsLangEl.addEventListener('change', () => {
+    setLang(settingsLangEl.value as Lang);
+    render();
+  });
+}
 
 $('settings-restart').addEventListener('click', () => {
   if (!confirm('정말 다시 시작하시겠습니까? 모든 진행이 초기화됩니다.')) return;

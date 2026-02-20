@@ -3,6 +3,7 @@
 // ============================================================
 
 import { getCachedState, ClientUserState } from './userState';
+import { t, getLang, setLang, AVAILABLE_LANGS, Lang } from '../core/i18n';
 
 // 스테이지 정보
 const STAGE_INFO: Record<number, { name: string; defType: string; rounds: string }> = {
@@ -682,25 +683,44 @@ function renderShop(body: HTMLElement, state: ClientUserState) {
 
 // ── 설정 ──
 function renderSettings(body: HTMLElement, state: ClientUserState) {
+    const currentLangCode = getLang();
+    const langOptions = AVAILABLE_LANGS.map(l =>
+        `<option value="${l.code}" ${l.code === currentLangCode ? 'selected' : ''}>${l.label}</option>`
+    ).join('');
+
     body.innerHTML = `
         <div class="settings-page">
-            <h2>⚙️ 설정</h2>
+            <h2>${t('settings.title')}</h2>
             <div class="settings-list">
                 <div class="settings-item">
-                    <span>계정</span>
-                    <span>게스트 #${state.userId.slice(0, 8)}</span>
+                    <span>${t('lobby.account')}</span>
+                    <span>${t('lobby.guest')} #${state.userId.slice(0, 8)}</span>
                 </div>
                 <div class="settings-item">
-                    <span>데이터 저장</span>
-                    <span>☁️ 서버 저장됨</span>
+                    <span>${t('lobby.dataSave')}</span>
+                    <span>${t('lobby.serverSaved')}</span>
                 </div>
                 <div class="settings-item">
-                    <span>사운드</span>
+                    <span>${t('lobby.sound')}</span>
                     <span>ON</span>
+                </div>
+                <div class="settings-item">
+                    <span>${t('lobby.language')}</span>
+                    <select id="lang-select" class="lang-select">${langOptions}</select>
                 </div>
             </div>
         </div>
     `;
+
+    const langSelect = body.querySelector('#lang-select') as HTMLSelectElement;
+    if (langSelect) {
+        langSelect.addEventListener('change', () => {
+            setLang(langSelect.value as Lang);
+            // Re-render the entire lobby
+            const container = body.closest('#lobby-screen') || body.parentElement;
+            if (container) renderLobby(container as HTMLElement);
+        });
+    }
 }
 
 // ── Toast ──
