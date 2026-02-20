@@ -120,6 +120,10 @@ function getGridCoords(mapWrapper: HTMLElement, grid: HTMLElement) {
 window.addEventListener('resize', applyGameScale);
 applyGameScale(); // 초기 적용
 
+// ─── 실시간 DPS 추적 ────────────────────────────────────────
+let combatStartTime = 0;         // 웨이브 시작 시각 (performance.now)
+let lastDpsUpdate = 0;           // 마지막 DPS 갱신 시각
+
 // ═══════════════════════════════════════════════════════════════
 // ─── ASYNC RACING MULTIPLAYER ────────────────────────────────
 // 각자 독립 진행 + 상태 릴레이 + 미니맵 라운드 표시
@@ -1879,25 +1883,32 @@ function renderDPSPanel(): void {
   };
   const hasBuff = buffs.dmgMultiplier > 1.01 || buffs.atkSpeedMultiplier > 1.01 || buffs.flatDmgBonus > 0 || buffs.doubleHitChance > 0 || buffs.splashDmg > 0;
 
+  // 판정: 전투 중이면 실시간 DPS, 아니면 이론 DPS
+  const isCombatActive = combatStartTime > 0;
+  const elapsedSec = isCombatActive ? Math.max(1, (performance.now() - combatStartTime) / 1000) : 0;
+
   const dpsEntries = p.board.map(unit => {
     const def = UNIT_MAP[unit.unitId];
-    const baseDps = calculateUnitDPS(unit);
-    const buffedDps = calculateUnitDPS(unit, buffData);
+    const theoryDps = calculateUnitDPS(unit, buffData);
     const coverage = getRangeCoverage(unit);
-    const effectiveDps = buffedDps * coverage;
+    const theoryEffDps = theoryDps * coverage;
+    // 실시간: 누적 실제 데미지 ÷ 경과 시간
+    const realDps = isCombatActive ? Math.floor((unit.totalDamageDealt ?? 0) / elapsedSec) : 0;
+    const totalDmg = unit.totalDamageDealt ?? 0;
     return {
       name: def?.name || unit.unitId,
       emoji: def?.emoji || '?',
       star: unit.star,
-      baseDps,
-      buffedDps,
-      effectiveDps,
+      theoryDps: Math.floor(theoryEffDps),
+      realDps,
+      totalDmg,
+      effectiveDps: isCombatActive ? realDps : theoryEffDps,
       coverage: Math.round(coverage * 100),
     };
   }).sort((a, b) => b.effectiveDps - a.effectiveDps);
 
-  const totalEffDPS = dpsEntries.reduce((sum, e) => sum + e.effectiveDps, 0);
-  $('hud-dps').textContent = Math.floor(totalEffDPS).toString();
+  const totalDPS = dpsEntries.reduce((sum, e) => sum + e.effectiveDps, 0);
+  $('hud-dps').textContent = Math.floor(totalDPS).toString();
 
   // TOP5 표시 (유효 DPS 기준)
   const top5 = dpsEntries.slice(0, 5);
@@ -1905,25 +1916,25 @@ function renderDPSPanel(): void {
     const e = top5[i];
     const row = document.createElement('div');
     row.className = 'dps-row';
-    const baseEff = Math.floor(e.baseDps * e.coverage / 100);
-    const bonus = Math.floor(e.effectiveDps) - baseEff;
-    const dpsDisplay = bonus > 0
-      ? `${baseEff} <span class="dps-bonus">+${bonus}</span>`
-      : `${Math.floor(e.effectiveDps)}`;
+    // 전투 중: 실시간 DPS + 누적 데미지, 준비 중: 이론 DPS
+    const dpsVal = Math.floor(e.effectiveDps);
+    const dpsDisplay = isCombatActive
+      ? `${dpsVal} <span class="dps-bonus" style="color:#818cf8">📊${Math.floor(e.totalDmg).toLocaleString()}</span>`
+      : `${dpsVal}`;
     row.innerHTML = `
       <span class="dps-rank">#${i + 1}</span>
       <span class="dps-emoji">${e.emoji}</span>
       <span class="dps-name">${e.name} ${'⭐'.repeat(e.star)}</span>
       <span class="dps-value">${dpsDisplay}</span>
     `;
-    row.title = `기본: ${baseEff} | 시너지: +${bonus} | 유효: ${Math.floor(e.effectiveDps)} | 커버리지: ${e.coverage}%`;
+    row.title = `이론: ${e.theoryDps} | 실제: ${e.realDps} | 누적: ${Math.floor(e.totalDmg)} | 커버리지: ${e.coverage}%`;
     dpsList.appendChild(row);
   }
 
   // 총 유효 DPS
   const total = document.createElement('div');
   total.className = 'dps-total';
-  total.innerHTML = `<span>유효 DPS</span><span>${Math.floor(totalEffDPS)}</span>`;
+  total.innerHTML = `<span>${isCombatActive ? '실시간 DPS' : '유효 DPS'}</span><span>${Math.floor(totalDPS)}</span>`;
   dpsList.appendChild(total);
 
   if (hasBuff) {
@@ -1959,7 +1970,7 @@ function renderDPSPanel(): void {
   // 필요 유효 DPS = 총 HP ÷ 1바퀴 시간
   // 유효 DPS와 직접 비교 가능 (둘 다 커버리지 반영)
   const requiredEffDPS = Math.ceil(totalHp / onelapTime);
-  const isEnough = totalEffDPS >= requiredEffDPS;
+  const isEnough = totalDPS >= requiredEffDPS;
 
   const req = document.createElement('div');
   req.className = 'dps-required';
@@ -1992,7 +2003,7 @@ function renderDPSPanel(): void {
   if (!isEnough) {
     const deficit = document.createElement('div');
     deficit.className = 'dps-deficit';
-    deficit.textContent = `⚠ ${Math.ceil(requiredEffDPS - totalEffDPS)} DPS 부족`;
+    deficit.textContent = `⚠ ${Math.ceil(requiredEffDPS - totalDPS)} DPS 부족`;
     dpsList.appendChild(deficit);
   }
 }
@@ -2350,6 +2361,8 @@ function startCombat(): void {
   log(`👾 ${isBoss ? '⭐보스' : '몬스터'} ×${mCount} | HP: ${mHp} | 속도: ${(1.2 + round * 0.012).toFixed(2)}`, 'blue');
 
   // 전투 시작
+  combatStartTime = performance.now();
+  lastDpsUpdate = 0;
   combat.startCombat(
     state,
     p,
@@ -2357,9 +2370,16 @@ function startCombat(): void {
     // 렌더 콜백 (매 프레임)
     (combatState: CombatState) => {
       renderCombatOverlay(combatState);
+      // 250ms 간격 DPS 패널 갱신
+      const now = performance.now();
+      if (now - lastDpsUpdate > 250) {
+        lastDpsUpdate = now;
+        renderDPSPanel();
+      }
     },
     // 완료 콜백
     (result: CombatResult) => {
+      combatStartTime = 0;
       onCombatComplete(result);
     },
   );

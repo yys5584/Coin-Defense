@@ -24,6 +24,16 @@ const SPAWN_INTERVAL = 0.6;           // 몬스터 스폰 간격 (초)
 const MONSTER_BASE_SPEED = 1.2;       // 초당 이동 칸
 const LAP_DAMAGE = 1;                 // 몬스터 1바퀴당 플레이어 HP 피해
 
+/** 오버킬 방지 + 유닛별 실제 데미지 추적 */
+function applyDamage(monster: Monster, rawDmg: number, attacker?: UnitInstance): number {
+    const actual = Math.min(rawDmg, Math.max(0, monster.hp));
+    monster.hp -= actual;
+    if (attacker && actual > 0) {
+        attacker.totalDamageDealt = (attacker.totalDamageDealt ?? 0) + actual;
+    }
+    return actual;
+}
+
 // ─── 경로 계산 (9×6 외곽 트랙, 반시계 방향) ─────────────────
 //
 // 전체 그리드: 9×6 (중앙 7×4 보드 + 1칸 두께 외곽 트랙)
@@ -177,6 +187,7 @@ export class CombatSystem {
             u.skillStacks = 0;
             u.skillActive = false;
             u.attackCount = 0;
+            u.totalDamageDealt = 0;  // 웨이브별 DPS 초기화
         }
 
         // onCombatStart 스킬 처리
@@ -2235,8 +2246,8 @@ export class CombatSystem {
                 // 크리티컬 판정
                 const isCrit = dmg > def.baseDmg * STAR_MULTIPLIER[unit.star] * 1.8;
 
-                // 데미지 적용
-                target.hp -= dmg;
+                // 데미지 적용 (오버킬 방지 + 유닛별 누적 추적)
+                applyDamage(target, dmg, unit);
 
                 // ── 공격 애니메이션 트리거 ──
                 unit.lastAttackTime = performance.now();

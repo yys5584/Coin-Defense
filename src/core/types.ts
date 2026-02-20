@@ -104,6 +104,8 @@ export interface UnitInstance {
     lastTargetX?: number;        // 마지막 타겟 X 좌표 (시선 방향용)
     // 💧 마나
     currentMana?: number;        // 현재 마나 (런타임)
+    // 📊 실시간 DPS 추적
+    totalDamageDealt?: number;   // 웨이브 누적 실제 데미지
 }
 
 export interface Position {
