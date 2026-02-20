@@ -589,7 +589,7 @@ UNITS.forEach(u => { UNIT_MAP[u.id] = u; });
 //  T1/T2/T3 → T4 Coins → T5 Figures → T7 Legends → T10 Mythic
 
 export const UNIT_RECIPES: Record<string, string[]> = {
-    // --- Tier 4: COINS (from T1/T2/T3 ingredients) ---
+    // --- Tier 4: COINS (from T1/T2/T3 ingredients, all ★1) ---
     'u4_btc': ['u2_hal', 'u2_node', 'u1_miner'],
     'u4_eth': ['u3_gavin', 'u2_smart', 'u1_gas'],
     'u4_base': ['u2_pollak', 'u2_smart', 'u1_meta'],
@@ -602,7 +602,7 @@ export const UNIT_RECIPES: Record<string, string[]> = {
     'u4_wif': ['u3_ansem', 'u2_long', 'u1_pump'],
     'u4_luna': ['u2_daniele', 'u1_scam', 'u1_fud'],
 
-    // --- Tier 5: EPIC FIGURES (from their coins!) ---
+    // --- Tier 5: EPIC FIGURES (from their coins, all ★1) ---
     'u5_saylor': ['u4_btc', 'u4_btc', 'u1_hodl'],
     'u5_armstrong': ['u4_base', 'u4_eth', 'u1_intern'],
     'u5_coplan': ['u4_eth', 'u2_poly', 'u1_chart'],
@@ -612,15 +612,15 @@ export const UNIT_RECIPES: Record<string, string[]> = {
     'u5_dokwon': ['u4_luna', 'u2_hacker', 'u1_scam'],
     'u5_sbf': ['u4_sol', 'u2_hacker', 'u1_fud'],
 
-    // --- Tier 7: LEGENDS (ultimate top-down synergy) ---
-    'u7_trump': ['u5_saylor', 'u5_coplan', 'u4_btc'],
-    'u7_vitalik': ['u5_armstrong', 'u4_eth', 'u4_base'],
-    'u7_elon': ['u5_murad', 'u4_doge', 'u4_wif'],
-    'u7_cz': ['u5_hayes', 'u5_jeff', 'u4_bnb'],
-    'u7_gensler': ['u5_dokwon', 'u5_sbf', 'u4_xrp'],
+    // --- Tier 7: LEGENDS (BRUTAL — requires ★2 ingredients!) ---
+    'u7_trump': ['u5_saylor:2', 'u5_coplan:2', 'u4_btc:2'],
+    'u7_vitalik': ['u5_armstrong:2', 'u4_eth:2', 'u4_base:2'],
+    'u7_elon': ['u5_murad:2', 'u4_doge:2', 'u4_wif:2'],
+    'u7_cz': ['u5_hayes:2', 'u5_jeff:2', 'u4_bnb:2'],
+    'u7_gensler': ['u5_dokwon:2', 'u5_sbf:2', 'u4_xrp:2'],
 
-    // --- Tier 10: MYTHIC ---
-    'u10_satoshi': ['u7_trump', 'u7_elon', 'u7_vitalik'],
+    // --- Tier 10: MYTHIC (★1 — board space limit) ---
+    'u10_satoshi': ['u7_trump:1', 'u7_elon:1', 'u7_vitalik:1'],
 };
 
 // ─── 합성 배수 ──────────────────────────────────────────────

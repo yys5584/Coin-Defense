@@ -4,11 +4,11 @@
 // ============================================================
 
 import { EventBus } from './core/EventBus';
-import { createGameState, getLevelDef } from './core/GameState';
+import { createGameState, getLevelDef, createUnitInstance } from './core/GameState';
 import { CommandProcessor } from './core/systems/CommandProcessor';
 import { CombatSystem, getPositionOnPath, CombatResult } from './core/systems/CombatSystem';
 import { SynergySystem } from './core/systems/SynergySystem';
-import { UNIT_MAP, SYNERGIES, STAR_MULTIPLIER, LEVELS, getBaseIncome, getInterest, getStreakBonus, getStageRound, getStage, isBossRound, BOX_DROP_TABLES, BOX_UNLOCK_CHANCE, UNLOCK_CONDITIONS, AUGMENTS, STAGE_HINTS, STAGE_DEFENSE } from './core/config';
+import { UNIT_MAP, SYNERGIES, STAR_MULTIPLIER, LEVELS, UNIT_RECIPES, getBaseIncome, getInterest, getStreakBonus, getStageRound, getStage, isBossRound, BOX_DROP_TABLES, BOX_UNLOCK_CHANCE, UNLOCK_CONDITIONS, AUGMENTS, STAGE_HINTS, STAGE_DEFENSE } from './core/config';
 import { UNIT_DICTIONARY } from './core/unitDictionary';
 import { GameState, PlayerState, UnitInstance, CombatState, ActiveSynergy } from './core/types';
 import { createUnitVisual, preloadAllSprites, COST_GLOW, COST_GLOW_SHADOW, hasSpriteFor, hasUnitSprite, getUnitSprite, drawUnitSprite, drawMonsterSprite, getUnitSpriteInfo, getUnitSpriteSheet } from './client/sprites';
@@ -1390,6 +1390,7 @@ function render(): void {
   renderBoard();
   renderBench();
   renderShop();
+  renderRecipePanel();
   renderSynergies();
   renderDPSPanel();
   updateButtonStates();
@@ -3540,6 +3541,145 @@ function checkUnlockConditions(): void {
     log(`⭐ ${unitDef.name} (${unitDef.cost}코) 해금 완료! 상점에서 등장합니다!`, 'purple');
     events.emit('unlock:activated', { unitId: cond.unitId });
   }
+}
+
+// ── 레시피 합성 엔진 (Top-Down Crafting) ─────────────────────
+
+/** 레시피 재료 문자열 파싱: 'u5_saylor:2' → { id: 'u5_saylor', star: 2 } */
+function parseRecipeReq(req: string): { id: string; star: number } {
+  const parts = req.split(':');
+  return { id: parts[0], star: parts.length > 1 ? parseInt(parts[1]) : 1 };
+}
+
+/** 사용 가능한 레시피 스캔 */
+function scanForRecipes(): { targetId: string; ingredients: { id: string; star: number }[]; matched: UnitInstance[][] }[] {
+  const p = player();
+  const allUnits = [...p.board, ...p.bench];
+  const results: { targetId: string; ingredients: { id: string; star: number }[]; matched: UnitInstance[][] }[] = [];
+
+  for (const [targetId, reqs] of Object.entries(UNIT_RECIPES)) {
+    const parsed = reqs.map(parseRecipeReq);
+    // 각 재료에 대해 매칭되는 유닛 찾기 (이미 사용된 유닛 제외)
+    const usedIds = new Set<string>();
+    const matched: UnitInstance[][] = [];
+    let canCraft = true;
+
+    for (const req of parsed) {
+      const candidate = allUnits.find(u =>
+        u.unitId === req.id &&
+        u.star >= req.star &&
+        !usedIds.has(u.instanceId)
+      );
+      if (candidate) {
+        usedIds.add(candidate.instanceId);
+        matched.push([candidate]);
+      } else {
+        canCraft = false;
+        break;
+      }
+    }
+
+    if (canCraft) {
+      results.push({ targetId, ingredients: parsed, matched });
+    }
+  }
+
+  return results;
+}
+
+/** 레시피 실행: 재료 소비 → 결과물 생성 */
+function executeRecipe(targetId: string): boolean {
+  const p = player();
+  if (inCombat) return false;
+
+  const allUnits = [...p.board, ...p.bench];
+  const reqs = UNIT_RECIPES[targetId];
+  if (!reqs) return false;
+
+  const parsed = reqs.map(parseRecipeReq);
+  const usedIds = new Set<string>();
+  const toRemove: UnitInstance[] = [];
+
+  for (const req of parsed) {
+    const candidate = allUnits.find(u =>
+      u.unitId === req.id &&
+      u.star >= req.star &&
+      !usedIds.has(u.instanceId)
+    );
+    if (!candidate) return false;
+    usedIds.add(candidate.instanceId);
+    toRemove.push(candidate);
+  }
+
+  // 재료 제거
+  for (const rem of toRemove) {
+    const bIdx = p.board.findIndex(u => u.instanceId === rem.instanceId);
+    if (bIdx >= 0) p.board.splice(bIdx, 1);
+    const eIdx = p.bench.findIndex(u => u.instanceId === rem.instanceId);
+    if (eIdx >= 0) p.bench.splice(eIdx, 1);
+  }
+
+  // 결과물 생성 (벤치에 배치)
+  const newUnit = createUnitInstance(targetId);
+  p.bench.push(newUnit);
+
+  const def = UNIT_MAP[targetId];
+  log(`✨ 합성! ${def?.emoji ?? '?'} ${def?.name ?? targetId} 생성!`, 'gold');
+  events.emit('unit:merged', { unitId: targetId, newStar: 1, instanceId: newUnit.instanceId });
+
+  // 자동 별 합성 체크
+  autoMergeAll(p);
+  render();
+  return true;
+}
+
+/** 합성 가능 레시피 패널 렌더링 */
+function renderRecipePanel(): void {
+  let panel = document.getElementById('recipe-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'recipe-panel';
+    panel.style.cssText = 'position:absolute;top:4px;right:4px;z-index:100;display:flex;flex-direction:column;gap:4px;pointer-events:auto;max-height:200px;overflow-y:auto;';
+    const wrapper = document.getElementById('game-scale-wrapper') || document.getElementById('logical-wrapper');
+    wrapper?.appendChild(panel);
+  }
+
+  if (inCombat) {
+    panel.innerHTML = '';
+    return;
+  }
+
+  const available = scanForRecipes();
+  if (available.length === 0) {
+    panel.innerHTML = '';
+    return;
+  }
+
+  panel.innerHTML = available.map(r => {
+    const def = UNIT_MAP[r.targetId];
+    const ingText = r.ingredients.map(ing => {
+      const iDef = UNIT_MAP[ing.id];
+      return `${iDef?.emoji ?? '?'}${'⭐'.repeat(ing.star)}`;
+    }).join('+');
+    return `<button class="recipe-btn" data-target="${r.targetId}" style="
+      background:linear-gradient(135deg,#1e293b,#0f172a);
+      border:2px solid #f59e0b;color:#fbbf24;padding:4px 10px;border-radius:8px;
+      cursor:pointer;font-size:12px;white-space:nowrap;
+      box-shadow:0 0 12px rgba(245,158,11,0.4);transition:all 0.2s;
+      display:flex;align-items:center;gap:6px;
+    ">
+      <span style="font-size:14px">✨</span>
+      <span>${ingText} → ${def?.emoji ?? '?'} ${def?.name ?? r.targetId}</span>
+    </button>`;
+  }).join('');
+
+  // 클릭 이벤트
+  panel.querySelectorAll('.recipe-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = (btn as HTMLElement).dataset.target!;
+      executeRecipe(target);
+    });
+  });
 }
 
 // ── 전투 후 자동 합성 ──────────────────────────────────────
