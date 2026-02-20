@@ -235,14 +235,16 @@ export const UNITS: UnitDef[] = [
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 28, attackSpeed: 0.98, attackRange: 3,
-        skill: { type: 'passive', name: '플래시론', desc: '3번째 공격마다 ⚡체인 2', params: { nthHit: 3, chainTargets: 2, chainPct: 0.40 } }
+        maxMana: 70, startingMana: 0,
+        skill: { type: 'active', name: '일드 파밍', desc: '마나 충전 시 증폭 체인 + ★3 6회 증폭', cooldown: 5, params: { ampChain: 1, ampChainTargets: 3, ampChainBoost: 0.20 } }
     },
     {
         id: 'rekt', name: 'Rekt', emoji: '👤', cost: 3,
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 28, attackSpeed: 1.12, attackRange: 3,
-        skill: { type: 'passive', name: '데이터 유출', desc: '공격이 최대HP 비례 추가타 (보스/탱커용)', params: { maxHpPct: 0.02 } }
+        maxMana: 50, startingMana: 0,
+        skill: { type: 'active', name: '청산 빔', desc: '마나 충전 시 체력% 이하 적 즉사 + ★3 연쇄처형', cooldown: 5, params: { executeThreshold: 0.20, executeManaRefund: 0.50 } }
     },
     {
         id: 'wintermute', name: 'Wintermute', emoji: '🤖', cost: 3,
@@ -272,8 +274,9 @@ export const UNITS: UnitDef[] = [
         id: 'gcr', name: 'GCR', emoji: '🐸', cost: 3,
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
-        baseDmg: 28, attackSpeed: 1.1, attackRange: 3,
-        skill: { type: 'passive', name: '역매매 관통', desc: '기본 공격 🔫관통 2 (뒤쪽 적 우선)', params: { pierceTargets: 2, piercePct: 0.70 } }
+        baseDmg: 28, attackSpeed: 1.1, attackRange: 4,
+        maxMana: 60, startingMana: 0,
+        skill: { type: 'active', name: '빅 숏', desc: '마나 충전 시 거리비례 관통 + ★3 반사 빔', cooldown: 5, params: { distancePierce: 1, distanceDmgBonus: 0.10, pierceTargets: 3 } }
     },
     {
         id: 'akang', name: 'Andrew Kang', emoji: '🦈', cost: 3,

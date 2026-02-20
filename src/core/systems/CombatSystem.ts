@@ -1418,6 +1418,70 @@ export class CombatSystem {
                     ally.currentMana = allyMax;
                 }
             }
+            // 👤 체력% 이하 즉사 + ★3 연쇄처형 (rekt 청산 빔 — executeThreshold)
+            if (p.executeThreshold) {
+                const threshold = unit.star >= 3 ? 0.40 : (unit.star >= 2 ? 0.30 : p.executeThreshold);
+                const manaRefund = unit.star >= 3 ? 1.0 : (unit.star >= 2 ? 1.0 : (p.executeManaRefund ?? 0.50));
+                let killCount = 0;
+                for (const m of alive) {
+                    if (m.isBoss) continue;
+                    if ((m.hp / m.maxHp) <= threshold) {
+                        m.hp = 0;
+                        killCount++;
+                    }
+                }
+                // 처치 시 마나 회복
+                if (killCount > 0) {
+                    unit.currentMana = (unit.currentMana ?? 0) + maxMana * manaRefund * Math.min(killCount, 3);
+                }
+                // 보스에게도 baseDmg 피해  
+                frontTarget.hp -= baseDmg * unit.star;
+            }
+            // 🧙 증폭 체인 (andre 일드 파밍 — ampChain)
+            if (p.ampChain) {
+                const bounces = unit.star >= 3 ? 6 : (unit.star >= 2 ? 4 : (p.ampChainTargets ?? 3));
+                const ampPerBounce = unit.star >= 3 ? 0.50 : (unit.star >= 2 ? 0.30 : (p.ampChainBoost ?? 0.20));
+                // 첫 타겟
+                let currentTarget = frontTarget;
+                let dmg = baseDmg;
+                const hitTargets = new Set();
+                for (let i = 0; i < bounces; i++) {
+                    currentTarget.hp -= dmg;
+                    hitTargets.add(currentTarget);
+                    dmg *= (1 + ampPerBounce);  // 매 바운스 딜 증폭!
+                    // 다음 타겟 (아직 안 맞은 적 중 가장 가까운)
+                    const next = alive
+                        .filter(m => !hitTargets.has(m) && m.alive)
+                        .sort((a, b) => b.pathProgress - a.pathProgress)[0];
+                    if (!next) {
+                        // 이미 모두 맞았으면 다시 첫 타겟 (보스 잭팟)
+                        currentTarget = frontTarget;
+                    } else {
+                        currentTarget = next;
+                    }
+                }
+            }
+            // 🐸 거리비례 관통 + ★3 반사 (gcr 빅 숏 — distancePierce)
+            if (p.distancePierce) {
+                const dmgPerDist = unit.star >= 3 ? 0.40 : (unit.star >= 2 ? 0.20 : (p.distanceDmgBonus ?? 0.10));
+                const pierceCount = (p.pierceTargets ?? 3) + unit.star;
+                const unitPos = unit.position ? getPositionOnPath(0) : { px: 0, py: 0 };
+
+                // 뒤쪽 적부터 관통
+                const targets = alive.sort((a, b) => a.pathProgress - b.pathProgress).slice(0, pierceCount);
+                for (const m of targets) {
+                    // 거리 기반 딜 증가 (pathProgress 차이가 클수록 보너스)
+                    const distBonus = 1 + (1 - m.pathProgress) * 5 * dmgPerDist;
+                    m.hp -= baseDmg * distBonus;
+                }
+                // ★3: 반사 빔 (돌아오며 2차 타격, 50% 딜)
+                if (unit.star >= 3) {
+                    for (const m of targets) {
+                        const distBonus = 1 + m.pathProgress * 5 * dmgPerDist;
+                        m.hp -= baseDmg * distBonus * 0.50;
+                    }
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)
