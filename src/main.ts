@@ -2879,8 +2879,8 @@ function showAugmentPick(round: number): void {
         log('🪑 벤치 슬롯 +3!', 'green');
       }
       if (aug.id === 'aug_layer2') {
-        // 진격력: 보드 배치 슬롯 +1 (레벨 제한 완화)
-        log('📶 보드 슬롯 +1!', 'green');
+        // 레이어 2: 한 칸에 유닛 2마리 겹쳐 배치 가능 + 보드 슬롯 +1
+        log('🥞 레이어 2 활성! 한 칸에 유닛 2마리 배치 가능 + 슬롯+1', 'green');
       }
       if (aug.id === 'aug_dex_swap') {
         // 리롤 마스터: 무료 리롤 1회 즉시 지급
