@@ -2570,6 +2570,14 @@ function renderCombatOverlay(cs: CombatState): void {
     el.style.left = `${Math.round(toPixelX(pos.px))}px`;
     el.style.top = `${Math.round(toPixelY(pos.py))}px`;
 
+    // 스폰 페이드인: 처음 300ms 동안 opacity 0→1
+    if (m.spawnTime) {
+      const age = nowMs - m.spawnTime;
+      if (age < 300) {
+        el.style.opacity = `${Math.min(1, age / 300)}`;
+      }
+    }
+
     overlay.appendChild(el);
   }
 

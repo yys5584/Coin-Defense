@@ -148,6 +148,7 @@ export interface Monster {
     hitTime?: number;       // 피격 시각 (performance.now ms, 플래시 효과용)
     dots?: { dps: number; remaining: number }[];  // DoT 효과
     debuffs?: CCDebuff[];   // CC 디버프 목록
+    spawnTime?: number;     // 스폰 시각 (performance.now ms, 페이드인용)
 }
 
 /** 전투 이펙트 (Unity 매핑: type → VFX Prefab) */

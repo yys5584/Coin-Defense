@@ -545,6 +545,9 @@ export class CombatSystem {
     private spawnMonster(hp: number, speed: number, gold: number, isBoss: boolean, def: number = 0, mdef: number = 0): void {
         this.monsterIdCounter++;
         const actualSpeed = speed + (Math.random() * 0.2 - 0.1); // ±10% 속도 변동
+        // 스폰 위치: 경로 시작점 직전에서 부드럽게 진입 (순간이동 방지)
+        // -0.02 = 마지막 세그먼트 끝(1,0)→(0,0) 사이의 50% 지점에서 시작
+        const spawnOffset = -0.008 - Math.random() * 0.012; // -0.008~-0.02 랜덤
         this.combat.monsters.push({
             id: this.monsterIdCounter,
             hp,
@@ -553,12 +556,13 @@ export class CombatSystem {
             mdef,
             speed: actualSpeed,
             baseSpeed: actualSpeed,
-            pathProgress: 0,
+            pathProgress: spawnOffset,
             laps: 0,
             alive: true,
             isBoss,
             goldReward: gold,
             debuffs: [],
+            spawnTime: performance.now(),
         });
         this.combat.spawnQueue--;
     }
