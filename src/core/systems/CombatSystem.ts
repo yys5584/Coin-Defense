@@ -1354,6 +1354,70 @@ export class CombatSystem {
                     ally.attackCooldown = Math.max(0, (ally.attackCooldown ?? 0) * (1 - frenzyMult * 0.3));
                 }
             }
+            // 📉 몹몰이 블랙홀 + 대폭발 (zhusu 슈퍼사이클 — superCycle)
+            if (p.superCycle) {
+                // ★ 스케일링: 범위, 지속, 딜
+                const pullRange = unit.star >= 3 ? alive.length : (unit.star >= 2 ? Math.min(8, alive.length) : Math.min(4, alive.length));
+                const burstDmg = unit.star >= 3 ? 3000 : (unit.star >= 2 ? 1000 : (p.burstDmg ?? 400));
+                const stunDur = unit.star >= 3 ? 3 : (unit.star >= 2 ? 1.5 : 0);
+
+                // 적 몰이: 가장 많은 곳(앞쪽)으로 흡입
+                const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, pullRange);
+                const centerProgress = selected.length > 0 ? selected[0].pathProgress : 0.5;
+                for (const m of selected) {
+                    m.pathProgress = m.pathProgress + (centerProgress - m.pathProgress) * 0.80;
+                    m.hp -= burstDmg;
+                    // 스턴
+                    if (stunDur > 0) {
+                        if (!m.debuffs) m.debuffs = [];
+                        const dur = m.isBoss ? stunDur * 0.3 : stunDur;
+                        m.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: dur });
+                    }
+                }
+            }
+            // 🎯 보스 저격 (balaji 백만불 베팅 — sniperShots)
+            if (p.sniperShots) {
+                // 무조건 최고HP 적 타겟
+                const bossTarget = alive.reduce((a, b) => b.hp > a.hp ? b : a);
+                const shots = p.sniperShots ?? 3;
+                // ★ 스케일링: 딜배, 방무시
+                const dmgMult = unit.star >= 3 ? 4.0 : (unit.star >= 2 ? 2.0 : (p.sniperMult ?? 1.0));
+                const defIgnorePct = unit.star >= 3 ? 1.0 : (unit.star >= 2 ? 0.50 : 0.0);
+
+                for (let i = 0; i < shots; i++) {
+                    // 방어 무시 딜
+                    const rawDmg = baseDmg * dmgMult;
+                    const effectiveDef = bossTarget.def * (1 - defIgnorePct);
+                    const finalDmg = rawDmg * (100 / (100 + effectiveDef));
+                    bossTarget.hp -= finalDmg;
+                }
+                // ★3: 처치 시 마나 100% 페이백
+                if (unit.star >= 3 && bossTarget.hp <= 0 && bossTarget.alive) {
+                    unit.currentMana = maxMana;
+                }
+            }
+            // 🔗 아군 스킬 2연속 (gavin 파라체인 — doubleCast)
+            if (p.doubleCast) {
+                // ★ 스케일링: 범위
+                const dcRange = unit.star >= 3 ? 99 : (unit.star >= 2 ? 2 : (p.doubleCastRange ?? 1));
+                const penalty = unit.star >= 3 ? 1.0 : (unit.star >= 2 ? 1.0 : (p.doubleCastPenalty ?? 0.50));
+
+                for (const ally of boardUnits) {
+                    if (ally === unit) continue;
+                    if (!ally.position || !unit.position) continue;
+                    const allyDef = UNIT_MAP[ally.unitId];
+                    if (!allyDef?.skill || allyDef.skill.type !== 'active') continue;
+
+                    // 범위 체크
+                    const dx = Math.abs(ally.position.x - unit.position.x);
+                    const dy = Math.abs(ally.position.y - unit.position.y);
+                    if (dx > dcRange || dy > dcRange) continue;
+
+                    // 즉시 마나 100% 충전 (= 다음 프레임에 스킬 발동)
+                    const allyMax = allyDef.maxMana ?? 100;
+                    ally.currentMana = allyMax;
+                }
+            }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)

@@ -169,7 +169,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 42, attackSpeed: 1.36, attackRange: 3,
-        skill: { type: 'active', name: 'Substrate', desc: '8초마다 적 1기 🛡️MDEF↓', cooldown: 8, params: { mdefShred: 12, debuffDuration: 4 } }
+        maxMana: 110, startingMana: 20,
+        skill: { type: 'active', name: '파라체인 연결', desc: '마나 충전 시 아군 스킬 2연속 + ★3 전체', cooldown: 5, params: { doubleCast: 1, doubleCastRange: 1, doubleCastPenalty: 0.50 } }
     },
     {
         id: 'hayden', name: 'Hayden Adams', emoji: '🦄', cost: 4,
@@ -193,7 +194,7 @@ export const UNITS: UnitDef[] = [
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.21, attackRange: 4,
         maxMana: 80, startingMana: 20,
-        skill: { type: 'active', name: '100만불 배팅', desc: '마나 충전 시 최대HP 적 저격(큰 피해)', cooldown: 8, params: { burstMult: 3.0 } }
+        skill: { type: 'active', name: '백만불 베팅', desc: '마나 충전 시 보스 저격 + ★3 트루딜+마나페이백', cooldown: 5, params: { sniperShots: 3, sniperMult: 1.0, defIgnore: 0.0, killManaPayback: 0 } }
     },
     {
         id: 'lazarus', name: 'Lazarus', emoji: '💀', cost: 4,
@@ -208,8 +209,8 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Rugpull,
         dmgType: 'physical' as const,
         baseDmg: 42, attackSpeed: 1.48, attackRange: 3,
-        maxMana: 80, startingMana: 20,
-        skill: { type: 'active', name: '3AC 청산', desc: '마나 충전 시 최대HP 적 💥광역 폭발', cooldown: 8, params: { splashPct: 0.50, splashTargets: 2 } }
+        maxMana: 100, startingMana: 20,
+        skill: { type: 'active', name: '슈퍼사이클 청산', desc: '마나 충전 시 블랙홀 몹몰이 + 대폭발', cooldown: 5, params: { superCycle: 1, pullDuration: 1, burstDmg: 400 } }
     },
     {
         id: 'anatoly', name: 'Anatoly', emoji: '⚡', cost: 4,
