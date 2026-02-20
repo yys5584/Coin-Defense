@@ -2470,11 +2470,11 @@ function renderCombatOverlay(cs: CombatState): void {
     const pathBottom = pathTop + pr.height / s;
     const gridRight = gridOffsetX + cellW * 7;
     const gridBottom = gridOffsetY + cellH * 4;
-    // 트랙 중심 = path와 grid 사이의 중점
-    trackLeft = (pathLeft + gridOffsetX) / 2;
-    trackTop = (pathTop + gridOffsetY) / 2;
-    trackRight = (pathRight + gridRight) / 2;
-    trackBottom = (pathBottom + gridBottom) / 2;
+    // 트랙 중심 = path 쪽으로 60%, grid 쪽으로 40% (조금 넓게 공전)
+    trackLeft = pathLeft * 0.6 + gridOffsetX * 0.4;
+    trackTop = pathTop * 0.6 + gridOffsetY * 0.4;
+    trackRight = pathRight * 0.6 + gridRight * 0.4;
+    trackBottom = pathBottom * 0.6 + gridBottom * 0.4;
   } else {
     // fallback: grid 기준 1셀 바깥
     trackLeft = gridOffsetX - cellW * 0.7;
