@@ -124,6 +124,17 @@ applyGameScale(); // 초기 적용
 let combatStartTime = 0;         // 웨이브 시작 시각 (performance.now)
 let lastDpsUpdate = 0;           // 마지막 DPS 갱신 시각
 
+// 전 라운드 수입 추적
+let lastRoundIncome = {
+  stageGold: 0,     // 스테이지 보상 (base income)
+  gradeGold: 0,     // 등급 보너스
+  grade: '-' as string,
+  interestGold: 0,  // 이자
+  combatGold: 0,    // 전투 킬골드
+  totemGold: 0,     // 유닛/증강 보상
+  total: 0,
+};
+
 // ═══════════════════════════════════════════════════════════════
 // ─── ASYNC RACING MULTIPLAYER ────────────────────────────────
 // 각자 독립 진행 + 상태 릴레이 + 미니맵 라운드 표시
@@ -1997,14 +2008,12 @@ function renderDPSPanel(): void {
 function showGoldTooltip(targetEl: HTMLElement): void {
   removeHudTooltips();
   const p = player();
-  const nextRound = state.round + 1;
+  const nextRound = state.round;
   const isWarmup = getStage(nextRound) === 1;
   const base = getBaseIncome(nextRound);
   const interest = isWarmup ? 0 : getInterest(p.gold);
-  const streakCount = Math.max(p.winStreak, p.lossStreak);
-  const streak = isWarmup ? 0 : getStreakBonus(streakCount);
 
-  // 토템 골드 (보드 위 roundEndGold passive 스킬 유닛)
+  // 토템 골드
   let totemGold = 0;
   const totemUnits: string[] = [];
   for (const u of p.board) {
@@ -2016,10 +2025,25 @@ function showGoldTooltip(targetEl: HTMLElement): void {
     }
   }
 
-  const total = base + interest + streak + totemGold;
+  const predictedTotal = base + interest + totemGold;
 
-  const streakLabel = p.winStreak > 0 ? `🔥 ${p.winStreak}연승` : p.lossStreak > 0 ? `💀 ${p.lossStreak}연패` : '없음';
+  // 등급별 색상
+  const gc: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', F: '#f87171' };
 
+  // 전 라운드 실적 HTML
+  const prev = lastRoundIncome;
+  const prevSection = prev.total > 0 ? `
+    <div style="font-weight:700;margin-bottom:4px">📊 전 라운드 수입</div>
+    <div class="tt-row"><span class="tt-label">스테이지 보상</span><span class="tt-value gold">+${prev.stageGold}G</span></div>
+    <div class="tt-row"><span class="tt-label">등급 <span style="color:${gc[prev.grade] || '#888'};font-weight:bold">${prev.grade}</span></span><span class="tt-value gold">+${prev.gradeGold}G</span></div>
+    <div class="tt-row"><span class="tt-label">이자</span><span class="tt-value gold">+${prev.interestGold}G</span></div>
+    <div class="tt-row"><span class="tt-label">전투 킬골드</span><span class="tt-value gold">+${prev.combatGold}G</span></div>
+    ${prev.totemGold > 0 ? `<div class="tt-row"><span class="tt-label">⛏️ 채굴</span><span class="tt-value gold">+${prev.totemGold}G</span></div>` : ''}
+    <div class="tt-row tt-total"><span>합계</span><span class="tt-value gold">+${prev.total}G</span></div>
+    <hr class="tt-divider">
+  ` : '';
+
+  // 토템 행
   const totemRow = totemGold > 0
     ? `<div class="tt-row"><span class="tt-label">⛏️ 채굴 (${totemUnits.join(', ')})</span><span class="tt-value gold">+${totemGold}G</span></div>`
     : '';
@@ -2027,13 +2051,14 @@ function showGoldTooltip(targetEl: HTMLElement): void {
   const tip = document.createElement('div');
   tip.className = 'hud-tooltip gold-tooltip';
   tip.innerHTML = `
-    <div style="font-weight:700;margin-bottom:6px">💰 ${getStageRound(nextRound)} 예상 수입</div>
-    <div class="tt-row"><span class="tt-label">기본급</span><span class="tt-value gold">+${base}G</span></div>
-    <div class="tt-row"><span class="tt-label">이자 (${p.gold}G / 10)</span><span class="tt-value gold">+${interest}G</span></div>
-    <div class="tt-row"><span class="tt-label">연승보너스 (${streakLabel})</span><span class="tt-value green">+${streak}G</span></div>
+    ${prevSection}
+    <div style="font-weight:700;margin-bottom:4px">💰 ${getStageRound(nextRound)} 예상 수입</div>
+    <div class="tt-row"><span class="tt-label">스테이지 보상</span><span class="tt-value gold">+${base}G</span></div>
+    <div class="tt-row"><span class="tt-label">등급 보너스</span><span class="tt-value" style="color:#94a3b8">S~B 등급에 따라</span></div>
+    <div class="tt-row"><span class="tt-label">이자 (${p.gold}G ÷ 10)</span><span class="tt-value gold">+${interest}G</span></div>
     ${totemRow}
     <hr class="tt-divider">
-    <div class="tt-row tt-total"><span>합계</span><span class="tt-value gold">+${total}G</span></div>
+    <div class="tt-row tt-total"><span>예상 최소</span><span class="tt-value gold">+${predictedTotal}G</span></div>
   `;
   targetEl.appendChild(tip);
 }
@@ -3189,19 +3214,51 @@ function onCombatComplete(result: CombatResult): void {
   // 결과 반영
   cmd.getEconomy().processStreaks(p, result.won);
 
+  // 수입 정산 (라운드 기본 수입)
+  const roundGold = cmd.getEconomy().processIncome(state, p);
+
   // 등급별 보너스 골드
-  const totalGold = result.goldEarned + result.bonusGold;
+  const combatGold = result.goldEarned;
+  const gradeGold = result.bonusGold;
+  const totalGold = combatGold + gradeGold;
+
+  // 전 라운드 수입 기록
+  const nextRound = state.round;
+  const isWarmup = getStage(nextRound) === 1;
+  const base = getBaseIncome(nextRound);
+  const interest = isWarmup ? 0 : getInterest(p.gold);
+
+  // 토템 골드
+  let totemG = 0;
+  for (const u of p.board) {
+    if (!u.position) continue;
+    const uDef = UNIT_MAP[u.unitId];
+    if (uDef?.skill?.type === 'passive' && uDef.skill.params.roundEndGold) {
+      totemG += uDef.skill.params.roundEndGold;
+    }
+  }
+
+  lastRoundIncome = {
+    stageGold: base,
+    gradeGold,
+    grade: result.grade,
+    interestGold: interest,
+    combatGold,
+    totemGold: totemG,
+    total: roundGold + totalGold + totemG,
+  };
+
   const gradeColors: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', F: '#f87171' };
   const gradeColor = gradeColors[result.grade] || '#94a3b8';
-  const gradeLabel = result.bonusGold > 0 ? ` [${result.grade}등급 +${result.bonusGold}G]` : ` [${result.grade}등급]`;
+  const gradeLabel = gradeGold > 0 ? ` [${result.grade}등급 +${gradeGold}G]` : ` [${result.grade}등급]`;
 
   if (result.won) {
     p.gold += totalGold;
-    log(`✅ 승리! 킬:${result.kills} 골드+${totalGold}${gradeLabel} (${result.elapsedTime.toFixed(1)}s)`, 'green');
+    log(`✅ 승리! 킬:${result.kills} 골드+${totalGold + roundGold}${gradeLabel} (${result.elapsedTime.toFixed(1)}s)`, 'green');
   } else {
     cmd.getEconomy().applyDamage(p, result.damage);
     p.gold += totalGold;
-    log(`💀 패배! 킬:${result.kills} -${result.damage}HP 골드+${totalGold}${gradeLabel}`, 'red');
+    log(`💀 패배! 킬:${result.kills} -${result.damage}HP 골드+${totalGold + roundGold}${gradeLabel}`, 'red');
   }
 
   // 등급 표시 스탬프 (대형 애니메이션)

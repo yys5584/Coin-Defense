@@ -17,7 +17,6 @@ export class EconomySystem {
         const base = getBaseIncome(state.round);
         const isWarmup = getStage(state.round) === 1;
         let interest = isWarmup ? 0 : getInterest(player.gold);
-        const streak = isWarmup ? 0 : getStreakBonus(Math.max(player.winStreak, player.lossStreak));
 
         // 증강: 디파이 이자농사 — 이자 상한 +3
         if (player.augments.includes('aug_defi_farm') && !isWarmup) {
@@ -26,7 +25,7 @@ export class EconomySystem {
         // MEV 샌드위치: 킬 골드는 CombatSystem에서 처리
         const goldRushBonus = 0;
 
-        const total = base + interest + streak + goldRushBonus;
+        const total = base + interest + goldRushBonus;
         player.gold += total;
 
         // 증강: 구제 금융 — HP 회복 없음 (1회성 비상 안전망)
@@ -34,7 +33,7 @@ export class EconomySystem {
 
         this.events.emit('gold:changed', {
             gold: player.gold,
-            breakdown: { base, interest, streak },
+            breakdown: { base, interest },
         });
 
         return total;
