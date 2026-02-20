@@ -1920,6 +1920,86 @@ function renderDPSPanel(): void {
 
   $('hud-dps').textContent = isCombatActive ? teamDPS.toString() : bDPS.toString();
 
+  // ── HUD DPS 호버 툴팁: 유닛별 DPS ──
+  const hudDpsEl = ($('hud-dps').closest('.hud-btn') || $('hud-dps').parentElement) as HTMLElement | null;
+  if (hudDpsEl) {
+    // 기존 리스너 제거 + 재설정 (renderDPSPanel이 반복 호출되므로)
+    const existingTip = document.getElementById('dps-hover-tip');
+    if (existingTip && !(hudDpsEl as any)._hoverActive) existingTip.remove();
+
+    if (!(hudDpsEl as any)._dpsTooltipBound) {
+      (hudDpsEl as any)._dpsTooltipBound = true;
+      hudDpsEl.style.cursor = 'pointer';
+      hudDpsEl.addEventListener('mouseenter', () => {
+        (hudDpsEl as any)._hoverActive = true;
+        updateDpsTooltip(hudDpsEl as HTMLElement);
+      });
+      hudDpsEl.addEventListener('mouseleave', () => {
+        (hudDpsEl as any)._hoverActive = false;
+        document.getElementById('dps-hover-tip')?.remove();
+      });
+    }
+    // 호버 중이면 툴팁 갱신
+    if ((hudDpsEl as any)._hoverActive) {
+      updateDpsTooltip(hudDpsEl as HTMLElement);
+    }
+  }
+
+  function updateDpsTooltip(anchor: HTMLElement) {
+    const p2 = player();
+    const elapsed = isCombatActive ? Math.max(1, (performance.now() - combatStartTime) / 1000) : 1;
+    const totalDmg = p2.board.reduce((s, u) => s + (u.totalDamageDealt ?? 0), 0);
+    const entries = p2.board
+      .filter(u => u.position && (u.totalDamageDealt ?? 0) > 0)
+      .map(u => ({
+        emoji: UNIT_MAP[u.unitId]?.emoji || '?',
+        name: UNIT_MAP[u.unitId]?.name || u.unitId,
+        star: u.star,
+        dps: Math.floor((u.totalDamageDealt ?? 0) / elapsed),
+        pct: totalDmg > 0 ? Math.round(((u.totalDamageDealt ?? 0) / totalDmg) * 100) : 0,
+      }))
+      .sort((a, b) => b.dps - a.dps);
+
+    let tip = document.getElementById('dps-hover-tip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'dps-hover-tip';
+      tip.style.cssText = `
+        position:fixed; z-index:9999; pointer-events:none;
+        background:rgba(15,10,25,0.95); border:1px solid rgba(255,255,255,0.15);
+        border-radius:6px; padding:8px 12px; min-width:180px; max-width:260px;
+        box-shadow:0 4px 20px rgba(0,0,0,0.6); font-size:12px; color:#e0e0e0;
+      `;
+      document.body.appendChild(tip);
+    }
+    const rect = anchor.getBoundingClientRect();
+    tip.style.left = `${rect.left}px`;
+    tip.style.top = `${rect.bottom + 6}px`;
+
+    if (!isCombatActive || entries.length === 0) {
+      tip.innerHTML = `<div style="color:#94a3b8;text-align:center">전투 시작 후 표시됩니다</div>`;
+      return;
+    }
+
+    const rows = entries.map((e, i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:2px 0;${i === 0 ? 'color:#ffd700;' : ''}">
+        <span>${e.emoji} ${e.name} ${'★'.repeat(e.star)}</span>
+        <span style="font-weight:bold;margin-left:12px">${e.dps} <span style="opacity:0.5">(${e.pct}%)</span></span>
+      </div>
+    `).join('');
+
+    tip.innerHTML = `
+      <div style="font-weight:700;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:4px">
+        ⚔️ 유닛별 DPS
+      </div>
+      ${rows}
+      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-top:4px;padding-top:4px;display:flex;justify-content:space-between;font-weight:bold">
+        <span>합계</span>
+        <span>${teamDPS} DPS</span>
+      </div>
+    `;
+  }
+
   // ── 등급별 DPS 임계값 바 ──
   const gradeBar = document.createElement('div');
   gradeBar.style.cssText = 'display:flex;gap:4px;margin-bottom:4px;';
