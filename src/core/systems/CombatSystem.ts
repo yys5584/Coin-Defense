@@ -1461,20 +1461,35 @@ export class CombatSystem {
                 }
             }
             // 🐋 블랙홀 (cz — blackhole: 적 흡입 + 스턴)
+            // 가장 앞 적 위치로 모든 적 흡입 + 랜덤 오프셋으로 겹침 방지
             if (p.blackhole) {
-                // 모든 적을 맵 중앙으로 흡입 (pathProgress → 0.5)
+                const centerTarget = frontTarget;
+                const centerProgress = centerTarget.pathProgress;
+                const pullStr = p.pullStrength ?? 0.60;
+                const stunDur = p.stunDuration ?? 3;
+
                 for (const m of alive) {
-                    const pull = p.pullStrength ?? 0.30;
-                    const center = 0.5;
-                    m.pathProgress = m.pathProgress + (center - m.pathProgress) * pull;
+                    // 흡입: 가장 앞 적 위치로 강제 이동 + 랜덤 오프셋
+                    const offset = (Math.random() - 0.5) * 0.03;
+                    m.pathProgress = m.pathProgress + (centerProgress - m.pathProgress) * pullStr + offset;
                     // 스턴
                     if (!m.debuffs) m.debuffs = [];
-                    const dur = m.isBoss ? (p.stunDuration ?? 3) * 0.3 : (p.stunDuration ?? 3);
+                    const dur = m.isBoss ? stunDur * 0.3 : stunDur;
                     m.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: dur });
+                    // 피해
+                    m.hp -= baseDmg * 1.5;
                 }
-                // 중앙에 피해
-                const centerDmg = baseDmg * 1.5;
-                for (const m of alive) { m.hp -= centerDmg; }
+                // 흡입 지점 VFX
+                const bhPos = getPositionOnPath(centerProgress);
+                this.combat.effects.push({
+                    id: this.effectIdCounter++,
+                    type: 'skill_blackhole',
+                    x: bhPos.px, y: bhPos.py,
+                    value: Math.round(baseDmg * 1.5),
+                    startTime: performance.now(),
+                    duration: 1200,
+                    frameIndex: 0,
+                });
             }
             // 🚀 화성 로켓 (elon — marsRocket: 전체 넉백 + 아군 광분)
             if (p.marsRocket) {
@@ -1494,16 +1509,18 @@ export class CombatSystem {
             }
             // 📉 몹몰이 블랙홀 + 대폭발 (zhusu 슈퍼사이클 — superCycle)
             if (p.superCycle) {
-                // ★ 스케일링: 범위, 지속, 딜
+                // ★ 스케일링: 범위, 딬
                 const pullRange = unit.star >= 3 ? alive.length : (unit.star >= 2 ? Math.min(8, alive.length) : Math.min(4, alive.length));
                 const burstDmg = unit.star >= 3 ? 3000 : (unit.star >= 2 ? 1000 : (p.burstDmg ?? 400));
                 const stunDur = unit.star >= 3 ? 3 : (unit.star >= 2 ? 1.5 : 0);
 
-                // 적 몰이: 가장 많은 곳(앞쪽)으로 흡입
+                // 가장 앞 적 기준 몹몰이
                 const selected = alive.sort((a, b) => b.pathProgress - a.pathProgress).slice(0, pullRange);
                 const centerProgress = selected.length > 0 ? selected[0].pathProgress : 0.5;
                 for (const m of selected) {
-                    m.pathProgress = m.pathProgress + (centerProgress - m.pathProgress) * 0.80;
+                    // 흡입 + 랜덤 오프셋으로 겹침 방지
+                    const offset = (Math.random() - 0.5) * 0.03;
+                    m.pathProgress = m.pathProgress + (centerProgress - m.pathProgress) * 0.85 + offset;
                     m.hp -= burstDmg;
                     // 스턴
                     if (stunDur > 0) {
@@ -1512,6 +1529,17 @@ export class CombatSystem {
                         m.debuffs.push({ type: 'stun', slowPct: 0.95, remaining: dur });
                     }
                 }
+                // 블랙홀 VFX
+                const bhPos = getPositionOnPath(centerProgress);
+                this.combat.effects.push({
+                    id: this.effectIdCounter++,
+                    type: 'skill_blackhole',
+                    x: bhPos.px, y: bhPos.py,
+                    value: Math.round(burstDmg),
+                    startTime: performance.now(),
+                    duration: 1000,
+                    frameIndex: 0,
+                });
             }
             // 🪓 처형 (Rekt 청산 빔 — executeThreshold + executeManaRefund)
             // HP%가 임계 이하면 즉사 + 마나 환급 → 연쇄 살인

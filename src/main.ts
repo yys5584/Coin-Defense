@@ -2488,6 +2488,20 @@ function renderCombatOverlay(cs: CombatState): void {
       el.textContent = '💀';
       overlay.appendChild(el);
 
+    } else if (fx.type === 'skill_blackhole') {
+      // 🕳️ 블랙홀 — 보라색 소용돌이 + 검은 원
+      const size = 40 + progress * 60;
+      const rotDeg = progress * 720; // 2바퀴 회전
+      el.style.cssText = `
+        position:absolute; left:${fxX - size / 2}px; top:${fxY - size / 2}px;
+        width:${size}px; height:${size}px; border-radius:50%;
+        background:radial-gradient(circle, rgba(20,0,40,${0.9 - progress * 0.9}) 0%, rgba(100,0,200,${0.5 - progress * 0.5}) 50%, transparent 100%);
+        box-shadow:0 0 ${20 + progress * 30}px rgba(150,0,255,${0.7 - progress * 0.7}), inset 0 0 ${10 + progress * 15}px rgba(0,0,0,0.8);
+        transform:rotate(${rotDeg}deg);
+        pointer-events:none;
+      `;
+      overlay.appendChild(el);
+
     } else if (fx.type === 'freeze') {
       // ❄️ 빙결 — 파란 결정
       const size = 20 + Math.sin(progress * Math.PI) * 15;
