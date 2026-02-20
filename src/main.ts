@@ -2855,11 +2855,6 @@ function renderCombatOverlay(cs: CombatState): void {
       // 크릿 시 LIQUIDATED 연출 + 스크린 쉐이크
       if (fx.type === 'crit' && progress < 0.05) {
         el.textContent = val >= 50 ? `${val} LIQUIDATED!` : `${val}💥`;
-        const wrapper = document.getElementById('game-scale-wrapper') || document.getElementById('logical-wrapper');
-        if (wrapper && !wrapper.classList.contains('screen-shake')) {
-          wrapper.classList.add('screen-shake');
-          setTimeout(() => wrapper.classList.remove('screen-shake'), 200);
-        }
       } else {
         el.textContent = val.toString();
       }
