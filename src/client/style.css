@@ -1628,6 +1628,7 @@ body {
 
 /* ── Shop Card Bar ── */
 #shop-bar {
+    position: relative;
     background: linear-gradient(180deg, rgba(25, 18, 8, .95) 0%, rgba(20, 14, 6, .98) 100%);
     padding: 8px 14px 10px;
     border-top: 1px solid rgba(90, 74, 46, .3);
@@ -2655,9 +2656,30 @@ body {
 }
 
 .synergy-tooltip {
-    min-width: 220px;
-    max-width: 300px;
+    min-width: 280px;
+    max-width: 360px;
     z-index: 9999;
+    background: #0a0f1e !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+}
+
+.synergy-tooltip .tt-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 3px 0;
+}
+
+.synergy-tooltip .tt-label {
+    flex-shrink: 0;
+    min-width: 50px;
+}
+
+.synergy-tooltip .tt-value {
+    flex: 1;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2665,16 +2687,21 @@ body {
    ═══════════════════════════════════════════════════════════ */
 
 .sell-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    background: rgba(239, 68, 68, 0.08);
-    border: 2px dashed rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.15);
+    border: 2px dashed rgba(239, 68, 68, 0.5);
     border-radius: 8px;
     color: #f87171;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
+    z-index: 10;
     transition: all 0.2s;
     animation: sellZoneFadeIn 0.15s ease;
 }

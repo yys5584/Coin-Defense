@@ -17,7 +17,7 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         skillDesc: {
             star1: '인접 아군 1명 마나 15 회복',
             star2: '인접 아군 2명 마나 30 회복',
-            star3: '★★★ 주변 8칸 모든 아군 마나 50 회복 + 공속 20%↑',
+            star3: '주변 8칸 모든 아군 마나 50 회복 + 공속 20%↑',
         },
     },
     scamdev: {
@@ -25,9 +25,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '백서는 화려하지만 Github 커밋 기록은 단 1줄, "Hello World"뿐입니다.',
         lore: '링크드인 프로필에는 MIT 중퇴라고 적혀있지만 실제로는 유데미 강좌도 완강 못 했다. 백서 50페이지는 전부 GPT가 썼고, 토큰 런칭 3일 만에 유동성을 빼고 텔레그램을 폭파했다. 그의 코드는 버그 자체가 무기처럼 퍼져나간다.',
         skillDesc: {
-            star1: '단일 적 3초 도트. 킬 시 1명 전이',
+            star1: '단일 적 3초간 HP 4%/초 도트. 킬 시 1명 전이',
             star2: '4초 도트. 킬 시 2명 전이',
-            star3: '★★★ 5초 도트. 킬 시 주변 전체 무한 전이',
+            star3: '5초 도트. 킬 시 주변 전체 무한 전이',
         },
     },
     hodler: {
@@ -35,9 +35,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"비트코인을 사면 팔지 마라." HODLer의 신조는 단순합니다. 다이아몬드 핸드.',
         lore: '2013년 비트코인포럼에서 술에 취해 "I AM HODLING"이라고 오타를 친 게 전설의 시작. -80% 폭락에도 팔지 않고, 여자친구가 떠나도 팔지 않고, 거래소가 해킹당해도 콜드월렛은 무사했다. 시간이 지날수록 강해지는 다이아몬드 핸드의 소유자.',
         skillDesc: {
-            star1: '확정 크리 1타 (누적 크리DMG +10%)',
-            star2: '확정 크리 3타',
-            star3: '★★★ 매 시전 영구 크리DMG 누적. 갈수록 한방이 강해짐',
+            star1: '확정 크리 1타 (크리DMG +10% 영구 누적)',
+            star2: '확정 크리 3타 (크리DMG +10% 영구 누적)',
+            star3: '확정 크리 + 매 시전 크리DMG +15% 영구 누적 (무한 스택)',
         },
     },
     memecoin: {
@@ -45,9 +45,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '도지코인, 시바이누, 페페… 밈에서 태어나 밈으로 죽는 코인의 왕.',
         lore: '백서도 없고, 로드맵도 없고, 개발팀도 사실 강아지 한 마리뿐이다. 하지만 일론 머스크가 트윗 하나 올리면 시총이 500억이 된다. 도지코인에서 시바이누, 페페, 본크, WIF까지… 밈은 죽지 않고 연쇄적으로 퍼져나간다. 스킬도 체인처럼.',
         skillDesc: {
-            star1: '체인 3회 + 킬 시 마나 페이백',
-            star2: '체인 4회 + 킬 마나 강화',
-            star3: '★★★ 체인 5회 + 킬 시 마나 100% → 무한 연쇄',
+            star1: '체인 2회 (40% 딜) + 킬 시 마나 100% 환급',
+            star2: '체인 3회 (40% 딜) + 킬 시 마나 100% 환급',
+            star3: '체인 5회 + 킬 시 마나 100% → 무한 연쇄',
         },
     },
     fudspreader: {
@@ -55,9 +55,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"비트코인은 죽었다"를 1만 번 외친 자. 공포를 먹고 사는 존재.',
         lore: '비트코인 부고 기사는 2010년부터 지금까지 총 477번 작성되었다. 매번 "이번엔 진짜 끝"이라 외치지만, 비트코인은 매번 부활했다. FUD(공포, 불확실성, 의심)를 퍼뜨리는 자들의 독은 서서히 퍼지며, 죽으면서도 마지막 에너지를 남긴다.',
         skillDesc: {
-            star1: '단일 적 도트 부여',
-            star2: '3명에게 도트',
-            star3: '★★★ 사망 시 마나 구슬 드롭 → 아군 마나 충전',
+            star1: '단일 적 HP 4%/초 도트 (4초)',
+            star2: '3명에게 도트 (4초)',
+            star3: '사망 시 마나 구슬 30 드롭 → 아군 마나 충전',
         },
     },
     piuser: {
@@ -65,9 +65,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '폰으로 채굴한다는 달콤한 거짓말에 수백만이 넘어갔습니다.',
         lore: '"하루에 한 번 버튼만 누르면 코인이 채굴됩니다!" 전 세계 4700만 명이 매일 경건하게 버튼을 눌렀다. 메인넷은 영원히 "Coming Soon"이고, KYC는 여권까지 요구한다. 하지만 그 미친 탭핑 속도만큼은 진짜였다.',
         skillDesc: {
-            star1: '2연타 강타',
-            star2: '3연타 강타',
-            star3: '★★★ 3연타 + 15% 확률 즉사 (보스 제외)',
+            star1: '2연타 (×1.5 DMG)',
+            star2: '3연타 (×1.5 DMG)',
+            star3: '3연타 + 1% 확률 즉사 (보스 제외, 킬 시 +5G)',
         },
     },
     tradebot: {
@@ -75,9 +75,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '0.001초 만에 주문을 넣고 빼는 초단타 봇. 감정 따위는 없습니다.',
         lore: 'CEX의 오더북에서 0.001초 단위로 주문을 넣고 취소하는 초고빈도 트레이딩 봇. 감정이 없으니 공포도 탐욕도 없다. 시간이 지날수록 시장의 패턴을 학습하며 점점 빨라진다. 인간 트레이더들이 잠든 새벽 3시에도 쉬지 않는다.',
         skillDesc: {
-            star1: '자신 공속 버프',
-            star2: '더 강한 공속 버프',
-            star3: '★★★ 매 시전 영구 공속 누적. 시간이 갈수록 미쳐감',
+            star1: '3초간 공속 +50%',
+            star2: '3초간 공속 +50% + 영구 공속 +5% 누적',
+            star3: '3초간 공속 +50% + 영구 공속 +20% 누적 (무한 스택)',
         },
     },
     kol: {
@@ -85,9 +85,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"1000배 간다!" 그의 한 마디에 커뮤니티가 불탑니다.',
         lore: 'Key Opinion Leader — 크립토 트위터의 인플루언서. 팔로워 50만 명에게 "이 코인 1000배 간다"고 외치면 정말 10배는 간다(그리고 99% 빠진다). 광고비는 BTC로만 받으며, 한 마디의 힘으로 아군 전체의 에너지를 충전시킨다.',
         skillDesc: {
-            star1: '주변 아군 마나 소량 충전',
-            star2: '넓은 범위 마나 충전',
-            star3: '★★★ 모든 Social 아군 마나 100% 즉시 충전',
+            star1: '인접 아군 3초간 공속 +20%',
+            star2: '범위 3 아군 3초간 공속 +20%',
+            star3: '모든 Social 아군 마나 100% 즉시 충전',
         },
     },
     gareth: {
@@ -95,9 +95,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '차트만 보면 모든 게 하락장입니다. 영원한 비관론자.',
         lore: '전통 금융 출신의 차트 분석가. 2015년부터 "비트코인 $200으로 간다"고 예측했고, 2025년에도 같은 말을 하고 있다. 그의 비관적 분석은 시장 전체를 느리게 만들지만, 가끔 맞을 때의 임팩트는 어마어마하다.',
         skillDesc: {
-            star1: '다수 적 감속',
-            star2: '더 많은 적 감속 + 지속시간↑',
-            star3: '★★★ 감속 + 트루뎀 디버프',
+            star1: '적 2명 3초간 이속 -30%',
+            star2: '적 3명 3초간 이속 -30% + 트루DMG',
+            star3: '적 4명 감속 -30% + 트루DMG 디버프',
         },
     },
     roubini: {
@@ -105,9 +105,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"암호화폐는 사기다!" 2008년 금융위기를 예언한 둠세이어.',
         lore: '누리엘 루비니 — 2008년 금융위기를 예측하여 "닥터 둠"이란 별명을 얻은 경제학자. 비트코인을 "모든 버블의 어머니"라 불렀고, 의회 청문회에서 크립토를 공개 처형했다. 적의 HP가 클수록 그의 비판도 강력해진다.',
         skillDesc: {
-            star1: 'HP비례 도트 (단일)',
-            star2: 'HP비례 도트 (3체)',
-            star3: '★★★ HP비례 도트 + 최대HP 영구 삭제',
+            star1: 'HP 5%/초 도트 (3초, 단일)',
+            star2: 'HP 5%/초 도트 (3초, 3체)',
+            star3: 'HP 5%/초 도트 + 최대HP 30% 영구 삭제',
         },
     },
     metamask: {
@@ -115,9 +115,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '가스비 폭발! 이더리움 거래의 관문. 매번 수수료에 놀랍니다.',
         lore: '월간 활성 유저 3000만의 이더리움 지갑. 여우 아이콘만 봐도 가스비 PTSD가 온다. NFT 민팅 때 가스비로 $500, 실제 NFT 가격 $50인 적도 있다. 하지만 이 여우 없이는 DeFi 한 발짝도 못 움직인다. 아군의 속도를 높여주는 인프라의 핵심.',
         skillDesc: {
-            star1: '자신+인접 아군 공속↑',
-            star2: '더 넓은 범위 공속↑',
-            star3: '★★★ 강력한 광역 공속 버프',
+            star1: '자신+인접 1명 3초간 공속 +30%',
+            star2: '범위 2 아군 3초간 공속 +30%',
+            star3: '범위 3 아군 3초간 공속 +50%',
         },
     },
     perpdex: {
@@ -125,9 +125,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '100배 레버리지의 세계. 한 방에 부자, 한 방에 거지.',
         lore: 'dYdX, GMX, Hyperliquid — 무기한 선물을 탈중앙화한 프로토콜들. 100배 레버리지로 $100을 $10,000으로 만들 수도, $0으로 만들 수도 있다. 관통 빔처럼 직선으로 뚫고 지나가며, 명중할 때마다 에너지를 수확한다.',
         skillDesc: {
-            star1: '관통 빔 (명중당 마나 회복)',
-            star2: '더 많은 관통 + 마나',
-            star3: '★★★ 대량 관통 + 마나 수확 극대화',
+            star1: '관통 3체 (50% 딜) + 명중당 마나 10 회복',
+            star2: '관통 4체 (50% 딜) + 명중당 마나 15 회복',
+            star3: '관통 5체 (60% 딜) + 명중당 마나 20 회복',
         },
     },
     a16zintern: {
@@ -135,9 +135,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Silicon Valley의 인턴이지만 리서치 능력은 시니어급.',
         lore: 'Andreessen Horowitz(a16z)의 크립토 펀드 인턴. 스탠포드 2학년이지만 DeFi 리서치 리포트는 PhD급이다. 매주 월요일 파트너 미팅에서 프로젝트의 약점을 정확히 찔러 방어를 분쇄한다. 정규직 전환을 위해 오늘도 야근 중.',
         skillDesc: {
-            star1: '다수 적 물방 깎기',
-            star2: '더 많은 적 방깎',
-            star3: '★★★ 광역 방깎 + 스턴',
+            star1: '적 1명 방어력 -5 (4초)',
+            star2: '적 2명 방어력 -5 (4초)',
+            star3: '적 3명 방어력 -8 + 0.5초 스턴',
         },
     },
     cramer: {
@@ -145,9 +145,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"이 종목은 매수!" 라고 하면 100% 폭락. 인버스 크레이머의 법칙.',
         lore: '짐 크레이머 — CNBC Mad Money 진행자. "이 주식 사세요!" 하면 반드시 폭락하고, "팔아!" 하면 급등한다. 인버스 크레이머 ETF가 실제로 만들어질 뻔했다. 적을 얼리고 경로를 역주행시키는 역설의 달인.',
         skillDesc: {
-            star1: '다수 적 빙결',
-            star2: '더 많은 적 빙결',
-            star3: '★★★ 빙결 + 적 경로 역주행',
+            star1: '적 1명 1.5초 빙결 (이속 -90%)',
+            star2: '적 2명 1.5초 빙결',
+            star3: '적 3명 2초 빙결 + 경로 역주행',
         },
     },
     curve: {
@@ -155,9 +155,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '스테이블코인 스왑의 왕. 곡선이 아름답습니다.',
         lore: 'Curve Finance — 스테이블코인 거래에 최적화된 AMM. 마이클 에고로프가 만든 수학적 보닝 커브는 슬리피지를 최소화한다. CRV 토큰 워의 주인공이며, Convex와의 거버넌스 전쟁은 DeFi 역사의 한 페이지. 곡선의 아름다움으로 적을 느리게 만든다.',
         skillDesc: {
-            star1: '광역 슬로우',
-            star2: '강화된 슬로우',
-            star3: '★★★ 광역 슬로우 + 아군 마나 리젠',
+            star1: '광역 폭발 3체 (40% 딜)',
+            star2: '광역 폭발 4체 (50% 딜)',
+            star3: '광역 폭발 5체 (60% 딜) + 마나 리젠',
         },
     },
 
@@ -169,9 +169,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '거래소는 항상 승리합니다. 출금 수수료는 별도.',
         lore: '제시 파웰 — Kraken 거래소 창립자. 2011년 Mt.Gox 해킹 수습을 도운 뒤 자신의 거래소를 세웠다. 극단적인 자유주의자로 직원들에게도 표현의 자유를 강조해 논란을 일으켰다. 킬 시 골드를 뜯어내는 수수료의 달인.',
         skillDesc: {
-            star1: '200 버스트 딜. 킬 시 +1G',
-            star2: '450 딜. 킬 시 1G + 마나 30 페이백',
-            star3: '★★★ 1200 딜. 킬 시 2G + 마나 100% → 연속 시전',
+            star1: '버스트 200 DMG + 킬 시 +1G',
+            star2: '버스트 450 DMG + 킬 시 +1G',
+            star3: '버스트 1200 DMG + 킬 시 +2G + 마나 100% 환급',
         },
     },
     wonyotti: {
@@ -179,9 +179,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '풀시드 롱으로 전설이 된 트레이더. 확신의 올인.',
         lore: '원요띠 — 한국 크립토 커뮤니티의 전설적 트레이더. 풀시드 레버리지 롱으로 수십억을 벌었다는 소문과 함께 확신이 있으면 올인이라는 철학으로 추종자를 모았다. 가장 강한 아군을 골라 공속을 끌어올리는 코칭의 달인.',
         skillDesc: {
-            star1: '가장 강한 아군 공속↑',
-            star2: '더 강한 버프',
-            star3: '★★★ 최강 아군 공속 대폭↑',
+            star1: '최강 아군 4초간 공속 +40%',
+            star2: '최강 아군 4초간 공속 +60%',
+            star3: '최강 아군 공속 +80% + 스플래시 50%',
         },
     },
     hsaka: {
@@ -189,9 +189,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '크립토 윈터의 화신. HP 50% 이하 적에게 2배 딜.',
         lore: '크립토 트위터의 전설적 트레이더. 본명은 알려져 있지 않으며, 시장의 바닥을 정확히 잡아내는 것으로 유명하다. 크립토 윈터에 가장 활발하게 활동하며, HP가 낮은 적에게 치명적인 보너스 딜을 넣는다.',
         skillDesc: {
-            star1: '다수 적 빙결 + 빙결 적 보너스 딜',
-            star2: '더 많은 빙결 + 긴 지속',
-            star3: '★★★ 대량 빙결 + 빙결 적 추가딜 극대화',
+            star1: '적 1명 2초 빙결 + 빙결 중 DMG +20%',
+            star2: '적 2명 2초 빙결 + 빙결 중 DMG +30%',
+            star3: '적 3명 빙결 + HP 10% 쇄빙 폭발',
         },
     },
     jackdorsey: {
@@ -199,9 +199,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '트위터를 만들고 비트코인에 올인한 남자.',
         lore: '잭 도시 — 트위터(X) 공동 창립자. 2021년 CEO에서 물러난 뒤 비트코인 맥시멀리스트가 되었다. Block을 통해 비트코인 결제와 채굴 하드웨어까지 만들고 있다. 번개처럼 체인을 이으며 감전 장판을 깔아놓는다.',
         skillDesc: {
-            star1: '체인 라이트닝',
-            star2: '더 많은 체인',
-            star3: '★★★ 체인 + 감전 DoT + 아군 마나 회복',
+            star1: '체인 3회 (35% 딜) + 감전 장판',
+            star2: '체인 4회 (40% 딜) + 감전 장판',
+            star3: '체인 5회 (50% 딜) + 감전 장판 강화',
         },
     },
     jessepollak: {
@@ -209,9 +209,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Base 체인의 아버지. 온체인 경제를 꿈꾸는 빌더.',
         lore: '제시 폴락 — Coinbase에서 Base 체인을 만든 빌더. 온체인이 뉴 온라인이라는 모토로 이더리움 L2를 대중화했다. 포크가 아닌 순수 빌딩으로 DeFi 생태계 전체의 속도를 올리는 촉매제.',
         skillDesc: {
-            star1: '체인 딜 + DeFi 아군 공속↑',
-            star2: '더 많은 체인 + 강한 버프',
-            star3: '★★★ 대량 체인 + DeFi 팀 전체 공속 폭↑',
+            star1: '체인 3회 (35% 딜) + DeFi 아군 DMG +10% (2초)',
+            star2: '체인 4회 + DeFi DMG +15%',
+            star3: '체인 5회 + DeFi 아군 공속 +30%',
         },
     },
     halfinney: {
@@ -219,9 +219,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '최초의 비트코인 수신자. 사토시가 보낸 첫 거래의 주인공.',
         lore: '할 피니 — 비트코인 역사의 가장 중요한 인물 중 하나. 2009년 사토시가 보낸 최초의 비트코인 거래를 받은 사람. PGP 2.0 개발에 참여했고, 루게릭병으로 2014년 사망 후 냉동보존됨. 비트코인 아군 전체의 기반을 강화하는 시조새.',
         skillDesc: {
-            star1: '₿ 아군 공속↑',
-            star2: '더 강한 ₿ 팀 버프',
-            star3: '★★★ 모든 ₿ 유닛 공속 대폭↑',
+            star1: '인접 ₿ 아군 사거리 +1',
+            star2: '범위 2 ₿ 아군 사거리 +1',
+            star3: '전체 ₿ 아군 사거리 무한',
         },
     },
     kashkari: {
@@ -229,9 +229,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '금리 인상의 화신. "인플레이션은 일시적"이라는 거짓말.',
         lore: '닐 카시카리 — 미니애폴리스 연준 총재. 2008년 금융위기 때 7000억 달러 TARP 프로그램을 관리했다. 금리 인상을 외치며 모든 자산시장을 얼려버리는 규제의 냉기.',
         skillDesc: {
-            star1: '광역 슬로우',
-            star2: '전체 슬로우',
-            star3: '★★★ 전체 빙결 + 골드 보너스',
+            star1: '적 2명 3초간 이속 -40%',
+            star2: '적 3명 3초간 이속 -40%',
+            star3: '전체 적 3초 완전 빙결 + 킬 시 +1G',
         },
     },
     kris: {
@@ -239,9 +239,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Crypto.com의 CEO. "Fortune favors the brave."',
         lore: '크리스 마르스잘렉 — Crypto.com CEO. 맷 데이먼의 Fortune Favors the Brave 광고로 유명. LA 레이커스 경기장 이름까지 바꿨다. 쿠폰 남발 후 돌연 이율을 깎아 유저들의 분노를 샀다. 보유 골드에 비례해 딜이 폭발한다.',
         skillDesc: {
-            star1: '버스트 딜 + 킬골드',
-            star2: '강화된 버스트',
-            star3: '★★★ 보유 골드 비례 추가 딜 폭발',
+            star1: '버스트 150 DMG + 킬 시 +1G',
+            star2: '버스트 300 DMG + 킬 시 +1G',
+            star3: '버스트 600 DMG + 킬 시 +2G + 보유골드×2 보너스 DMG',
         },
     },
     cdixon: {
@@ -249,9 +249,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"Read Write Own" — Web3의 철학을 설파하는 VC의 거물.',
         lore: '크리스 딕슨 — a16z Crypto 총괄. Read Write Own 저서로 Web3의 철학을 대중에게 전파했다. 블로그 하나하나가 크립토 VC의 교과서. 아군의 크리티컬 능력을 극대화하는 이론가.',
         skillDesc: {
-            star1: '범위 내 아군 크리/공속↑',
-            star2: '더 넓은 버프 범위',
-            star3: '★★★ 대범위 크리 버프 극대화',
+            star1: '범위 3 아군 3초간 크리확률 +15%',
+            star2: '범위 3 아군 3초간 크리확률 +25%',
+            star3: '범위 3 아군 3초간 크리확률 +35% + 확정 크리',
         },
     },
     opensea: {
@@ -259,9 +259,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'NFT 마켓플레이스의 왕좌. 민팅 수수료가 곧 힘.',
         lore: 'NFT 거래량의 90%를 점유한 마켓플레이스. 2021~22년 최전성기에 기업가치 130억 달러를 달성했지만, NFT 붕괴와 함께 95% 추락. 아군의 가치를 발굴하고 딜을 높여주는 큐레이터.',
         skillDesc: {
-            star1: '최강 아군 1명 딜↑',
-            star2: '2명 딜↑',
-            star3: '★★★ 다수 아군 딜 대폭↑',
+            star1: '아군 1명 3초간 DMG +20%',
+            star2: '아군 2명 3초간 DMG +30%',
+            star3: '아군 3명 3초간 DMG +40% + 크리 확정',
         },
     },
     craigwright: {
@@ -269,9 +269,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"나는 사토시다!" 자칭 비트코인 창시자. 소송이 취미.',
         lore: '크레이그 라이트 — 나는 사토시 나카모토다라고 수년간 주장한 호주 컴퓨터 과학자. 2024년 영국 법원에서 공식 사토시가 아니다 판결. 소송만 수십 건 제기한 소송왕. 남의 스킬을 베끼는 표절의 달인.',
         skillDesc: {
-            star1: 'DoT + 방깎',
-            star2: '3체 DoT + 방깎',
-            star3: '★★★ DoT+방깎 + 최강 아군 스킬 50% 복사딜',
+            star1: '적 1명 HP 5%/초 도트 (3초) + 방어력 -5',
+            star2: '적 2명 도트 + 방어력 -8',
+            star3: '적 3명 도트 + 방어력 -10 + 스킬 표절',
         },
     },
     daniele: {
@@ -279,9 +279,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Wonderland의 몰락. 리베이스 토큰의 꿈과 악몽.',
         lore: '다니엘레 세스타 — Wonderland(TIME) 프로젝트 리더. 리베이스 토큰으로 APY 80,000%를 약속하며 10억 달러를 모았지만, 재무 담당이 전과자였음이 밝혀지며 붕괴. 관통하며 HP를 되감는 시간의 조종자.',
         skillDesc: {
-            star1: '관통 빔',
-            star2: '더 많은 관통',
-            star3: '★★★ 관통 + maxHP 20% 트루뎀 폭발',
+            star1: '관통 2체 (60% 딜)',
+            star2: '관통 3체 (60% 딜)',
+            star3: '관통 4체 (70% 딜) + HP 3초 전 상태로 되감기',
         },
     },
     ruja: {
@@ -289,9 +289,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '원코인 사기로 40억 달러를 들고 사라진 크립토 퀸. FBI 수배 1순위.',
         lore: '루자 이그나토바 — 원코인 창립자. 40억 달러 이상을 사기로 모은 뒤 2017년 사라졌다. FBI 10대 수배 명단에 올라 있으며 현재까지 행방불명. 골드를 무에서 창조하는 연금술사.',
         skillDesc: {
-            star1: '킬 시 골드 획득',
-            star2: '더 많은 골드',
-            star3: '★★★ 대량 골드 + 주변 아군 버프',
+            star1: '관통 1체 (45% 딜)',
+            star2: '관통 2체 (50% 딜)',
+            star3: '관통 3체 (55% 딜) + 킬 시 +2G',
         },
     },
 
@@ -303,9 +303,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '100배 레버리지 롱을 쳤다가 전 재산이 증발. 이제 남의 숨통을 끊는 데 집착합니다.',
         lore: 'REKT — 크립토 레버리지 트레이딩의 희생자를 총칭하는 밈. 100배 롱에 5% 빠지면 전 재산 증발. 2022년 루나 사태 때만 수십억 달러가 청산됐다. 그 분노로 HP 낮은 적을 연쇄 처형하는 복수귀.',
         skillDesc: {
-            star1: 'HP 20% 이하 즉사. 마나 50% 환급',
-            star2: 'HP 23% 이하 즉사. 마나 ~100% 환급',
-            star3: '★★★ HP 26% 이하 전체 스캔 연쇄 처형! 킬 시 마나 100% → 무한 난사',
+            star1: 'HP 20% 이하 적 즉사 + 마나 50% 환급',
+            star2: 'HP 25% 이하 적 즉사 + 마나 50% 환급',
+            star3: 'HP 30% 이하 적 즉사 + 마나 100% → 무한 연쇄 처형',
         },
     },
     wintermute: {
@@ -313,9 +313,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '알고리즘 마켓 메이커. 유동성의 지배자.',
         lore: '윈터뮤트 — 런던 기반 알고리즘 마켓메이커. 2022년 해킹으로 1.6억 달러를 잃고도 살아남은 생존력의 상징. CEX와 DEX 양쪽에서 유동성을 공급하며, 스플래시 딜처럼 넓은 범위에 동시 영향을 미치는 시장의 거인.',
         skillDesc: {
-            star1: '스플래시 50% (3체)',
-            star2: '더 넓은 스플래시',
-            star3: '★★★ 스플래시 + 전체 적 HP 50% 삭제',
+            star1: '스플래시 3체 (50% 딜)',
+            star2: '스플래시 4체 (60% 딜)',
+            star3: '스플래시 5체 (70% 딜) + 대상 HP 50% 삭제',
         },
     },
     akang: {
@@ -323,9 +323,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '풀 레버리지 숏으로 유명한 트레이더. 공매도의 달인.',
         lore: '에이캉 — 크립토 트위터에서 공매도로 유명한 트레이더. 레버리지 숏 포지션으로 시장 하락에 베팅하며, 정확한 타이밍으로 수익을 올렸다. 적을 얼리고 마나통까지 축소시키는 냉혈한 숏셀러.',
         skillDesc: {
-            star1: '3체 빙결',
-            star2: '4체 빙결',
-            star3: '★★★ 5체 빙결 + 영구 maxMana 축소 → 스킬 가속',
+            star1: '적 3명 2초 빙결 (이속 -90%)',
+            star2: '적 4명 2.5초 빙결',
+            star3: '적 5명 3초 빙결 + maxMana 영구 축소',
         },
     },
     andre: {
@@ -333,9 +333,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Yearn Finance 창시자. "I test in prod." 프로덕션에서 테스트하는 광인.',
         lore: '앙드레 크로녜 — Yearn Finance 창시자. 남아공 출신 개발자로 I test in prod라는 파격적 철학으로 유명. 몇 번이나 은퇴를 선언했다가 복귀했다. DeFi 프로토콜을 마법처럼 만들어내는 천재.',
         skillDesc: {
-            star1: '체인 라이트닝',
-            star2: '더 많은 체인',
-            star3: '★★★ 대량 체인 + DeFi 시너지 극대화',
+            star1: '증폭 체인 3회 (매 타격 DMG +20%)',
+            star2: '증폭 체인 4회 (매 타격 DMG +25%)',
+            star3: '증폭 체인 6회 (매 타격 DMG +30%)',
         },
     },
     simon: {
@@ -343,9 +343,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '시드 투자의 귀재. 남들이 못 보는 가치를 찾아냅니다.',
         lore: '시몬 — 크립토 시드 투자의 귀재. 남들이 주목하지 않는 초기 프로젝트에서 100배 수익을 뽑아낸다. 그의 확정 크리는 정밀한 분석에서 나오며, 아군 전체의 전투력을 영구적으로 끌어올린다.',
         skillDesc: {
-            star1: '고배율 확정 크리',
-            star2: '더 높은 크리 배율',
-            star3: '★★★ 초고배율 크리 + 모든 아군 영구 공격력↑',
+            star1: '확정 크리 (×3.0 DMG)',
+            star2: '확정 크리 (×4.0 DMG)',
+            star3: '확정 크리 (×5.0 DMG) + 아군 전체 영구 DMG +10%',
         },
     },
     peterschiff: {
@@ -353,9 +353,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '비트코인 부정론자이자 금 매니아. "비트코인은 디지털 거품!"',
         lore: '피터 쉬프 — 금 투자 전문가이자 비트코인의 영원한 적. 아들은 비트코인에 올인했지만 아버지는 끝까지 금을 고수. 비트코인은 디지털 튤립이라는 지론은 2010년부터 변하지 않았다. 적을 황금동상으로 굳혀버린다.',
         skillDesc: {
-            star1: '다수 기절',
-            star2: '더 많은 기절',
-            star3: '★★★ 5초 황금동상 기절 + 방깎',
+            star1: '적 1명 1.5초 스턴',
+            star2: '적 2명 2초 스턴',
+            star3: '적 1명 5초 황금동상 기절 + 방어력 -15 + 킬 시 +3G',
         },
     },
     rogerver: {
@@ -363,9 +363,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"비트코인 캐시가 진짜 비트코인이다!" 영원한 분쟁의 중심.',
         lore: '로저 버 — 비트코인 예수에서 비트코인 캐시의 수호자로. 초기 비트코인 전도사였으나 블록 크기 전쟁에서 BCH를 선택해 커뮤니티와 결별했다. 2024년 세금 사기로 체포. 관통하며 적을 밀어내는 포크의 힘.',
         skillDesc: {
-            star1: '관통 빔',
-            star2: '더 많은 관통',
-            star3: '★★★ 전체 적 넉백 + 기절',
+            star1: '관통 3체 (60% 딜)',
+            star2: '관통 4체 (60% 딜) + 넉백',
+            star3: '관통 5체 (70% 딜) + 전체 넉백',
         },
     },
     cathie: {
@@ -373,9 +373,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'ARK Invest의 CEO. "혁신은 과소평가된다."',
         lore: '캐시 우드 — ARK Invest CEO. 혁신에 투자한다는 철학으로 파괴적 기술 기업에 집중. 2020~21년 전설적 수익률 후 2022년 -75% 추락. 5년 뒤를 본다며 흔들리지 않는다.',
         skillDesc: {
-            star1: '고딜 저격',
-            star2: '강화 저격',
-            star3: '★★★ 초강력 저격 + 방무시',
+            star1: '최후방 적 저격 (확정 크리)',
+            star2: '최후방 적 저격 (확정 크리 ×2.0)',
+            star3: '최후방 적 저격 (확정 크리 ×3.0) + 방무시',
         },
     },
     warren: {
@@ -383,9 +383,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"암호화폐 산업을 규제해야 합니다!" 크립토의 영원한 적.',
         lore: '엘리자베스 워런 — 미국 상원의원. Anti-Crypto Army를 자처하며 크립토 규제 법안을 주도. DeFi를 탈세와 자금세탁의 도구라 비판한다. 적 전체를 약화시키는 규제의 철퇴.',
         skillDesc: {
-            star1: '적 디버프',
-            star2: '광역 디버프',
-            star3: '★★★ 전체 적 약화',
+            star1: '적 1명 HP 3%/초 도트 (3초) + 이속 -25% (2초)',
+            star2: '적 2명 도트 + 이속 -30%',
+            star3: '적 3명 도트 + 이속 -40%',
         },
     },
     cobie: {
@@ -393,9 +393,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'CT(크립토 트위터)의 인플루언서. 내부 정보의 달인.',
         lore: '코비(조던 피시) — 크립토 트위터의 최고 인플루언서. UpOnly 팟캐스트로 유명하며, 내부 정보를 누구보다 빨리 입수한다는 소문. 한 방에 결판내는 정보전의 달인.',
         skillDesc: {
-            star1: '단일 강타',
-            star2: '강화된 강타',
-            star3: '★★★ 초강력 강타 + 보너스 효과',
+            star1: '아군 1명 3초간 공속 +25%',
+            star2: '아군 1명 3초간 공속 +40%',
+            star3: '아군 2명 3초간 공속 +50%',
         },
     },
     gcr: {
@@ -403,9 +403,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '크립토 최고의 트레이더. 시장의 흐름을 읽는 초능력자.',
         lore: 'GCR(Giancarlo) — 크립토 역사상 가장 수익률이 높은 트레이더 중 하나. 루나 숏으로 수천만 달러를 벌었고, 시장의 구조적 약점을 찾아 베팅한다. 그의 예언은 거의 빗나가지 않는다.',
         skillDesc: {
-            star1: '강력한 일격',
-            star2: '더 강한 일격',
-            star3: '★★★ 초월적 딜 + 특수 효과',
+            star1: '거리비례 관통 3체 (거리당 DMG +10%)',
+            star2: '관통 4체 (거리당 DMG +15%)',
+            star3: '관통 5체 (거리당 DMG +20%) + 반사 빔',
         },
     },
     heart: {
@@ -413,9 +413,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'HEX 창시자. "최고의 투자 기회!" 논란의 아이콘.',
         lore: '리처드 하트 — HEX 토큰 창시자. 역사상 최고의 투자 기회라고 자칭하며 수십억 달러를 모았다. 람보르기니와 세계 최대 다이아몬드를 과시하는 마케팅의 제왕. SEC 사기 혐의로 소송 중.',
         skillDesc: {
-            star1: '버스트 딜',
-            star2: '강화된 버스트',
-            star3: '★★★ 초고딜 버스트',
+            star1: '3번째 공격마다 체인 1회 (40% 딜)',
+            star2: '3번째 공격마다 체인 2회 (45% 딜)',
+            star3: '3번째 공격마다 체인 3회 (50% 딜)',
         },
     },
     chefnomi: {
@@ -423,9 +423,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'SushiSwap 개발자금을 들고 튄 전설의 셰프. 나중에 돌려줬습니다.',
         lore: '셰프 노미 — SushiSwap 익명 개발자. 2020년 UniSwap 포크 후 개발자 기금 1400만 달러를 무단 인출해 러그풀 비난을 받았다. 이후 전액 반환하며 DeFi 역사에 독특한 족적을 남겼다.',
         skillDesc: {
-            star1: '딜 + 골드',
-            star2: '강화된 딜',
-            star3: '★★★ 고딜 + 골드 보너스',
+            star1: '3번째 공격마다 체인 1회 + HP 2%/초 도트 (2초)',
+            star2: '3번째 공격마다 체인 2회 + 도트',
+            star3: '3번째 공격마다 체인 3회 + 도트 강화',
         },
     },
     burry: {
@@ -433,9 +433,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '2008년 서브프라임 위기를 예측한 전설의 투자자.',
         lore: '마이클 버리 — 2008년 서브프라임 모기지 붕괴를 예측, 빅쇼트로 전설이 된 투자자. 영화 주인공이기도 하다. 크립토에 회의적이지만, 그의 분석력은 어떤 방어도 무시하는 정밀 저격 그 자체.',
         skillDesc: {
-            star1: '강력한 저격',
-            star2: '더 강한 저격',
-            star3: '★★★ 초강력 저격 + 방무시',
+            star1: 'HP 50% 이하 적 우선 + DMG ×1.8',
+            star2: 'HP 50% 이하 적 DMG ×2.5',
+            star3: 'HP 50% 이하 적 DMG ×3.5 + 방무시 100%',
         },
     },
 
@@ -447,9 +447,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"비트코인 10만 불!" 100억$ 펀드를 공중분해시킨 남자.',
         lore: '주수 — Three Arrows Capital(3AC) 공동 창립자. 100억 달러 규모 펀드를 운영했으나 루나/테라 붕괴로 파산. 수십 개 프로토콜을 연쇄 파산시킨 크립토 역사상 최대 규모 블랙홀. 싱가포르에서 체포됨.',
         skillDesc: {
-            star1: '반경 2칸 몹몰이 + 폭발',
-            star2: '2초 흡입 + 대폭발',
-            star3: '★★★ 전체 흡입 + 3000 트루딜 + 3초 영구기절',
+            star1: '블랙홀 흡입 (1초) + 400 DMG 대폭발',
+            star2: '블랙홀 (1.5초) + 800 DMG',
+            star3: '블랙홀 (2초) + 1500 DMG + 3초 영구기절',
         },
     },
     balaji: {
@@ -457,9 +457,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"비트코인 90일 안에 100만 달러 간다!" 백만불 베팅의 남자.',
         lore: '발라지 스리니바산 — 전 Coinbase CTO. 2023년 비트코인 90일 안에 100만 달러에 100만 달러를 베팅했다가 졌다. 네트워크 국가 개념의 창시자. 최고HP 적을 정조준하는 이론가.',
         skillDesc: {
-            star1: '최고HP 적 3연사',
-            star2: '딜 2배 + 방무시 50%',
-            star3: '★★★ 딜 4배 + 방무시 100% → 보스 킬러',
+            star1: '저격 3발 (×1.0 DMG)',
+            star2: '저격 4발 (×1.5 DMG)',
+            star3: '저격 5발 (×2.0 DMG) + 방무시 100% + 킬 시 마나 100%',
         },
     },
     anatoly: {
@@ -467,9 +467,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Solana 창시자. 네트워크 지연은 특기가 아니라 설계입니다(?)',
         lore: '아나톨리 야코벤코 — Solana 창시자. 퀄컴 출신 엔지니어로 세계에서 가장 빠른 블록체인을 만들었지만, 네트워크가 너무 자주 멈춰서 밈이 되었다. 다운타임도 기능이라는 농담의 주인공.',
         skillDesc: {
-            star1: '다수 기절',
-            star2: '더 많은 기절 + 지속↑',
-            star3: '★★★ 전체 적 4초 빙결 (시간 정지)',
+            star1: '적 1명 1초 스턴',
+            star2: '적 2명 2초 스턴',
+            star3: '전체 적 4초 시간 정지 (완전 빙결)',
         },
     },
     lazarus: {
@@ -477,9 +477,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '북한 해킹 그룹. 수십억 달러의 암호화폐를 탈취한 유령.',
         lore: '라자루스 그룹 — 북한 정찰총국 산하 해킹 조직. 2016년 방글라데시 중앙은행부터 2022년 로닌 브릿지까지, 총 수십억 달러의 암호화폐를 탈취했다. 유령처럼 공격하고 기지까지 힐하는 최종 병기.',
         skillDesc: {
-            star1: '광역 기절 + DoT',
-            star2: '더 넓은 기절',
-            star3: '★★★ 기절+DoT + 기지HP 회복',
+            star1: '적 3명 2초 스턴 + HP 4%/초 도트 (3초)',
+            star2: '적 4명 2.5초 스턴 + 도트',
+            star3: '적 5명 3초 스턴 + 도트 + 기지HP 2 회복',
         },
     },
     marc: {
@@ -487,9 +487,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'a16z 수장. "소프트웨어가 세상을 집어삼킨다."',
         lore: '마크 앤드리슨 — 넷스케이프 창시자이자 a16z 공동 창립자. 소프트웨어가 세상을 집어삼킨다는 명언의 주인공. 크립토에 수십억 달러를 투자한 실리콘밸리의 킹메이커.',
         skillDesc: {
-            star1: '체인 라이트닝',
-            star2: '체인 + 방깎',
-            star3: '★★★ 체인 + 자동 포탑 소환 + 마나 충전',
+            star1: '체인 3회 (45% 딜)',
+            star2: '체인 4회 (50% 딜)',
+            star3: '체인 5회 + 자동 포탑 소환 + 마나 충전',
         },
     },
     hayden: {
@@ -497,9 +497,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Uniswap 창시자. AMM의 혁명을 일으킨 유니콘.',
         lore: '헤이든 애덤스 — Uniswap 창시자. 기계공학 전공이었으나 실직 후 이더리움을 배워 AMM의 혁명을 일으켰다. x*y=k 공식으로 DEX의 표준을 만들었다. 체인 딜과 HP 스왑은 토큰 스왑의 은유.',
         skillDesc: {
-            star1: '체인 딜',
-            star2: '더 많은 체인',
-            star3: '★★★ 체인 + 최고HP↔최저HP 적 HP% 스왑',
+            star1: '체인 3회 (40% 딜) + 마방 무시',
+            star2: '체인 4회 (50% 딜) + 마방 무시',
+            star3: '체인 5회 + 최고HP↔최저HP 적 HP% 스왑',
         },
     },
     gavin: {
@@ -507,9 +507,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Polkadot 창시자. 이더리움 공동 창립자.',
         lore: '개빈 우드 — 이더리움 공동 창립자이자 Polkadot 창시자. 솔리디티 언어를 만들었고 이더리움 황서를 작성했다. 이더리움을 떠나 크로스체인 생태계를 구축중. 적의 마법 방어를 분쇄하는 기술의 아버지.',
         skillDesc: {
-            star1: '단일 적 마방 깎기',
-            star2: '더 많은 마방깎',
-            star3: '★★★ 대량 마방 분쇄',
+            star1: '인접 아군 1명 스킬 2연속 (50% DMG)',
+            star2: '인접 아군 2명 스킬 2연속',
+            star3: '전체 아군 스킬 2연속',
         },
     },
     stani: {
@@ -517,9 +517,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'AAVE 창시자. 탈중앙 대출의 새 시대를 열었습니다.',
         lore: '스타니 쿨레초프 — Aave 창시자. 핀란드 법대생이었으나 DeFi에 빠져 탈중앙 대출 플랫폼을 만들었다. 플래시론이라는 혁신적 개념을 도입했다. 적의 방어를 흡수해 아군 전체의 원기옥을 날린다.',
         skillDesc: {
-            star1: '적 방어력 흡수',
-            star2: '더 많은 흡수',
-            star3: '★★★ 방어 흡수 + 전아군 DMG 합산 원기옥!',
+            star1: '3번째 공격마다 방어력 -10 (4초)',
+            star2: '3번째 공격마다 방어력 -15 (4초)',
+            star3: '3번째 공격마다 방어력 -20 + 아군 전체 DMG 합산 원기옥',
         },
     },
 
@@ -531,9 +531,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '회사 빚을 내서라도 비트코인을 무한 추매(HODL). 수량만이 전부.',
         lore: '마이클 세일러 — MicroStrategy CEO. 회사 자금과 빚으로 비트코인을 15만 개 이상 매입한 역사상 가장 큰 기업 비트코인 홀더. 비트코인은 사이버 부동산이라 부르며, 팔지 않고 영원히 산다. 킬할 때마다 영구적으로 강해지는 무한 성장의 화신.',
         skillDesc: {
-            star1: '킬 시 영구 스킬DMG +15 누적',
-            star2: '킬 시 영구 +40 누적',
-            star3: '★★★ 킬 시 +100 누적 + 평타에 누적딜 스플래시',
+            star1: '관통 2체 (70% 딜)',
+            star2: '관통 3체 (80% 딜)',
+            star3: '관통 4체 + 킬 시 영구 DMG +100 누적 + 스플래시',
         },
     },
     dokwon: {
@@ -541,9 +541,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '연 이율 20%를 보장한다며 전 세계를 홀린 남자. 루나 사태의 주범.',
         lore: '권도형 — Terraform Labs 창시자. 알고리즘 스테이블코인 UST와 루나로 400억 달러 생태계를 구축했으나, 2022년 5월 디페깅으로 전부 붕괴. 몬테네그로에서 도주 중 체포. 시한폭탄처럼 아군 딜을 모아 한 방에 터뜨린다.',
         skillDesc: {
-            star1: '3초 뒤 폭발. 아군 딜 30% 누적 합산',
-            star2: '60% 누적 합산 폭발',
-            star3: '★★★ 150% 누적 + 4자탄 연쇄 대폭발',
+            star1: 'HP 3%/초 도트 (3초) + 방무시 100%',
+            star2: 'HP 4%/초 도트 (4초) + 방무시',
+            star3: 'HP 5%/초 도트 (5초) + 방무시 + 아군 딜 ×10 원기옥 축적',
         },
     },
     sbf: {
@@ -551,9 +551,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'FTX 붕괴의 주범. 고객 자금으로 도박한 천재 사기꾼.',
         lore: '샘 뱅크먼-프리드 — FTX 거래소 창립자. MIT 출신 천재로 포장됐지만, 고객 수십억 달러를 알라메다 리서치에 빼돌렸다. 바하마에서 LOL하며 증언했고, 징역 25년. FTT 담보 무한 레버리지가 방깎+스턴의 모티브.',
         skillDesc: {
-            star1: '방어력 깎기 + 스턴',
-            star2: '더 강한 방깎',
-            star3: '★★★ 대량 방깎 + 장기 스턴',
+            star1: '3번째 공격마다 방어력 -12 (4초) + 0.5초 스턴',
+            star2: '3번째 공격마다 방어력 -18 + 0.8초 스턴',
+            star3: '3번째 공격마다 방어력 -25 + 1초 스턴 + 장기 방깎 8초',
         },
     },
     justinsun: {
@@ -561,9 +561,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'TRON 창시자. 과대광고의 달인. "Just wait!"',
         lore: '저스틴 선 — TRON 창시자. 잭 마의 대학 출신으로 자칭 아이돌 기업가. 워런 버핏과의 점심에 $4.6M을 냈고, 3억 달러 바나나 아트를 먹었다. 과대광고의 제왕이며, 적의 HP를 %로 깎아내린다.',
         skillDesc: {
-            star1: '적 HP% 비례 피해 (3체)',
-            star2: '더 많은 HP% 피해',
-            star3: '★★★ 전체 적 HP% 삭제',
+            star1: '4번째 공격마다 주변 적 1.2초 빙결 (이속 -15%)',
+            star2: '4번째 공격마다 1.5초 빙결 범위↑',
+            star3: '4번째 공격마다 2초 빙결 + 적 HP 50% 삭제',
         },
     },
     hayes: {
@@ -571,9 +571,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'BitMEX 창시자. "100배 레버리지가 진짜 크립토다."',
         lore: '아서 헤이즈 — BitMEX 공동 창립자. 100배 레버리지 영구선물을 대중화한 장본인. 2020년 CFTC 기소로 미국을 떠났지만 블로그로 크립토 매크로 분석의 교주가 됐다. 리스크를 즐기는 갬블러.',
         skillDesc: {
-            star1: '확률적 고딜',
-            star2: '더 높은 확률 + 딜',
-            star3: '★★★ 초고확률 극딜',
+            star1: '3번째 공격 ×2.5 DMG (딜레이 0.5초)',
+            star2: '3번째 공격 ×3.5 DMG',
+            star3: '3번째 공격 ×5.0 DMG + 80% 확률 크리',
         },
     },
     etf: {
@@ -581,9 +581,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '기관 자금의 물결. 월스트리트가 크립토에 올인한 순간.',
         lore: '2024년 1월, SEC가 비트코인 현물 ETF 11개를 동시 승인하며 역사적 순간이 도래. 블랙록, 피델리티 등 월스트리트 거인들이 크립토에 본격 진입했다. 무한 관통하며 기존 금융의 벽을 허무는 기관 자금의 물결.',
         skillDesc: {
-            star1: '관통 빔',
-            star2: '딜 2배 관통',
-            star3: '★★★ 무한 관통 + 빔 강도 누적 + 마나 자급',
+            star1: '관통 5체 (70% 딜)',
+            star2: '관통 7체 (80% 딜)',
+            star3: '무한 관통 (90% 딜) + 마나 자급',
         },
     },
     armstrong: {
@@ -591,9 +591,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Coinbase CEO. 규제와 싸우는 합법 크립토의 수호자.',
         lore: '브라이언 암스트롱 — Coinbase CEO. 에어비앤비 출신으로 2012년 거래소를 창립, 2021년 나스닥 직상장으로 역사를 썼다. SEC와 정면으로 맞서며 합법 크립토의 수호자를 자처한다.',
         skillDesc: {
-            star1: '강력한 버스트',
-            star2: '더 강한 버스트',
-            star3: '★★★ 초강력 버스트 + 팀 버프',
+            star1: '관통 1체 (55% 딜)',
+            star2: '관통 2체 (65% 딜)',
+            star3: '관통 3체 (75% 딜) + 팀 버프',
         },
     },
     jeff: {
@@ -601,9 +601,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '속도가 곧 정의. 누구보다 빠르게.',
         lore: '제프 — 속도에 미친 크립토 트레이더. 누구보다 빠르게 포지션을 잡고 빠르게 빠진다. 밀리초 단위의 집행 속도가 그의 무기이며, 시장이 움직이기 전에 이미 수익을 확정짓는다.',
         skillDesc: {
-            star1: '빠른 연타',
-            star2: '더 빠른 연타',
-            star3: '★★★ 초고속 연타 + 특수 효과',
+            star1: '적 8마리 이상 시 관통 +1',
+            star2: '적 8마리+ 관통 +2, 12마리+ 관통 +3',
+            star3: '적 8마리+ 관통 +3, 12마리+ 관통 +5 + 초고속 연타',
         },
     },
     aave: {
@@ -611,9 +611,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '플래시 론의 원조. 0초 만에 빌리고 갚는 DeFi의 핵심.',
         lore: 'Aave — 핀란드어로 유령을 뜻하는 DeFi 대출 프로토콜. TVL 100억 달러 이상의 DeFi 대들보. 플래시론으로 한 트랜잭션 안에서 빌리고 갚는 혁신을 도입했다. 적의 방어를 유령처럼 흡수해 원기옥으로 되돌려준다.',
         skillDesc: {
-            star1: '방어력 흡수',
-            star2: '방어+마방 흡수',
-            star3: '★★★ 전아군 DMG 합산 ×10 → 원기옥 폭발!',
+            star1: '적 2명 방어력 30% 흡수',
+            star2: '적 3명 방어력 40% 흡수',
+            star3: '적 4명 방어력 50% 흡수 + 전아군 DMG 합산 원기옥',
         },
     },
     coplan: {
@@ -621,9 +621,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'Polymarket 창시자. 미래를 거래하는 예언 시장의 신.',
         lore: '셰인 코플란 — Polymarket 창립자. 22살에 예측 시장을 만들어, 2024년 미국 대선에서 여론조사보다 정확한 예측을 보여줬다. CFTC의 규제와 싸우며 진실의 가격을 매기는 예언의 신.',
         skillDesc: {
-            star1: '예측 딜',
-            star2: '강화된 예측',
-            star3: '★★★ 초강력 예측 + 보너스',
+            star1: '크리 적중 시 0.6초 스턴',
+            star2: '크리 적중 시 1초 스턴',
+            star3: '크리 적중 시 1.5초 스턴 + 확정 크리',
         },
     },
 
@@ -635,9 +635,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"Funds are SAFU." 바이낸스의 황제. 시장을 한 손에 쥔 고래.',
         lore: '창펑 자오(CZ) — 바이낸스 창립자. 맥도날드 아르바이트생에서 세계 최대 거래소의 황제가 된 입지전적 인물. 2023년 자금세탁 혐의로 유죄 인정, CEO에서 물러남. Funds are SAFU는 크립토 역사상 가장 유명한 밈.',
         skillDesc: {
-            star1: '전체 블랙홀 흡입 + 스턴 + 1.5x 딜',
-            star2: '더 강한 흡입',
-            star3: '★★★ 초강력 블랙홀 + 영구 기절',
+            star1: '블랙홀 흡입 (2초) + 2000 트루딜',
+            star2: '블랙홀 (2.5초) + 2500 트루딜',
+            star3: '블랙홀 (3초) + 3000 트루딜 + 3초 영구기절',
         },
     },
     vitalik: {
@@ -645,9 +645,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '이더리움 창시자. 세상을 바꾼 천재 프로그래머.',
         lore: '비탈릭 부테린 — 이더리움 창시자. 19세에 백서를 작성, 스마트 컨트랙트로 블록체인의 가능성을 무한히 확장했다. 2022년 더 머지(PoS 전환)를 성공시켰다. 전 아군의 궁극기를 동시에 발동시키는 창시자.',
         skillDesc: {
-            star1: '스플래시 폭발 + 전아군 마나 100% 충전!',
-            star2: '더 강한 폭발',
-            star3: '★★★ 초강력 폭발 + 모든 아군 궁극기 즉시 발동',
+            star1: '전체 아군 스킬 즉시 발동 + DMG ×2',
+            star2: '전체 아군 스킬 즉시 발동 + DMG ×3',
+            star3: '전체 아군 스킬 즉시 발동 + DMG ×4 + 방무시',
         },
     },
     elon: {
@@ -655,9 +655,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"우리는 화성에 간다." 한 마디에 시장이 흔들리는 남자.',
         lore: '일론 머스크 — 테슬라, 스페이스X CEO. 2021년 비트코인 결제 수용 후 철회, 도지코인 펌핑 등으로 크립토 시장을 여러 번 뒤흔들었다. 트윗 하나로 시총 수백억을 움직이는 시장의 조커.',
         skillDesc: {
-            star1: '전체 넉백 + 스턴 + 아군 광분',
-            star2: '더 강한 넉백',
-            star3: '★★★ 초강력 넉백 + 전아군 초광분',
+            star1: '전체 적 넉백 + 1초 스턴',
+            star2: '전체 적 넉백 + 2초 스턴',
+            star3: '전체 적 넉백 + 3초 스턴 + 전아군 공속 +100%',
         },
     },
     gensler: {
@@ -665,9 +665,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: 'SEC 위원장. "크립토는 모두 증권이다!" 업계의 공포.',
         lore: '게리 겐슬러 — SEC 위원장(2021-2025). MIT에서 블록체인을 가르쳤으나, 위원장이 되자 비트코인 외 모든 크립토는 증권이라며 업계 전체를 적으로 돌렸다. 크립토의 영원한 보스전 상대.',
         skillDesc: {
-            star1: '적 약화 + 골드 압수',
-            star2: '더 강한 규제',
-            star3: '★★★ 전체 적 초강력 규제',
+            star1: '전체 적 이속 -25% (2초)',
+            star2: '전체 적 이속 -35% (3초)',
+            star3: '전체 적 이속 -50% (4초) + 보스 이속 -10%',
         },
     },
     trump: {
@@ -675,9 +675,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '"미국을 비트코인 수도로 만들겠다!" 대선 공약의 반전.',
         lore: '도널드 트럼프 — 제47대 미국 대통령. 2024년 대선에서 미국을 비트코인 수도로 만들겠다고 공약, 크립토 커뮤니티의 열광적 지지를 받았다. 자체 NFT와 공식 밈코인까지 발행한 최초의 대통령.',
         skillDesc: {
-            star1: '강력한 일격',
-            star2: '더 강한 일격',
-            star3: '★★★ 초강력 일격 + 특수 효과',
+            star1: '전체 적 규제 (이속 -50%, 2초)',
+            star2: '전체 적 규제 (이속 -60%, 3초)',
+            star3: '전체 적 규제 (이속 -70%, 4초) + DMG ×2',
         },
     },
 
@@ -689,9 +689,9 @@ export const UNIT_DICTIONARY: Record<string, UnitDictEntry> = {
         flavorText: '모든 것의 기원이자 끝. 그가 누구인지 아무도 모릅니다. 코드가 그를 증명할 뿐.',
         lore: '사토시 나카모토 — 비트코인 창시자. 2008년 백서 한 장으로 전 세계 금융 시스템을 뒤흔들었고, 2010년 영원히 사라졌다. 약 110만 BTC를 보유 추정되지만, 해당 지갑은 단 한 번도 움직이지 않았다. 모든 것의 시작이자 끝.',
         skillDesc: {
-            star1: '전체 HP 50% 삭제 + 잡몹 즉사 + 5초 시간 정지',
-            star2: '-',
-            star3: '-',
+            star1: '전체 적 HP 50% 트루딜 + 일반몹 즉사 (마나 200)',
+            star2: '전체 적 HP 50% 트루딜 + 일반몹 즉사 + 보스 DMG ×2',
+            star3: '전체 적 HP 50% 트루딜 + 일반몹 즉사 + 보스 DMG ×3 + 마나 50% 환급',
         },
     },
 };

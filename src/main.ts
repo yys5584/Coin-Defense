@@ -1675,11 +1675,25 @@ function renderSynergies(): void {
         bpHtml += `</div>`;
       }
       const tip = document.createElement('div');
-      tip.className = 'hud-tooltip synergy-tooltip';
+      tip.className = 'synergy-tooltip';
       tip.innerHTML = bpHtml;
-      tip.style.left = `${(e as MouseEvent).clientX + 12}px`;
-      tip.style.top = `${(e as MouseEvent).clientY - 20}px`;
-      tip.style.position = 'fixed';
+      tip.style.cssText = `
+        position: fixed;
+        left: ${(e as MouseEvent).clientX + 12}px;
+        top: ${(e as MouseEvent).clientY - 20}px;
+        background-color: #0a0f1e;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 13px;
+        color: #e2e8f0;
+        z-index: 99999;
+        pointer-events: none;
+        white-space: normal;
+        min-width: 280px;
+        max-width: 380px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+      `;
       document.body.appendChild(tip);
     });
     row.addEventListener('mouseleave', removeHudTooltips);
@@ -2040,7 +2054,7 @@ function showLevelTooltip(targetEl: HTMLElement): void {
 }
 
 function removeHudTooltips(): void {
-  document.querySelectorAll('.hud-tooltip').forEach(el => el.remove());
+  document.querySelectorAll('.hud-tooltip, .synergy-tooltip').forEach(el => el.remove());
 }
 
 function updateButtonStates(): void {
@@ -3618,9 +3632,9 @@ function showUnitInfoPanel(unit: UnitInstance, evt?: MouseEvent): void {
   let starDescsHtml = '';
   if (dict && dict.skillDesc.star2 !== '-') {
     const descs = [
-      { label: '★', text: dict.skillDesc.star1, star: 1 },
-      { label: '★★', text: dict.skillDesc.star2, star: 2 },
-      { label: '★★★', text: dict.skillDesc.star3, star: 3 },
+      { label: '★1', text: dict.skillDesc.star1, star: 1 },
+      { label: '★2', text: dict.skillDesc.star2, star: 2 },
+      { label: '★3', text: dict.skillDesc.star3, star: 3 },
     ];
     starDescsHtml = '<div class="uip-stars">';
     for (const sd of descs) {
