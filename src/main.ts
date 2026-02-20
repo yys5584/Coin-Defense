@@ -87,6 +87,39 @@ function returnToLobby() {
 
 initProLobby();
 
+// ─── 고정 해상도 스케일링 ──────────────────────────────────────
+const DESIGN_W = 1440;
+const DESIGN_H = 810;
+const scaleWrapperEl = document.getElementById('game-scale-wrapper');
+let currentScale = 1;
+
+function applyGameScale(): void {
+  if (!scaleWrapperEl) return;
+  currentScale = Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H);
+  const scaledW = DESIGN_W * currentScale;
+  const scaledH = DESIGN_H * currentScale;
+  const offsetX = Math.max(0, (window.innerWidth - scaledW) / 2);
+  const offsetY = Math.max(0, (window.innerHeight - scaledH) / 2);
+  scaleWrapperEl.style.transform = `scale(${currentScale})`;
+  scaleWrapperEl.style.left = `${offsetX}px`;
+  scaleWrapperEl.style.top = `${offsetY}px`;
+}
+
+/** getBoundingClientRect÷scale로 정확한 논리좌표 반환 */
+function getGridCoords(mapWrapper: HTMLElement, grid: HTMLElement) {
+  const s = currentScale;
+  const gr = grid.getBoundingClientRect();
+  const wr = mapWrapper.getBoundingClientRect();
+  const gridOffsetX = (gr.left - wr.left) / s;
+  const gridOffsetY = (gr.top - wr.top) / s;
+  const gridW = gr.width / s;
+  const gridH = gr.height / s;
+  return { gridOffsetX, gridOffsetY, gridW, gridH, cellW: gridW / 7, cellH: gridH / 4 };
+}
+
+window.addEventListener('resize', applyGameScale);
+applyGameScale(); // 초기 적용
+
 // ═══════════════════════════════════════════════════════════════
 // ─── ASYNC RACING MULTIPLAYER ────────────────────────────────
 // 각자 독립 진행 + 상태 릴레이 + 미니맵 라운드 표시
@@ -2345,17 +2378,40 @@ function renderCombatOverlay(cs: CombatState): void {
   }
   overlay.innerHTML = '';
 
-  // 몬스터 렌더 — 외곽 트랙 중심선 직접 계산
+  // getBoundingClientRect÷scale = 정확한 논리좌표 (border/padding/scale 무관)
   const grid = $('board-grid');
-  const gridRect = grid.getBoundingClientRect();
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const gridOffsetX = gridRect.left - wrapperRect.left;
-  const gridOffsetY = gridRect.top - wrapperRect.top;
-  const cellW = gridRect.width / 7;
-  const cellH = gridRect.height / 4;
-  // 논리좌표 (0~8, 0~5) → 픽셀: grid 기준 오프셋 + 수동 보정 (좌 2칸, 상 1칸)
-  const toPixelX = (lx: number) => gridOffsetX + (-0.7 + lx * 0.9375) * cellW;
-  const toPixelY = (ly: number) => gridOffsetY + (ly - 1.0) * cellH;
+  const { gridOffsetX, gridOffsetY, cellW, cellH } = getGridCoords(mapWrapper, grid);
+
+  // 보라색 트랙 중심선 계산: #monster-path와 #board-grid 사이의 중점
+  const monsterPath = document.getElementById('monster-path');
+  let trackLeft: number, trackTop: number, trackRight: number, trackBottom: number;
+  if (monsterPath) {
+    const s = currentScale;
+    const pr = monsterPath.getBoundingClientRect();
+    const wr = mapWrapper.getBoundingClientRect();
+    const pathLeft = (pr.left - wr.left) / s;
+    const pathTop = (pr.top - wr.top) / s;
+    const pathRight = pathLeft + pr.width / s;
+    const pathBottom = pathTop + pr.height / s;
+    const gridRight = gridOffsetX + cellW * 7;
+    const gridBottom = gridOffsetY + cellH * 4;
+    // 트랙 중심 = path와 grid 사이의 중점
+    trackLeft = (pathLeft + gridOffsetX) / 2;
+    trackTop = (pathTop + gridOffsetY) / 2;
+    trackRight = (pathRight + gridRight) / 2;
+    trackBottom = (pathBottom + gridBottom) / 2;
+  } else {
+    // fallback: grid 기준 1셀 바깥
+    trackLeft = gridOffsetX - cellW * 0.7;
+    trackTop = gridOffsetY - cellH * 0.7;
+    trackRight = gridOffsetX + cellW * 7.7;
+    trackBottom = gridOffsetY + cellH * 4.7;
+  }
+  // 논리좌표 (0~8, 0~5) → 트랙 중심선 좌표
+  const trackW = trackRight - trackLeft;
+  const trackH = trackBottom - trackTop;
+  const toPixelX = (lx: number) => trackLeft + (lx / 8) * trackW;
+  const toPixelY = (ly: number) => trackTop + (ly / 5) * trackH;
   const nowMs = performance.now();
 
   for (const m of cs.monsters) {
@@ -3371,25 +3427,20 @@ function showRangeCircle(cellX: number, cellY: number, unit: UnitInstance): void
   if (!def) return;
 
   let range = def.attackRange ?? 2.5;
-  // passive 스킬 사거리 보정
   if (def.skill?.type === 'passive' && def.skill.params.rangeBonus) {
     range += def.skill.params.rangeBonus;
   }
 
   const grid = $('board-grid');
-  const mapWrapper = document.getElementById('map-wrapper');
-  if (!grid || !mapWrapper) return;
+  if (!grid) return;
 
-  const gridRect = grid.getBoundingClientRect();
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const cellW = gridRect.width / 7;
-  const cellH = gridRect.height / 4;
+  // 해당 셀 찾기
+  const cell = grid.querySelector(`.board-cell[data-x="${cellX}"][data-y="${cellY}"]`) as HTMLElement;
+  if (!cell) return;
 
-  // 셀 중심 (wrapper 기준)
-  const centerX = (gridRect.left - wrapperRect.left) + (cellX + 0.5) * cellW;
-  const centerY = (gridRect.top - wrapperRect.top) + (cellY + 0.5) * cellH;
-
-  // 범위 = range * 셀 평균 크기
+  // 셀 크기에서 반지름 계산
+  const cellW = cell.offsetWidth;
+  const cellH = cell.offsetHeight;
   const avgCellSize = (cellW + cellH) / 2;
   const radius = range * avgCellSize;
 
@@ -3397,9 +3448,12 @@ function showRangeCircle(cellX: number, cellY: number, unit: UnitInstance): void
   circle.id = 'range-circle';
   circle.style.width = `${radius * 2}px`;
   circle.style.height = `${radius * 2}px`;
-  circle.style.left = `${centerX - radius}px`;
-  circle.style.top = `${centerY - radius}px`;
-  mapWrapper.appendChild(circle);
+  // 셀의 자식으로 추가 → CSS로 정확히 중앙 정렬
+  circle.style.position = 'absolute';
+  circle.style.left = '50%';
+  circle.style.top = '50%';
+  circle.style.transform = 'translate(-50%, -50%)';
+  cell.appendChild(circle);
 }
 
 function hideRangeCircle(): void {
