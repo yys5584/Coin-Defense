@@ -1304,6 +1304,26 @@ function renderHUD(): void {
     xpFill.style.width = '100%';
   }
   $('hud-gold').textContent = `${p.gold}`;
+  // HODL 이자 코인 스택 (10G당 1개, 최대 3개)
+  let hodlContainer = document.getElementById('hodl-stacks');
+  if (!hodlContainer) {
+    hodlContainer = document.createElement('span');
+    hodlContainer.id = 'hodl-stacks';
+    hodlContainer.className = 'hodl-stacks';
+    for (let i = 0; i < 3; i++) {
+      const coin = document.createElement('span');
+      coin.className = 'hodl-coin';
+      coin.textContent = '🪙';
+      hodlContainer.appendChild(coin);
+    }
+    $('hud-gold').parentElement?.appendChild(hodlContainer);
+  }
+  const litCount = Math.min(3, Math.floor(p.gold / 10));
+  const coins = hodlContainer.children;
+  for (let i = 0; i < 3; i++) {
+    const c = coins[i] as HTMLElement;
+    c.className = 'hodl-coin' + (i < litCount ? ' lit' : '') + (litCount >= 3 && i < litCount ? ' max-glow' : '');
+  }
   $('hud-hp').textContent = `${p.hp}`;
   // Update HP fill bar
   const hpFill = document.getElementById('hud-hp-fill');
@@ -1755,8 +1775,34 @@ function renderSynergies(): void {
       if (sx < 4) sx = 4;
       tip.style.left = `${sx}px`;
       tip.style.top = `${sy}px`;
+
+      // 보드 유닛 하이라이트 (시너지 매칭)
+      const boardCells = document.querySelectorAll('#board-grid .board-cell');
+      const pState = player();
+      boardCells.forEach((cell, idx) => {
+        const unit = pState.board.find(u => u.position && u.position.x * 4 + u.position.y === Math.floor(idx / 4) * 4 + idx % 4);
+        // 비교 불가 → 셀 data-unit-id로 확인
+        const cellEl = cell as HTMLElement;
+        const unitInCell = pState.board.find(u => u.position && u.position.x === Math.floor(idx / 4) && u.position.y === idx % 4);
+        if (unitInCell) {
+          const uDef = UNIT_MAP[unitInCell.unitId];
+          if (uDef && `origin_${uDef.origin.toLowerCase()}` === syn.id) {
+            cellEl.classList.add('synergy-highlight');
+            cellEl.classList.remove('synergy-dim');
+          } else {
+            cellEl.classList.add('synergy-dim');
+            cellEl.classList.remove('synergy-highlight');
+          }
+        }
+      });
     });
-    row.addEventListener('mouseleave', removeHudTooltips);
+    row.addEventListener('mouseleave', () => {
+      removeHudTooltips();
+      // 보드 유닛 하이라이트 제거
+      document.querySelectorAll('.synergy-highlight, .synergy-dim').forEach(el => {
+        el.classList.remove('synergy-highlight', 'synergy-dim');
+      });
+    });
 
     panel.appendChild(row);
   }
@@ -2535,7 +2581,9 @@ function renderCombatOverlay(cs: CombatState): void {
     overlay.id = 'combat-overlay';
     mapWrapper.appendChild(overlay);
   }
-  overlay.innerHTML = '';
+  // 고성능 DOM 배치: fragment에 모아서 한번에 붙임
+  while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
+  const frag = document.createDocumentFragment();
 
   // getBoundingClientRect÷scale = 정확한 논리좌표 (border/padding/scale 무관)
   const grid = $('board-grid');
@@ -2662,7 +2710,7 @@ function renderCombatOverlay(cs: CombatState): void {
       }
     }
 
-    overlay.appendChild(el);
+    frag.appendChild(el);
   }
 
   // ── 투사체 렌더 ──
@@ -2679,7 +2727,7 @@ function renderCombatOverlay(cs: CombatState): void {
     bullet.className = 'projectile';
     bullet.style.left = `${bx}px`;
     bullet.style.top = `${by}px`;
-    overlay.appendChild(bullet);
+    frag.appendChild(bullet);
   }
 
   // ── 이펙트 렌더 (Unity: type별 VFX Prefab 매핑) ──
@@ -2695,12 +2743,23 @@ function renderCombatOverlay(cs: CombatState): void {
     if (fx.type === 'damage' || fx.type === 'crit') {
       // 데미지 숫자 — 위로 떠오르며 사라짐
       el.className = fx.type === 'crit' ? 'fx-crit' : 'fx-damage';
-      el.textContent = fx.value?.toString() ?? '';
+      const val = fx.value ?? 0;
+      // 크릿 시 LIQUIDATED 연출 + 스크린 쉐이크
+      if (fx.type === 'crit' && progress < 0.05) {
+        el.textContent = val >= 50 ? `${val} LIQUIDATED!` : `${val}💥`;
+        const wrapper = document.getElementById('game-scale-wrapper') || document.getElementById('logical-wrapper');
+        if (wrapper && !wrapper.classList.contains('screen-shake')) {
+          wrapper.classList.add('screen-shake');
+          setTimeout(() => wrapper.classList.remove('screen-shake'), 200);
+        }
+      } else {
+        el.textContent = val.toString();
+      }
       const floatY = fxY - progress * 30; // 위로 30px 이동
       el.style.left = `${fxX}px`;
       el.style.top = `${floatY}px`;
       el.style.opacity = `${1 - progress * 0.8}`;
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
       // 크리티컬에만 스프라이트 버스트
       if (fx.type === 'crit') {
@@ -2716,7 +2775,7 @@ function renderCombatOverlay(cs: CombatState): void {
         const col = (fx.frameIndex ?? 0) % 6;
         const row = Math.floor((fx.frameIndex ?? 0) / 6);
         sprite.style.backgroundPosition = `-${col * 64}px -${row * 64}px`;
-        overlay.appendChild(sprite);
+        frag.appendChild(sprite);
       }
     } else if (fx.type === 'death') {
       // 사망 폭발 — 스프라이트 시트 애니메이션
@@ -2732,13 +2791,13 @@ function renderCombatOverlay(cs: CombatState): void {
       const currentFrame = Math.min(Math.floor(progress * frameCount), frameCount - 1);
       const col = (fx.frameIndex ?? 0) + currentFrame;
       el.style.backgroundPosition = `-${(col % 10) * 64}px -${Math.floor(col / 10) * 64}px`;
-      overlay.appendChild(el);
+      frag.appendChild(el);
     } else if (fx.type === 'boss_warning') {
       // 보스 경고 — 전체 화면 플래시
       el.className = 'fx-boss-warn';
       el.textContent = '⚠️ BOSS ⚠️';
       el.style.opacity = `${1 - progress}`;
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
       // ═══ 스킬 이펙트 렌더링 ═══
     } else if (fx.type === 'skill_explosion') {
@@ -2751,7 +2810,7 @@ function renderCombatOverlay(cs: CombatState): void {
         box-shadow:0 0 ${10 + progress * 20}px rgba(255,100,0,${0.6 - progress * 0.6});
         pointer-events:none;
       `;
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_lightning' || fx.type === 'skill_chain') {
       // ⚡ 번개/체인 — 시안/노란 전기 버스트 + 글로우 링
@@ -2786,7 +2845,7 @@ function renderCombatOverlay(cs: CombatState): void {
         opacity:${1 - progress};
       `;
       el.appendChild(ring);
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_sniper') {
       // 🎯 저격 — 하얀 레이저 빔 효과
@@ -2798,7 +2857,7 @@ function renderCombatOverlay(cs: CombatState): void {
         box-shadow:0 0 ${15 + progress * 10}px rgba(100,180,255,${0.8 - progress * 0.8});
         pointer-events:none;
       `;
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_stun') {
       // 💫 스턴 — 노란 별 회전
@@ -2810,7 +2869,7 @@ function renderCombatOverlay(cs: CombatState): void {
         opacity:${1 - progress}; pointer-events:none;
       `;
       el.textContent = '💫';
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_aoe') {
       // 🌀 광역 — 주황 원형 파동
@@ -2822,7 +2881,7 @@ function renderCombatOverlay(cs: CombatState): void {
         background:radial-gradient(circle, rgba(255,165,0,${0.15 - progress * 0.15}) 0%, transparent 70%);
         pointer-events:none;
       `;
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_buff') {
       // 💚 버프 — 녹색 상승 파티클
@@ -2835,7 +2894,7 @@ function renderCombatOverlay(cs: CombatState): void {
         box-shadow:0 0 ${6 + progress * 8}px rgba(100,255,150,${0.4 - progress * 0.4});
         pointer-events:none;
       `;
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_gold') {
       // 💰 골드 — 금색 반짝
@@ -2847,7 +2906,7 @@ function renderCombatOverlay(cs: CombatState): void {
         opacity:${1 - progress}; pointer-events:none;
       `;
       el.textContent = '💰';
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_execute') {
       // 💀 처형 — 빨간 해골
@@ -2859,7 +2918,7 @@ function renderCombatOverlay(cs: CombatState): void {
         opacity:${1 - progress * 0.7}; pointer-events:none;
       `;
       el.textContent = '💀';
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'skill_blackhole') {
       // 🕳️ 블랙홀 — 보라색 소용돌이 + 검은 원
@@ -2873,7 +2932,7 @@ function renderCombatOverlay(cs: CombatState): void {
         transform:rotate(${rotDeg}deg);
         pointer-events:none;
       `;
-      overlay.appendChild(el);
+      frag.appendChild(el);
 
     } else if (fx.type === 'freeze') {
       // ❄️ 빙결 — 파란 결정
@@ -2885,7 +2944,7 @@ function renderCombatOverlay(cs: CombatState): void {
         box-shadow:0 0 ${10 + progress * 15}px rgba(100,200,255,${0.5 - progress * 0.5});
         pointer-events:none;
       `;
-      overlay.appendChild(el);
+      frag.appendChild(el);
     }
   }
 
@@ -2932,9 +2991,12 @@ function renderCombatOverlay(cs: CombatState): void {
         opacity:${1 - progress * progress};
         z-index:999; pointer-events:none;
       `;
-      overlay.appendChild(beam);
+      frag.appendChild(beam);
     }
   }
+
+  // DocumentFragment 한번에 DOM에 붙임 (단일 reflow)
+  overlay.appendChild(frag);
 
   // 전투 정보 HUD
   let infoEl = document.getElementById('combat-info');
@@ -3650,6 +3712,23 @@ async function showGameOver(): Promise<void> {
   const targetStage = currentStageId + 1;
   const cleared = getStage(reachedRound) >= targetStage && getStageRound(reachedRound) === `${targetStage}-7`;
   inCountdown = false;
+
+  // RUG PULL 연출 (HP 0 패배 — 클리어 시 비표시)
+  if (!cleared) {
+    const rugPull = document.createElement('div');
+    rugPull.className = 'rug-pull-overlay';
+    rugPull.innerHTML = `
+      <div class="rug-pull-title">RUG PULL</div>
+      <div class="rug-pull-sub">Your liquidity has been drained.</div>
+      <div style="margin-top:20px;font-size:14px;color:rgba(255,255,255,0.4)">
+        라운드 ${getStageRound(reachedRound)} 도달
+      </div>
+    `;
+    document.body.appendChild(rugPull);
+    // 2.5초 후 자동 제거
+    await new Promise(r => setTimeout(r, 2500));
+    rugPull.remove();
+  }
 
   // 게임 화면 즉시 숨기기
   appEl?.classList.add('hidden');
