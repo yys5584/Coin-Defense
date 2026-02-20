@@ -1513,6 +1513,66 @@ export class CombatSystem {
                     }
                 }
             }
+            // 🪓 처형 (Rekt 청산 빔 — executeThreshold + executeManaRefund)
+            // HP%가 임계 이하면 즉사 + 마나 환급 → 연쇄 살인
+            if (p.executeThreshold) {
+                const threshold = p.executeThreshold * (1 + (unit.star - 1) * 0.15); // ★2=23%, ★3=26%
+                const manaRefund = p.executeManaRefund ?? 0.50;
+
+                if (unit.star >= 3) {
+                    // ★3: 연쇄 처형 — 모든 생존 적 스캔
+                    let killCount = 0;
+                    for (const m of alive) {
+                        if (!m.alive) continue;
+                        const hpPct = m.hp / m.maxHp;
+                        if (hpPct <= threshold && !m.isBoss) {
+                            // 즉사!
+                            m.hp = 0;
+                            killCount++;
+                            // 💀 EXECUTED 이펙트
+                            const mPos = getPositionOnPath(m.pathProgress);
+                            this.combat.effects.push({
+                                id: this.effectIdCounter++,
+                                type: 'skill_execute',
+                                x: mPos.px, y: mPos.py,
+                                value: 0,
+                                startTime: performance.now(),
+                                duration: 600,
+                                frameIndex: 0,
+                            });
+                        }
+                    }
+                    // 킬 1마리라도 냈으면 마나 100% 환급 (다음 턴 즉시 재시전)
+                    if (killCount > 0) {
+                        unit.currentMana = maxMana;
+                    }
+                } else {
+                    // ★1~2: 단일 타겟 처형
+                    const target = frontTarget;
+                    const hpPct = target.hp / target.maxHp;
+
+                    if (hpPct <= threshold && !target.isBoss) {
+                        // 즉사!
+                        target.hp = 0;
+                        // 마나 환급 (★1=50%, ★2=75%)
+                        unit.currentMana = (unit.currentMana ?? 0) + maxMana * (manaRefund * unit.star);
+                        // 💀 EXECUTED 이펙트
+                        const mPos = getPositionOnPath(target.pathProgress);
+                        this.combat.effects.push({
+                            id: this.effectIdCounter++,
+                            type: 'skill_execute',
+                            x: mPos.px, y: mPos.py,
+                            value: 0,
+                            startTime: performance.now(),
+                            duration: 600,
+                            frameIndex: 0,
+                        });
+                    } else {
+                        // 처형 실패 → 일반 버스트 딜
+                        target.hp -= baseDmg * 1.5;
+                    }
+                }
+            }
             // 🎯 보스 저격 (balaji 백만불 베팅 — sniperShots)
             if (p.sniperShots) {
                 // 무조건 최고HP 적 타겟
