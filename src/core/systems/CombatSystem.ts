@@ -24,6 +24,20 @@ const SPAWN_INTERVAL = 0.6;           // 몬스터 스폰 간격 (초)
 const MONSTER_BASE_SPEED = 1.2;       // 초당 이동 칸
 const LAP_DAMAGE = 1;                 // 몬스터 1바퀴당 플레이어 HP 피해
 
+// 셀 종횡비 보정: 시각적 범위원은 avgCellSize 기반 원이지만
+// 그리드 셀은 정사각형이 아님 (가로 > 세로)
+// 외곽 그리드 9×6, 맵 영역 비율 약 9:5.5 → cellW/cellH ≈ 1.18
+const CELL_ASPECT = 1.18; // cellW / cellH
+const CELL_AVG_SX = 2 * CELL_ASPECT / (CELL_ASPECT + 1); // ≈1.08
+const CELL_AVG_SY = 2 / (CELL_ASPECT + 1);               // ≈0.92
+
+/** 시각적 범위원과 일치하는 거리 계산 (avgCellSize 정규화) */
+function rangeDist(dx: number, dy: number): number {
+    const sx = dx * CELL_AVG_SX;
+    const sy = dy * CELL_AVG_SY;
+    return Math.sqrt(sx * sx + sy * sy);
+}
+
 /** 오버킬 방지 + 유닛별 실제 데미지 추적 */
 function applyDamage(monster: Monster, rawDmg: number, attacker?: UnitInstance): number {
     const actual = Math.min(rawDmg, Math.max(0, monster.hp));
@@ -582,7 +596,7 @@ export class CombatSystem {
                 const mPos = getPositionOnPath(m.pathProgress);
                 const dx = mPos.px - (unit.position!.x + 1.5);
                 const dy = mPos.py - (unit.position!.y + 1.5);
-                return Math.sqrt(dx * dx + dy * dy) <= unitRange;
+                return rangeDist(dx, dy) <= unitRange;
             });
             if (!hasTargetInRange) continue; // 마나 만땅이지만 사거리 내 적 없음 → 대기
             unit.currentMana = 0;
@@ -1879,7 +1893,7 @@ export class CombatSystem {
                     const pos = getPositionOnPath(m.pathProgress);
                     const dx = pos.px - (unit.position.x + 1.5);
                     const dy = pos.py - (unit.position.y + 1.5);
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const dist = rangeDist(dx, dy);
                     if (dist <= range && m.pathProgress < worstProgress) {
                         target = m;
                         worstProgress = m.pathProgress;
@@ -1893,7 +1907,7 @@ export class CombatSystem {
                     const pos = getPositionOnPath(m.pathProgress);
                     const dx = pos.px - (unit.position.x + 1.5);
                     const dy = pos.py - (unit.position.y + 1.5);
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const dist = rangeDist(dx, dy);
                     if (dist <= range && m.hp > bestHp) {
                         target = m;
                         bestHp = m.hp;
@@ -1907,7 +1921,7 @@ export class CombatSystem {
                     const pos = getPositionOnPath(m.pathProgress);
                     const dx = pos.px - (unit.position.x + 1.5);
                     const dy = pos.py - (unit.position.y + 1.5);
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const dist = rangeDist(dx, dy);
                     if (dist <= range && m.pathProgress > bestProgress) {
                         target = m;
                         bestProgress = m.pathProgress;
