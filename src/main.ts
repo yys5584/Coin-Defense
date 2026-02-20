@@ -1861,28 +1861,12 @@ function renderSynergies(): void {
       .filter(d => `origin_${d.origin.toLowerCase()}` === syn.id)
       .sort((a, b) => a.cost - b.cost);
 
-    // 보드+벤치에 있는 유닛 ID 셋
-    const ownedIds = new Set<string>();
-    for (const u of p.board) ownedIds.add(u.unitId);
-    for (const u of p.bench) ownedIds.add(u.unitId);
-
-    // 유닛 약자 목록: 첫글자(또는 $제거 후 첫글자), 코스트 색상, 보유여부
-    const unitAbbrs = allSynUnits.map(d => {
-      const owned = ownedIds.has(d.id);
-      const cc = getCostColor(d.cost);
-      const initial = d.name.replace(/^\$/, '').charAt(0).toUpperCase();
-      const opacity = owned ? '1' : '0.3';
-      const weight = owned ? '700' : '400';
-      return `<span style="color:${cc};opacity:${opacity};font-weight:${weight};font-size:10px" title="${d.name} (${d.cost}코)">${initial}</span>`;
-    }).join(' ');
-
     row.innerHTML = `
       <span class="synergy-count">${count}</span>
       <span>${syn.emoji}</span>
       <span class="synergy-name">${syn.cryptoName}</span>
       <span class="synergy-progress">(${progressLabel})</span>
       <span class="synergy-bp-nums">${bpNums}</span>
-      <div class="synergy-unit-roster">${unitAbbrs}</div>
     `;
 
     // 시너지 호버 툴팁 — 상세 정보
@@ -1896,22 +1880,29 @@ function renderSynergies(): void {
         bpHtml += `<span class="tt-label">${reached ? '✅' : '⬜'} ${bp.count}체</span>`;
         bpHtml += `<span class="tt-value">${bp.effect}</span></div>`;
       }
-      // 해당 시너지에 기여하는 유닛 목록
-      const p = player();
-      const contributingUnits = p.board.filter(u => {
-        const uDef = UNIT_MAP[u.unitId];
-        if (!uDef) return false;
-        return `origin_${uDef.origin.toLowerCase()}` === syn.id;
-      });
-      if (contributingUnits.length > 0) {
-        bpHtml += `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #334155;font-size:11px;color:var(--muted)">보유 유닛:</div>`;
-        bpHtml += `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">`;
-        for (const cu of contributingUnits) {
-          const cuDef = UNIT_MAP[cu.unitId];
-          if (cuDef) bpHtml += `<span style="background:#1e293b;padding:2px 6px;border-radius:4px;font-size:11px">${cuDef.emoji} ${cuDef.name} ${'⭐'.repeat(cu.star)}</span>`;
-        }
-        bpHtml += `</div>`;
+      // 해당 시너지의 전체 유닛 로스터 (코스트순, 보유 밝게 / 미보유 흐리게)
+      bpHtml += `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #334155;font-size:11px;color:var(--muted)">유닛 목록:</div>`;
+      bpHtml += `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">`;
+      const tp = player();
+      const ownIds = new Set<string>();
+      for (const u of tp.board) ownIds.add(u.unitId);
+      for (const u of tp.bench) ownIds.add(u.unitId);
+      // 보유 유닛의 스타 정보
+      const starMap: Record<string, number> = {};
+      for (const u of [...tp.board, ...tp.bench]) {
+        starMap[u.unitId] = Math.max(starMap[u.unitId] || 0, u.star);
       }
+      for (const ud of allSynUnits) {
+        const isOwned = ownIds.has(ud.id);
+        const cc = getCostColor(ud.cost);
+        if (isOwned) {
+          const stars = '⭐'.repeat(starMap[ud.id] || 1);
+          bpHtml += `<span style="background:#1e293b;padding:2px 6px;border-radius:4px;font-size:11px;border:1px solid ${cc}"><span style="color:${cc}">${ud.cost}코</span> ${ud.emoji} ${ud.name} ${stars}</span>`;
+        } else {
+          bpHtml += `<span style="background:#0f172a;padding:2px 6px;border-radius:4px;font-size:11px;opacity:0.4;border:1px solid #334155"><span style="color:${cc}">${ud.cost}코</span> ${ud.name}</span>`;
+        }
+      }
+      bpHtml += `</div>`;
       const tip = document.createElement('div');
       tip.className = 'synergy-tooltip';
       tip.innerHTML = bpHtml;
