@@ -310,7 +310,7 @@ export const UNITS: UnitDef[] = [
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.98, attackRange: 3,
         maxMana: 70, startingMana: 0,
-        skill: { type: 'active', name: '풀시드 롱', desc: '마나 충전 시 최강 아군 공속 대폭↑', cooldown: 5, params: { bestAllyAtkSpdBuff: 0.40, buffDuration: 4 } }
+        skill: { type: 'active', name: '풀시드 롱', desc: '마나 충전 시 최강아군 공속↑ + ★3 스플래시', cooldown: 5, params: { bestAllyAtkSpdBuff: 0.40, buffDuration: 4, hyperCarry: 1 } }
     },
     {
         id: 'jessepowell', name: 'Jesse Powell', emoji: '🛡️', cost: 2,
@@ -318,7 +318,7 @@ export const UNITS: UnitDef[] = [
         dmgType: 'physical' as const,
         baseDmg: 16, attackSpeed: 0.95, attackRange: 3,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '수수료 장사', desc: '마나 충전 시 단일 버스트딜 + 킬 시 골드/마나', cooldown: 5, params: { burstDmg: 200, killGold: 1, killManaPayback: 30 } }
+        skill: { type: 'active', name: '수수료 장사', desc: '마나 충전 시 버스트딜 + 킬 시 골드/마나', cooldown: 5, params: { feeHustle: 1, burstDmg1: 200, burstDmg2: 450, burstDmg3: 1200, killGold1: 1, killGold3: 2, killManaPayback3: 1.0 } }
     },
     {
         id: 'opensea', name: 'OpenSea', emoji: '🔍', cost: 2,
@@ -350,7 +350,7 @@ export const UNITS: UnitDef[] = [
         dmgType: 'magic' as const,
         baseDmg: 16, attackSpeed: 0.95, attackRange: 3,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: '크립토 윈터', desc: '마나 충전 시 적 빙결 + 빙결 적 추가피해', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 2, freezeSlow: 0.90, frozenBonusDmg: 0.20, shatterHpPct: 0.10 } }
+        skill: { type: 'active', name: '크립토 윈터', desc: '마나 충전 시 빙결 + 추가피해 + ★3 쇄빙', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 2, freezeSlow: 0.90, frozenBonusDmg: 0.20, shatterHpPct: 0.10, shatterExplode: 1 } }
     },
 
     // ═══ 1코 (8종) ═══
