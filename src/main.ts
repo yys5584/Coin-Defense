@@ -1533,23 +1533,33 @@ function renderShop(): void {
             <span class="tt-dmg-type" style="color:${dmgTypeColor}">${dmgTypeIcon}</span>
             <span class="tt-origin">${toCrypto(def.origin)}</span>
           </div>
-          <div class="tt-stats">
-            <div class="tt-stat-row">
-              <span>DMG: ${def.baseDmg}</span>
-              <span>사거리: ${range}</span>
-            </div>
-            <div class="tt-stat-row">
-              <span>공속: ${atkSpd}/s</span>
-              <span>DPS: <span style="color:#fbbf24">${dps}</span></span>
-            </div>
+          <div class="tt-stat-list">
+            <div class="tt-stat-item">⚔️ DMG: ${def.baseDmg}</div>
+            <div class="tt-stat-item">📏 사거리: ${range}</div>
+            <div class="tt-stat-item">⚡ 공속: ${atkSpd}/s</div>
+            <div class="tt-stat-item">💥 DPS: <span style="color:#fbbf24">${dps}</span></div>
           </div>
           ${manaLine}
           ${skillSection}
           ${roleLine}
         `;
-        tooltipEl.style.left = `${(e as MouseEvent).clientX + 12}px`;
-        tooltipEl.style.top = `${(e as MouseEvent).clientY - 140}px`;
+        // 먼저 DOM에 추가하여 높이 측정
+        tooltipEl.style.visibility = 'hidden';
         document.body.appendChild(tooltipEl);
+        const ttRect = tooltipEl.getBoundingClientRect();
+        const mx = (e as MouseEvent).clientX;
+        const my = (e as MouseEvent).clientY;
+        // 기본: 위쪽에 표시
+        let tx = mx - ttRect.width / 2;
+        let ty = my - ttRect.height - 12;
+        // 위쪽 넘침 → 아래로
+        if (ty < 4) ty = my + 12;
+        // 좌우 넘침 보정
+        if (tx < 4) tx = 4;
+        if (tx + ttRect.width > window.innerWidth - 4) tx = window.innerWidth - ttRect.width - 4;
+        tooltipEl.style.left = `${tx}px`;
+        tooltipEl.style.top = `${ty}px`;
+        tooltipEl.style.visibility = 'visible';
       });
       slot.addEventListener('mouseleave', hideTooltip);
 
