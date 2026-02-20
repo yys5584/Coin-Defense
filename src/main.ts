@@ -2025,8 +2025,6 @@ function showGoldTooltip(targetEl: HTMLElement): void {
     }
   }
 
-  const predictedTotal = base + interest + totemGold;
-
   // 등급별 색상
   const gc: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', F: '#f87171' };
 
@@ -2048,17 +2046,26 @@ function showGoldTooltip(targetEl: HTMLElement): void {
     ? `<div class="tt-row"><span class="tt-label">⛏️ 채굴 (${totemUnits.join(', ')})</span><span class="tt-value gold">+${totemGold}G</span></div>`
     : '';
 
+  // 예상 등급 보너스 (전 라운드 등급 기준 예측)
+  const isBossNext = isBossRound(nextRound);
+  const gradeGoldTable: Record<string, number> = isBossNext
+    ? { S: 5, A: 3, B: 2, F: 0 }
+    : { S: 4, A: 2, B: 1, F: 0 };
+  const prevGrade = prev.grade !== '-' ? prev.grade : 'B';
+  const estGradeGold = gradeGoldTable[prevGrade] ?? 0;
+  const predictedTotal = base + interest + estGradeGold + totemGold;
+
   const tip = document.createElement('div');
   tip.className = 'hud-tooltip gold-tooltip';
   tip.innerHTML = `
     ${prevSection}
     <div style="font-weight:700;margin-bottom:4px">💰 ${getStageRound(nextRound)} 예상 수입</div>
     <div class="tt-row"><span class="tt-label">스테이지 보상</span><span class="tt-value gold">+${base}G</span></div>
-    <div class="tt-row"><span class="tt-label">등급 보너스</span><span class="tt-value" style="color:#94a3b8">S~B 등급에 따라</span></div>
-    <div class="tt-row"><span class="tt-label">이자 (${p.gold}G ÷ 10)</span><span class="tt-value gold">+${interest}G</span></div>
+    <div class="tt-row"><span class="tt-label">등급 보너스 <span style="color:${gc[prevGrade] || '#888'};font-weight:bold">${prevGrade}</span> 기준</span><span class="tt-value gold">+${estGradeGold}G</span></div>
+    <div class="tt-row"><span class="tt-label">이자 <span style="color:#666;font-size:11px">(최대 30G)</span></span><span class="tt-value gold">+${interest}G</span></div>
     ${totemRow}
     <hr class="tt-divider">
-    <div class="tt-row tt-total"><span>예상 최소</span><span class="tt-value gold">+${predictedTotal}G</span></div>
+    <div class="tt-row tt-total"><span>예상</span><span class="tt-value gold">+${predictedTotal}G</span></div>
   `;
   targetEl.appendChild(tip);
 }
