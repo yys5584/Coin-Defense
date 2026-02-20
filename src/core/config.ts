@@ -372,14 +372,6 @@ export const UNITS: UnitDef[] = [
         skill: { type: 'active', name: 'FUD Spread', desc: 'Contagious DoT on enemies', cooldown: 5, params: { dotPct: 0.04, dotDuration: 3, spreadOnKill: 1 } }
     },
     {
-        id: 'perpdex', name: 'PerpDEX', emoji: '🏦', cost: 1,
-        origin: Origin.Exchange,
-        dmgType: 'physical' as const,
-        baseDmg: 9, attackSpeed: 0.86, attackRange: 3,
-        maxMana: 40, startingMana: 0,
-        skill: { type: 'active', name: '롱/숏 빔', desc: '마나 충전 시 관통 빔 + 명중 시 마나 회복', cooldown: 5, params: { pierceTargets: 3, piercePct: 0.50, pierceManaPer: 10 } }
-    },
-    {
         id: 'hodler', name: 'HODLer', emoji: '🛡️', cost: 1,
         origin: Origin.VC,
         dmgType: 'physical' as const,
@@ -540,12 +532,12 @@ export const UNITS: UnitDef[] = [
 
     // ── Bear +3 ──
     {
-        id: 've33user', name: 'Ve(3,3) User', emoji: '🎰', cost: 1,
+        id: 'paperhand', name: 'Paper Hand', emoji: '🧱', cost: 1,
         origin: Origin.Bear,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.84, attackRange: 4,
         maxMana: 60, startingMana: 0,
-        skill: { type: 'active', name: 'Lock & Boost', desc: 'Freeze enemy + ★3 reverse', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 1.5, freezeSlow: 0.90, reverseMove: 0 } }
+        skill: { type: 'active', name: 'Panic Sell', desc: 'Freeze enemy + ★3 reverse', cooldown: 5, params: { freezeTargets: 1, freezeDuration: 1.5, freezeSlow: 0.90, reverseMove: 0 } }
     },
     {
         id: 'kashkari', name: 'Kashkari', emoji: '🏛️', cost: 2,
