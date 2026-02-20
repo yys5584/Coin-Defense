@@ -2062,7 +2062,7 @@ function showGoldTooltip(targetEl: HTMLElement): void {
     <div style="font-weight:700;margin-bottom:4px">💰 ${getStageRound(nextRound)} 예상 수입</div>
     <div class="tt-row"><span class="tt-label">스테이지 보상</span><span class="tt-value gold">+${base}G</span></div>
     <div class="tt-row"><span class="tt-label">등급 보너스 <span style="color:${gc[prevGrade] || '#888'};font-weight:bold">${prevGrade}</span> 기준</span><span class="tt-value gold">+${estGradeGold}G</span></div>
-    <div class="tt-row"><span class="tt-label">이자 <span style="color:#666;font-size:11px">(최대 30G)</span></span><span class="tt-value gold">+${interest}G</span></div>
+    <div class="tt-row"><span class="tt-label">이자 ${isWarmup ? '<span style="color:#ef4444;font-size:11px">(1-3 튜토리얼 미적용)</span>' : '<span style="color:#666;font-size:11px">(최대 30G)</span>'}</span><span class="tt-value gold">+${interest}G</span></div>
     ${totemRow}
     <hr class="tt-divider">
     <div class="tt-row tt-total"><span>예상</span><span class="tt-value gold">+${predictedTotal}G</span></div>
