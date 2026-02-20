@@ -2696,9 +2696,6 @@ body {
 
 .unit-info-panel {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     width: 280px;
     background: rgba(15, 15, 25, 0.97);
     border: 2px solid rgba(243, 186, 47, 0.6);
@@ -2715,12 +2712,10 @@ body {
 @keyframes panelFadeIn {
     from {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.95);
     }
 
     to {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
     }
 }
 
