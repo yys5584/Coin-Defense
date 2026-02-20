@@ -74,15 +74,15 @@ setOnStartGame(async (stageId: number) => {
   bgm.play().catch(() => { });
 });
 
-// 결과→로비 복귀
+// 결과→로비 복귀 (최신 메인 로비로)
 function returnToLobby() {
-  appEl?.classList.add('hidden');
   resultViewEl?.classList.add('hidden');
-  lobbyProEl?.classList.remove('hidden');
-  // 상태 새로고침 후 로비 다시 렌더
-  refreshState().then(() => {
-    if (lobbyProEl) renderLobby(lobbyProEl);
-  }).catch(() => { });
+  lobbyProEl?.classList.add('hidden');
+  appEl?.classList.add('hidden');
+  showScreen('lobby-screen');
+  // 모드 선택 초기화 (캠페인/일반전 선택 화면)
+  document.getElementById('lobby-submodes')?.classList.add('hidden');
+  document.getElementById('lobby-modes')?.classList.remove('hidden');
 }
 
 initProLobby();
@@ -1679,8 +1679,8 @@ function renderSynergies(): void {
       tip.innerHTML = bpHtml;
       tip.style.cssText = `
         position: fixed;
-        left: ${(e as MouseEvent).clientX + 12}px;
-        top: ${(e as MouseEvent).clientY - 20}px;
+        left: -9999px;
+        top: -9999px;
         background-color: #0a0f1e;
         border: 1px solid rgba(255,255,255,0.15);
         border-radius: 10px;
@@ -1695,6 +1695,18 @@ function renderSynergies(): void {
         box-shadow: 0 8px 32px rgba(0,0,0,0.8);
       `;
       document.body.appendChild(tip);
+      // 뷰포트 클램핑
+      const tr = tip.getBoundingClientRect();
+      const mx = (e as MouseEvent).clientX;
+      const my = (e as MouseEvent).clientY;
+      let sx = mx + 12;
+      let sy = my - 20;
+      if (sx + tr.width > window.innerWidth - 4) sx = mx - tr.width - 4;
+      if (sy < 4) sy = 4;
+      if (sy + tr.height > window.innerHeight - 4) sy = window.innerHeight - tr.height - 4;
+      if (sx < 4) sx = 4;
+      tip.style.left = `${sx}px`;
+      tip.style.top = `${sy}px`;
     });
     row.addEventListener('mouseleave', removeHudTooltips);
 
@@ -2042,7 +2054,7 @@ function showLevelTooltip(targetEl: HTMLElement): void {
   }
 
   const tip = document.createElement('div');
-  tip.className = 'hud-tooltip xp-tooltip';
+  tip.className = 'level-tooltip';
   tip.innerHTML = `
     <div class="xp-tt-layout">
       <div class="xp-tt-col">${leftHtml}</div>
@@ -2050,11 +2062,35 @@ function showLevelTooltip(targetEl: HTMLElement): void {
       <div class="xp-tt-col">${rightHtml}</div>
     </div>
   `;
-  targetEl.appendChild(tip);
+  tip.style.cssText = `
+    position: fixed;
+    z-index: 99999;
+    background: rgba(20, 30, 55, .97);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #e2e8f0;
+    pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,.7);
+    left: -9999px;
+    top: -9999px;
+  `;
+  document.body.appendChild(tip);
+  const rect = targetEl.getBoundingClientRect();
+  const tipRect = tip.getBoundingClientRect();
+  let tx = rect.left + rect.width / 2 - tipRect.width / 2;
+  let ty = rect.top - tipRect.height - 8;
+  if (ty < 4) ty = rect.bottom + 8;
+  if (tx < 4) tx = 4;
+  if (tx + tipRect.width > window.innerWidth - 4) tx = window.innerWidth - tipRect.width - 4;
+  if (ty + tipRect.height > window.innerHeight - 4) ty = window.innerHeight - tipRect.height - 4;
+  tip.style.left = `${tx}px`;
+  tip.style.top = `${ty}px`;
 }
 
 function removeHudTooltips(): void {
-  document.querySelectorAll('.hud-tooltip, .synergy-tooltip').forEach(el => el.remove());
+  document.querySelectorAll('.hud-tooltip, .synergy-tooltip, .level-tooltip').forEach(el => el.remove());
 }
 
 function updateButtonStates(): void {
@@ -3562,9 +3598,19 @@ function showTooltip(e: MouseEvent, unit: UnitInstance): void {
     ${def.uniqueEffect ? `<div class="tt-effect">${def.uniqueEffect}</div>` : ''}
     ${buffSummary}
   `;
-  tooltipEl.style.left = `${e.clientX + 12}px`;
-  tooltipEl.style.top = `${e.clientY + 12}px`;
+  // 뷰포트 클램핑
+  tooltipEl.style.left = '-9999px';
+  tooltipEl.style.top = '-9999px';
   document.body.appendChild(tooltipEl);
+  const ttR = tooltipEl.getBoundingClientRect();
+  let ttX = e.clientX + 12;
+  let ttY = e.clientY + 12;
+  if (ttX + ttR.width > window.innerWidth - 4) ttX = e.clientX - ttR.width - 4;
+  if (ttY + ttR.height > window.innerHeight - 4) ttY = e.clientY - ttR.height - 12;
+  if (ttX < 4) ttX = 4;
+  if (ttY < 4) ttY = 4;
+  tooltipEl.style.left = `${ttX}px`;
+  tooltipEl.style.top = `${ttY}px`;
 }
 
 function hideTooltip(): void {
@@ -3719,18 +3765,27 @@ function showUnitInfoPanel(unit: UnitInstance, evt?: MouseEvent): void {
   // 클릭 위치에 패널 표시 (화면 밖 넘침 방지)
   if (evt) {
     const pad = 12;
+    // 먼저 숨겨서 DOM에 추가 후 실제 크기 측정
+    unitInfoPanel.style.left = '-9999px';
+    unitInfoPanel.style.top = '-9999px';
+    unitInfoPanel.style.transform = 'none';
+    document.body.appendChild(unitInfoPanel);
+    const panelRect = unitInfoPanel.getBoundingClientRect();
+    const pw = panelRect.width;
+    const ph = panelRect.height;
     let px = evt.clientX + pad;
     let py = evt.clientY + pad;
-    // 우측/하단 넘침 보정
-    const pw = 280 + pad * 2;
-    const ph = 350;
-    if (px + pw > window.innerWidth) px = evt.clientX - pw;
-    if (py + ph > window.innerHeight) py = Math.max(pad, window.innerHeight - ph);
+    // 우측 넘침
+    if (px + pw > window.innerWidth - 4) px = evt.clientX - pw - pad;
+    // 하단 넘침
+    if (py + ph > window.innerHeight - 4) py = Math.max(4, window.innerHeight - ph - 4);
+    // 좌측/상단 넘침
+    if (px < 4) px = 4;
+    if (py < 4) py = 4;
     unitInfoPanel.style.left = `${px}px`;
     unitInfoPanel.style.top = `${py}px`;
-    unitInfoPanel.style.transform = 'none';
   }
-  document.body.appendChild(unitInfoPanel);
+  if (!unitInfoPanel.parentNode) document.body.appendChild(unitInfoPanel);
   unitInfoDetailOpen = false;
 }
 
@@ -3956,13 +4011,20 @@ if (goldHudItem) {
   goldHudItem.addEventListener('mouseleave', removeHudTooltips);
 }
 
-// level hover — XP 구매 버튼 전용
+// level hover — XP 구매 버튼 + 레벨 표시 + XP바 호버
 const xpBuyBtn = document.getElementById('btn-buy-xp');
 if (xpBuyBtn) {
   (xpBuyBtn as HTMLElement).style.position = 'relative';
   xpBuyBtn.addEventListener('mouseenter', () => showLevelTooltip(xpBuyBtn as HTMLElement));
   xpBuyBtn.addEventListener('mouseleave', removeHudTooltips);
 }
+// 레벨 영역 + XP바에도 확률 툴팁
+document.querySelectorAll('.cb-level, .cb-xp').forEach(el => {
+  (el as HTMLElement).style.position = 'relative';
+  (el as HTMLElement).style.cursor = 'help';
+  el.addEventListener('mouseenter', () => showLevelTooltip(el as HTMLElement));
+  el.addEventListener('mouseleave', removeHudTooltips);
+});
 
 // ─── 유닛 정보 페이지 ────────────────────────────────────────
 $('btn-info').addEventListener('click', () => {

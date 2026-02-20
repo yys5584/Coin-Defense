@@ -3147,7 +3147,8 @@ body {
     font-size: 14px;
 }
 
-.hud-tooltip .odds-row {
+.hud-tooltip .odds-row,
+.level-tooltip .odds-row {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -3155,32 +3156,39 @@ body {
     font-size: 12px;
 }
 
-.hud-tooltip .odds-cost {
+.hud-tooltip .odds-cost,
+.level-tooltip .odds-cost {
     min-width: 24px;
     font-weight: 600;
 }
 
-.hud-tooltip .odds-cost.c1 {
+.hud-tooltip .odds-cost.c1,
+.level-tooltip .odds-cost.c1 {
     color: #94a3b8;
 }
 
-.hud-tooltip .odds-cost.c2 {
+.hud-tooltip .odds-cost.c2,
+.level-tooltip .odds-cost.c2 {
     color: #22c55e;
 }
 
-.hud-tooltip .odds-cost.c3 {
+.hud-tooltip .odds-cost.c3,
+.level-tooltip .odds-cost.c3 {
     color: #3b82f6;
 }
 
-.hud-tooltip .odds-cost.c4 {
+.hud-tooltip .odds-cost.c4,
+.level-tooltip .odds-cost.c4 {
     color: #a855f7;
 }
 
-.hud-tooltip .odds-cost.c5 {
+.hud-tooltip .odds-cost.c5,
+.level-tooltip .odds-cost.c5 {
     color: #f97316;
 }
 
-.hud-tooltip .odds-bar-bg {
+.hud-tooltip .odds-bar-bg,
+.level-tooltip .odds-bar-bg {
     width: 80px;
     height: 8px;
     background: rgba(255, 255, 255, .08);
@@ -3188,33 +3196,40 @@ body {
     overflow: hidden;
 }
 
-.hud-tooltip .odds-bar-fill {
+.hud-tooltip .odds-bar-fill,
+.level-tooltip .odds-bar-fill {
     height: 100%;
     border-radius: 4px;
     transition: width .2s;
 }
 
-.hud-tooltip .odds-bar-fill.c1 {
+.hud-tooltip .odds-bar-fill.c1,
+.level-tooltip .odds-bar-fill.c1 {
     background: #94a3b8;
 }
 
-.hud-tooltip .odds-bar-fill.c2 {
+.hud-tooltip .odds-bar-fill.c2,
+.level-tooltip .odds-bar-fill.c2 {
     background: #22c55e;
 }
 
-.hud-tooltip .odds-bar-fill.c3 {
+.hud-tooltip .odds-bar-fill.c3,
+.level-tooltip .odds-bar-fill.c3 {
     background: #3b82f6;
 }
 
-.hud-tooltip .odds-bar-fill.c4 {
+.hud-tooltip .odds-bar-fill.c4,
+.level-tooltip .odds-bar-fill.c4 {
     background: #a855f7;
 }
 
-.hud-tooltip .odds-bar-fill.c5 {
+.hud-tooltip .odds-bar-fill.c5,
+.level-tooltip .odds-bar-fill.c5 {
     background: #f97316;
 }
 
-.hud-tooltip .odds-pct {
+.hud-tooltip .odds-pct,
+.level-tooltip .odds-pct {
     min-width: 32px;
     text-align: right;
     font-weight: 600;
