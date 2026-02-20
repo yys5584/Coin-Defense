@@ -2119,13 +2119,20 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
     hideSellZone();
   });
 
-  card.addEventListener('mouseenter', () => { hoveredUnit = unit; });
-  card.addEventListener('mouseleave', () => { hoveredUnit = null; });
+  if (location === 'bench') {
+    // 벤치: 기존처럼 호버 툴팁
+    card.addEventListener('mouseenter', (e) => { hoveredUnit = unit; showTooltip(e as MouseEvent, unit); });
+    card.addEventListener('mouseleave', () => { hoveredUnit = null; hideTooltip(); });
+  } else {
+    // 보드: 호버 시 hoveredUnit만 트래킹 (E키 판매용)
+    card.addEventListener('mouseenter', () => { hoveredUnit = unit; });
+    card.addEventListener('mouseleave', () => { hoveredUnit = null; });
+  }
 
   card.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    showUnitInfoPanel(unit);
+    showUnitInfoPanel(unit, e as MouseEvent);
   });
 
   // 터치 드래그 지원
@@ -3545,7 +3552,7 @@ function hideTooltip(): void {
 let unitInfoPanel: HTMLElement | null = null;
 let unitInfoDetailOpen = false;
 
-function showUnitInfoPanel(unit: UnitInstance): void {
+function showUnitInfoPanel(unit: UnitInstance, evt?: MouseEvent): void {
   hideUnitInfoPanel();
   hideTooltip();
   const def = UNIT_MAP[unit.unitId];
@@ -3674,6 +3681,20 @@ function showUnitInfoPanel(unit: UnitInstance): void {
   unitInfoPanel.addEventListener('click', (e) => e.stopPropagation());
   unitInfoPanel.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); });
 
+  // 클릭 위치에 패널 표시 (화면 밖 넘침 방지)
+  if (evt) {
+    const pad = 12;
+    let px = evt.clientX + pad;
+    let py = evt.clientY + pad;
+    // 우측/하단 넘침 보정
+    const pw = 280 + pad * 2;
+    const ph = 350;
+    if (px + pw > window.innerWidth) px = evt.clientX - pw;
+    if (py + ph > window.innerHeight) py = Math.max(pad, window.innerHeight - ph);
+    unitInfoPanel.style.left = `${px}px`;
+    unitInfoPanel.style.top = `${py}px`;
+    unitInfoPanel.style.transform = 'none';
+  }
   document.body.appendChild(unitInfoPanel);
   unitInfoDetailOpen = false;
 }
