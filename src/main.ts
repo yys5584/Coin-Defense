@@ -4835,5 +4835,50 @@ render();
   setTimeScale(scale: number) {
     (window as any).__TIME_SCALE__ = Math.max(1, scale);
   },
+
+  /** 유닛 DB: 모든 유닛 정의 반환 (학습용) */
+  getUnitDB() {
+    return Object.values(UNIT_MAP).map((u: any) => ({
+      id: u.id, name: u.name, cost: u.cost, origin: u.origin,
+      baseDmg: u.baseDmg, attackSpeed: u.attackSpeed ?? 1.0,
+      attackRange: u.attackRange ?? 2.5, dmgType: u.dmgType,
+      skillType: u.skill?.type, skillName: u.skill?.name,
+    }));
+  },
+
+  /** 보드 유닛별 DPS 반환 (현재 웨이브 누적) */
+  getBoardDPS() {
+    const p = player();
+    return p.board.map((u: UnitInstance) => ({
+      instanceId: u.instanceId, unitId: u.unitId,
+      star: u.star, position: u.position,
+      totalDmg: u.totalDamageDealt ?? 0,
+      name: UNIT_MAP[u.unitId]?.name,
+    }));
+  },
+
+  /** 시너지 정보 반환 (활성 시너지 + 다움 브레이크포인트) */
+  getSynergies() {
+    const p = player();
+    const active = synergy.calculateSynergies(p);
+    const buffs = synergy.calculateBuffs(active);
+    return {
+      active: active.map(s => {
+        const def = SYNERGIES.find((d: any) => d.id === s.synergyId);
+        const nextBP = def?.breakpoints?.find((bp: any) => bp.count > s.count);
+        return {
+          id: s.synergyId, count: s.count, level: s.activeLevel,
+          nextBreakpoint: nextBP?.count ?? null,
+          unitsNeeded: nextBP ? nextBP.count - s.count : null,
+        };
+      }),
+      buffs: {
+        dmg: buffs.dmgMultiplier, atkSpd: buffs.atkSpeedMultiplier,
+        crit: buffs.critChance, critDmg: buffs.critDmgMultiplier,
+        armorIgnore: buffs.armorIgnore, slow: buffs.slowPercent,
+        bonusGold: buffs.bonusKillGold + buffs.bonusRoundGold,
+      },
+    };
+  },
 };
 
