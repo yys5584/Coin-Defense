@@ -2386,6 +2386,38 @@ function startCombat(): void {
   // 전투 시작
   combatStartTime = performance.now();
   lastDpsUpdate = 0;
+
+  // 셀 비율 계산: range circle(avgCellSize 원) ↔ 전투 판정 동기화
+  {
+    const mapWrapper = document.getElementById('map-wrapper');
+    const grid = $('board-grid');
+    if (mapWrapper && grid) {
+      const { cellW, cellH, gridOffsetX, gridOffsetY } = getGridCoords(mapWrapper, grid);
+      const monsterPath = document.getElementById('monster-path');
+      let trackW: number, trackH: number;
+      if (monsterPath) {
+        const s = currentScale;
+        const pr = monsterPath.getBoundingClientRect();
+        const wr = mapWrapper.getBoundingClientRect();
+        const pathLeft = (pr.left - wr.left) / s;
+        const pathTop = (pr.top - wr.top) / s;
+        const pathRight = pathLeft + pr.width / s;
+        const pathBottom = pathTop + pr.height / s;
+        const gridRight = gridOffsetX + cellW * 7;
+        const gridBottom = gridOffsetY + cellH * 4;
+        trackW = ((pathRight + gridRight) / 2) - ((pathLeft + gridOffsetX) / 2);
+        trackH = ((pathBottom + gridBottom) / 2) - ((pathTop + gridOffsetY) / 2);
+      } else {
+        trackW = cellW * 8.4;
+        trackH = cellH * 5.4;
+      }
+      const pxPerGridX = trackW / 8; // 1 grid X unit = pixels
+      const pxPerGridY = trackH / 5; // 1 grid Y unit = pixels
+      const avgCellSize = (cellW + cellH) / 2;
+      combat.setCellScale(pxPerGridX / avgCellSize, pxPerGridY / avgCellSize);
+    }
+  }
+
   combat.startCombat(
     state,
     p,
@@ -3519,17 +3551,16 @@ function showRangeCircle(cellX: number, cellY: number, unit: UnitInstance): void
   const cell = grid.querySelector(`.board-cell[data-x="${cellX}"][data-y="${cellY}"]`) as HTMLElement;
   if (!cell) return;
 
-  // 셀 크기에서 사거리 타원 계산 (전투 판정은 그리드 유클리드 거리)
+  // 셀 크기에서 반지름 계산
   const cellW = cell.offsetWidth;
   const cellH = cell.offsetHeight;
-  const radiusX = range * cellW;
-  const radiusY = range * cellH;
+  const avgCellSize = (cellW + cellH) / 2;
+  const radius = range * avgCellSize;
 
   const circle = document.createElement('div');
   circle.id = 'range-circle';
-  circle.style.width = `${radiusX * 2}px`;
-  circle.style.height = `${radiusY * 2}px`;
-  circle.style.borderRadius = '50%';
+  circle.style.width = `${radius * 2}px`;
+  circle.style.height = `${radius * 2}px`;
   // 셀의 자식으로 추가 → CSS로 정확히 중앙 정렬
   circle.style.position = 'absolute';
   circle.style.left = '50%';
