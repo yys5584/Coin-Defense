@@ -80,8 +80,8 @@ function returnToLobby() {
   resultViewEl?.classList.add('hidden');
   appEl?.classList.add('hidden');
   document.querySelector('.rug-pull-overlay')?.remove();
-  // 로비 화면 표시 + 콘텐츠 복원
-  showScreen('lobby-screen');
+  // PRO 로비는 game-screen 안에 있음 → game-screen 표시 + lobby-pro 복원
+  showScreen('game-screen');
   if (lobbyProEl) {
     lobbyProEl.classList.remove('hidden');
     renderLobby(lobbyProEl);
