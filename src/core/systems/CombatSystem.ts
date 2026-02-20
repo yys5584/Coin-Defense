@@ -342,12 +342,31 @@ export class CombatSystem {
             // 4) active 스킬 처리 (3초 쿨 자동 시전)
             this.processActiveSkills(player.board, dt, player);
 
-            // 5) 죽은 몬스터 정리 + 사망 이펙트
+            // 5) 죽은 몬스터 정리 + 사망 이펙트 + DoT 전이
             for (const m of this.combat.monsters) {
                 if (m.alive && m.hp <= 0) {
                     m.alive = false;
                     this.combat.totalKills++;
                     this.combat.totalGoldEarned += m.goldReward + (this.buffs?.bonusKillGold ?? 0);
+
+                    // 🔥 DoT 전이: 죽은 몬스터의 DoT를 인근 적에게 전파
+                    if (m.dots && m.dots.length > 0) {
+                        const deathP = getPositionOnPath(m.pathProgress);
+                        const nearAlive = this.combat.monsters
+                            .filter(n => n.alive && n !== m)
+                            .map(n => ({ n, d: Math.sqrt((getPositionOnPath(n.pathProgress).px - deathP.px) ** 2 + (getPositionOnPath(n.pathProgress).py - deathP.py) ** 2) }))
+                            .sort((a, b) => a.d - b.d);
+                        // 전이 대상 수: 기본 1명(★1), 더 많은 전이는 ★2/3에서 처리(config params)
+                        const spreadCount = Math.min(nearAlive.length, 3);
+                        for (let i = 0; i < spreadCount; i++) {
+                            const target = nearAlive[i].n;
+                            if (!target.dots) target.dots = [];
+                            for (const dot of m.dots) {
+                                target.dots.push({ dps: dot.dps, remaining: dot.remaining });
+                            }
+                        }
+                    }
+
                     // 사망 이펙트 (Unity: DeathParticleSystem)
                     const deathPos = getPositionOnPath(m.pathProgress);
                     this.combat.effects.push({
@@ -648,7 +667,45 @@ export class CombatSystem {
             // 자신 공속↑ (워뇨띠, Elon 버프 — atkSpdBuff + buffDuration, self)
             if (p.atkSpdBuff && p.buffDuration && !p.buffRange && !p.rangeBonus) {
                 // 자신 공속 버프: 쿨다운 직접 감소
-                unit.attackCooldown = Math.max(0, (unit.attackCooldown ?? 0) * (1 - p.atkSpdBuff));
+                unit.attackCooldown = Math.max(0, (unit.attackCooldown ?? 0) * (1 - p.atkSpdBuff * unit.star));
+            }
+            // 💧 인접 아군 마나 회복 (pcminer 해시레이트 공유 — allyManaHeal)
+            if (p.allyManaHeal) {
+                const healAmount = p.allyManaHeal * unit.star;  // ★ 스케일링
+                const range = p.allyManaHealRange ?? 1;
+                const maxTargets = (p.allyManaTargets ?? 1) * unit.star; // ★2=2명, ★3=전체
+                let healed = 0;
+                for (const ally of boardUnits) {
+                    if (ally === unit || !ally.position || !unit.position) continue;
+                    if (UNIT_MAP[ally.unitId]?.skill?.type !== 'active') continue;
+                    const dx = Math.abs(ally.position.x - unit.position.x);
+                    const dy = Math.abs(ally.position.y - unit.position.y);
+                    // ★3: 주변 8칸 모든 아군 (range 무시)
+                    const inRange = unit.star >= 3 ? (dx <= 2 && dy <= 2) : (dx <= range && dy <= range);
+                    if (!inRange) continue;
+                    ally.currentMana = (ally.currentMana ?? 0) + healAmount;
+                    healed++;
+                    if (unit.star < 3 && healed >= maxTargets) break;
+                }
+            }
+            // 🦊 자신+인접 공속버프 (metamask 가스비 폭발 — atkSpdBuff + buffRange)
+            if (p.atkSpdBuff && p.buffDuration && p.buffRange) {
+                const buffMult = p.atkSpdBuff * unit.star;  // ★ 스케일링
+                // 자신 공속 버프
+                unit.attackCooldown = Math.max(0, (unit.attackCooldown ?? 0) * (1 - buffMult));
+                // 인접 아군 공속 버프
+                const maxTargets = (p.buffTargets ?? 1) * unit.star;
+                let buffed = 0;
+                for (const ally of boardUnits) {
+                    if (ally === unit || !ally.position || !unit.position) continue;
+                    const dx = Math.abs(ally.position.x - unit.position.x);
+                    const dy = Math.abs(ally.position.y - unit.position.y);
+                    if (dx <= p.buffRange && dy <= p.buffRange) {
+                        ally.attackCooldown = Math.max(0, (ally.attackCooldown ?? 0) * (1 - buffMult));
+                        buffed++;
+                        if (buffed >= maxTargets) break;
+                    }
+                }
             }
             // 아군 사거리+1 (Armstrong — rangeBonus + buffDuration)
             if (p.rangeBonus && p.buffDuration) {

@@ -321,21 +321,24 @@ export const UNITS: UnitDef[] = [
         origin: Origin.Bitcoin,
         dmgType: 'physical' as const,
         baseDmg: 9, attackSpeed: 0.65, attackRange: 2,
-        skill: { type: 'passive', name: '해시팜', desc: '인접 ₿ 아군 공속↑', params: { atkSpdBuff: 0.15, buffRange: 1 } }
+        maxMana: 40, startingMana: 0,
+        skill: { type: 'active', name: '해시레이트 공유', desc: '마나 충전 시 인접 ₿ 아군 마나 회복', cooldown: 5, params: { allyManaHeal: 15, allyManaHealRange: 1, allyManaTargets: 1 } }
     },
     {
         id: 'metamask', name: '메타마스크 유저', emoji: '🦊', cost: 1,
         origin: Origin.DeFi,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.78, attackRange: 3,
-        skill: { type: 'passive', name: '가스 최적화', desc: '자신 공속↑(상시)', params: { atkSpdBonus: 0.20 } }
+        maxMana: 30, startingMana: 0,
+        skill: { type: 'active', name: '가스비 폭발', desc: '마나 충전 시 자신+인접 아군 공속↑', cooldown: 5, params: { atkSpdBuff: 0.30, buffDuration: 3, buffRange: 1, buffTargets: 1 } }
     },
     {
         id: 'scamdev', name: '스캠 개발자', emoji: '🚩', cost: 1,
         origin: Origin.Social,
         dmgType: 'magic' as const,
         baseDmg: 9, attackSpeed: 0.78, attackRange: 3,
-        skill: { type: 'passive', name: '스캠 체인', desc: '5번째 공격마다 ⚡체인 1 + 슬로우(짧게)', params: { nthHit: 5, chainTargets: 1, chainPct: 0.30, slowPct: 0.20, slowDuration: 1.5 } }
+        maxMana: 50, startingMana: 0,
+        skill: { type: 'active', name: '퍼드 전염', desc: '마나 충전 시 적에게 전이 도트딜', cooldown: 5, params: { dotPct: 0.04, dotDuration: 3, spreadOnKill: 1 } }
     },
     {
         id: 'perpdex', name: 'PerpDEX', emoji: '🏦', cost: 1,
