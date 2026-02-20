@@ -2582,6 +2582,15 @@ body {
 }
 
 /* ── 유닛 사전 (상세 설명) ── */
+.tooltip .tt-shop-role {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    font-weight: 600;
+    color: #fbbf24;
+}
+
 .tooltip .tt-dict {
     margin-top: 8px;
     padding-top: 8px;

@@ -1451,37 +1451,72 @@ function renderShop(): void {
         </div>
       `;
 
-      // 상점 유닛 호버 툴팁
+      // 상점 유닛 호버 툴팁 (TFT 스타일)
       slot.addEventListener('mouseenter', (e) => {
         const range = def.attackRange ?? 2.5;
         const atkSpd = def.attackSpeed ?? 1.0;
+        const dps = Math.floor(def.baseDmg * atkSpd);
         const skill = def.skill;
+        const dict = UNIT_DICTIONARY[def.id];
+        const dmgTypeIcon = def.dmgType === 'magic' ? '🔮' : '⚔️';
+        const dmgTypeColor = def.dmgType === 'magic' ? '#c084fc' : '#fb923c';
         const skillTypeLabel: Record<string, string> = {
-          onHit: '⚔️ 적중 시', onKill: '💀 킬 시', passive: '🔵 패시브',
+          active: '🔥 액티브', onHit: '⚔️ 적중 시', onKill: '💀 킬 시', passive: '🔵 패시브',
           periodic: '🔄 주기적', onCombatStart: '🟢 전투 시작'
         };
         const skillTypeColor: Record<string, string> = {
-          onHit: '#fb923c', onKill: '#f87171', passive: '#60a5fa',
+          active: '#f59e0b', onHit: '#fb923c', onKill: '#f87171', passive: '#60a5fa',
           periodic: '#c084fc', onCombatStart: '#4ade80'
         };
+
+        // 스킬 상세 (사전 데이터 ★1)
+        let skillSection = '';
+        if (skill) {
+          const star1Desc = dict?.skillDesc?.star1 ?? skill.desc;
+          skillSection = `
+            <div class="tt-skill">
+              <div class="tt-skill-header" style="color:${skillTypeColor[skill.type] ?? '#fff'}">
+                ${skillTypeLabel[skill.type] ?? skill.type} — ${skill.name}
+              </div>
+              <div class="tt-skill-desc">${star1Desc}${skill.cooldown ? ` (${skill.cooldown}초)` : ''}${skill.chance && skill.chance < 1 ? ` [${Math.round(skill.chance * 100)}%]` : ''}</div>
+            </div>`;
+        }
+
+        // 마나 정보
+        let manaLine = '';
+        if (def.maxMana && skill?.type === 'active') {
+          const startMana = def.startingMana ?? 0;
+          manaLine = `<div class="tt-mana-label">⚡ 마나: ${startMana}/${def.maxMana}</div>`;
+        }
+
+        // 역할 1줄
+        const roleLine = dict ? `<div class="tt-shop-role">${dict.role}</div>` : '';
+
         tooltipEl = document.createElement('div');
         tooltipEl.className = 'tooltip';
         tooltipEl.innerHTML = `
           <div class="tt-name">${def.emoji} ${def.name}</div>
-          <div class="tt-cost">코스트: ${def.cost}</div>
-          <div class="tt-origin">특성: ${toCrypto(def.origin)}</div>
-
-          <div class="tt-dmg">DMG: ${def.baseDmg} | 사거리: ${range} | 공속: ${atkSpd}/s</div>
-          ${skill ? `<div class="tt-skill">
-            <div class="tt-skill-header" style="color:${skillTypeColor[skill.type] ?? '#fff'}">
-              ${skillTypeLabel[skill.type] ?? skill.type} — ${skill.name}
+          <div class="tt-meta">
+            <span class="tt-cost">💰 ${def.cost}</span>
+            <span class="tt-dmg-type" style="color:${dmgTypeColor}">${dmgTypeIcon}</span>
+            <span class="tt-origin">${toCrypto(def.origin)}</span>
+          </div>
+          <div class="tt-stats">
+            <div class="tt-stat-row">
+              <span>DMG: ${def.baseDmg}</span>
+              <span>사거리: ${range}</span>
             </div>
-            <div class="tt-skill-desc">${skill.desc}${skill.cooldown ? ` (${skill.cooldown}초)` : ''}${skill.chance && skill.chance < 1 ? ` [${Math.round(skill.chance * 100)}%]` : ''}</div>
-          </div>` : ''}
-          ${def.uniqueEffect ? `<div class="tt-effect">${def.uniqueEffect}</div>` : ''}
+            <div class="tt-stat-row">
+              <span>공속: ${atkSpd}/s</span>
+              <span>DPS: <span style="color:#fbbf24">${dps}</span></span>
+            </div>
+          </div>
+          ${manaLine}
+          ${skillSection}
+          ${roleLine}
         `;
         tooltipEl.style.left = `${(e as MouseEvent).clientX + 12}px`;
-        tooltipEl.style.top = `${(e as MouseEvent).clientY - 120}px`;
+        tooltipEl.style.top = `${(e as MouseEvent).clientY - 140}px`;
         document.body.appendChild(tooltipEl);
       });
       slot.addEventListener('mouseleave', hideTooltip);
