@@ -3737,15 +3737,24 @@ function renderCraftPanel(): void {
     </div>`;
 
     if (!isOpen) {
-      // 접힌 상태: 레시피별 한줄 요약만
+      // 접힌 상태: 보유 재료가 1개 이상인 레시피만 표시
       for (const targetId of group.targets) {
         const targetDef = UNIT_MAP[targetId];
         const check = checkCraftability(targetId);
         const owned = check.ingredients.filter(i => i.owned).length;
         const total = check.ingredients.length;
+        if (owned === 0 && !check.isCraftable) continue; // 0/n은 숨김
         const craftableClass = check.isCraftable ? ' craft-ready' : '';
 
-        html += `<div class="craft-recipe-row compact${craftableClass}">`;
+        // 호버 툴팁: 재료 목록
+        const tooltipLines = check.ingredients.map(ing => {
+          const iDef = UNIT_MAP[ing.id];
+          const star = ing.star > 1 ? `★${ing.star} ` : '';
+          const mark = ing.owned ? '✔' : 'X';
+          return `[${mark}] ${star}${iDef?.name ?? ing.id}`;
+        }).join('\n');
+
+        html += `<div class="craft-recipe-row compact${craftableClass}" title="${tooltipLines}">`;
         html += `<span class="craft-recipe-name">${targetDef?.emoji ?? '?'} ${targetDef?.name ?? targetId}</span>`;
         if (check.isCraftable) {
           html += `<span class="craft-ready-badge">⚡ 가능</span>`;
