@@ -3643,6 +3643,7 @@ function showUnitInfoPanel(unit: UnitInstance, evt?: MouseEvent): void {
   if (dict) {
     detailHtml = `
       <div class="uip-detail" style="display:none">
+        <div class="uip-lore">${dict.lore}</div>
         <div class="uip-detail-flavor">"${dict.flavorText}"</div>
         ${starDescsHtml}
       </div>`;
@@ -3684,6 +3685,16 @@ function showUnitInfoPanel(unit: UnitInstance, evt?: MouseEvent): void {
       detailEl.style.display = unitInfoDetailOpen ? 'block' : 'none';
       const btn = unitInfoPanel?.querySelector('.uip-btn-detail') as HTMLElement;
       if (btn) btn.textContent = unitInfoDetailOpen ? '📖 접기' : '📖 상세보기';
+      // 펼쳤을 때 화면 밖 넘침 자동 보정
+      if (unitInfoDetailOpen && unitInfoPanel) {
+        requestAnimationFrame(() => {
+          const rect = unitInfoPanel!.getBoundingClientRect();
+          if (rect.bottom > window.innerHeight - 4) {
+            const newTop = Math.max(4, window.innerHeight - rect.height - 4);
+            unitInfoPanel!.style.top = `${newTop}px`;
+          }
+        });
+      }
     }
   });
 

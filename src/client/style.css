@@ -2935,6 +2935,17 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
+.uip-lore {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid rgba(243, 186, 47, 0.4);
+    border-radius: 0 6px 6px 0;
+}
+
 /* ═══════════════════════════════════════════════════════════
    DRAG & DROP
    ═══════════════════════════════════════════════════════════ */
