@@ -69,6 +69,7 @@ setOnStartGame(async (stageId: number) => {
   lobbyProEl?.classList.add('hidden');
   resultViewEl?.classList.add('hidden');
   appEl?.classList.remove('hidden');
+  document.querySelector('.rug-pull-overlay')?.remove(); // 방어: 이전 세션 잔여물 제거
 
   // BGM 시작
   bgm.play().catch(() => { });
@@ -3715,6 +3716,8 @@ async function showGameOver(): Promise<void> {
 
   // RUG PULL 연출 (HP 0 패배 — 클리어 시 비표시)
   if (!cleared) {
+    // 게임 화면 즉시 숨기기 (RUG PULL 뒤에서 보이지 않도록)
+    appEl?.classList.add('hidden');
     const rugPull = document.createElement('div');
     rugPull.className = 'rug-pull-overlay';
     rugPull.innerHTML = `
@@ -3728,10 +3731,10 @@ async function showGameOver(): Promise<void> {
     // 2.5초 후 자동 제거
     await new Promise(r => setTimeout(r, 2500));
     rugPull.remove();
+  } else {
+    // 클리어 시 게임 화면 숨기기
+    appEl?.classList.add('hidden');
   }
-
-  // 게임 화면 즉시 숨기기
-  appEl?.classList.add('hidden');
 
   // 결과 화면 먼저 표시 (로딩 중 빈 화면 방지)
   const resultData = {
