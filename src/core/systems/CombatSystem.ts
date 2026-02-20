@@ -580,8 +580,8 @@ export class CombatSystem {
             const hasTargetInRange = this.combat.monsters.some(m => {
                 if (!m.alive) return false;
                 const mPos = getPositionOnPath(m.pathProgress);
-                const dx = mPos.px - (unit.position!.x + 1);
-                const dy = mPos.py - (unit.position!.y + 1);
+                const dx = mPos.px - (unit.position!.x + 1.5);
+                const dy = mPos.py - (unit.position!.y + 1.5);
                 return Math.sqrt(dx * dx + dy * dy) <= unitRange;
             });
             if (!hasTargetInRange) continue; // 마나 만땅이지만 사거리 내 적 없음 → 대기
@@ -1877,8 +1877,8 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - (unit.position.x + 1);
-                    const dy = pos.py - (unit.position.y + 1);
+                    const dx = pos.px - (unit.position.x + 1.5);
+                    const dy = pos.py - (unit.position.y + 1.5);
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist <= range && m.pathProgress < worstProgress) {
                         target = m;
@@ -1891,8 +1891,8 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - (unit.position.x + 1);
-                    const dy = pos.py - (unit.position.y + 1);
+                    const dx = pos.px - (unit.position.x + 1.5);
+                    const dy = pos.py - (unit.position.y + 1.5);
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist <= range && m.hp > bestHp) {
                         target = m;
@@ -1905,8 +1905,8 @@ export class CombatSystem {
                 for (const m of this.combat.monsters) {
                     if (!m.alive) continue;
                     const pos = getPositionOnPath(m.pathProgress);
-                    const dx = pos.px - (unit.position.x + 1);
-                    const dy = pos.py - (unit.position.y + 1);
+                    const dx = pos.px - (unit.position.x + 1.5);
+                    const dy = pos.py - (unit.position.y + 1.5);
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist <= range && m.pathProgress > bestProgress) {
                         target = m;
