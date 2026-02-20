@@ -3766,6 +3766,69 @@ body {
 
 
 /* Grade flash animation */
+/* ── 준비 타이머 바 ── */
+#prep-timer-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 6px;
+    background: #00BFFF;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 0 10px #00BFFF;
+    transition: width 0.1s linear, background-color 0.3s ease;
+    pointer-events: none;
+}
+
+#prep-timer-bar.emergency {
+    background: #ff4b4b !important;
+    box-shadow: 0 0 14px #ff4b4b;
+    animation: emergencyPulse 0.5s infinite;
+}
+
+@keyframes emergencyPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+/* ── 등급 스탬프 (대형) ── */
+@keyframes gradeStamp {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(5);
+    }
+
+    25% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.85);
+    }
+
+    40% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    55% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
+
 @keyframes gradeFlash {
     0% {
         opacity: 0;

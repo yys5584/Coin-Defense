@@ -417,11 +417,11 @@ export class CombatSystem {
 
             // 타임아웃 처리
             if (isBoss) {
-                // 보스: 120초 돌파 시 HP-5, 이후 5초마다 HP-3
-                if (this.combat.elapsedTime >= 120) {
-                    const overtime = this.combat.elapsedTime - 120;
+                // 보스: 60초 돌파 시 HP-5, 이후 5초마다 HP-3
+                if (this.combat.elapsedTime >= 60) {
+                    const overtime = this.combat.elapsedTime - 60;
                     const prevOvertime = overtime - dt;
-                    // 120초 돌파 순간: HP -5
+                    // 60초 돌파 순간: HP -5
                     if (prevOvertime < 0) {
                         this.combat.leakedDamage += 5;
                     }

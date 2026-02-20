@@ -2271,7 +2271,14 @@ function handleBoardClick(x: number, y: number, existing?: UnitInstance): void {
 // ─── 전투 (실제 CombatSystem) ───────────────────────────────
 
 function startCombat(): void {
-  if (inCountdown) return; // 카운트다운 중 전투 시작 방지
+  // 준비 타이머 정리
+  if ((window as any).__prepInterval) {
+    clearInterval((window as any).__prepInterval);
+    (window as any).__prepInterval = null;
+  }
+  const tb = (window as any).__prepTimerBar as HTMLElement | null;
+  if (tb) tb.style.display = 'none';
+
   const p = player();
 
   // ── 런 통계: 시너지 스냅샷 (매 전투 시작마다 최고치 갱신) ──
@@ -2733,7 +2740,7 @@ function renderCombatOverlay(cs: CombatState): void {
   }
 
   // 타임아웃 경고
-  const timeLimit = isBossRd ? 120 : 40;
+  const timeLimit = isBossRd ? 60 : 40;
   const timeLeft = Math.max(0, timeLimit - t);
   const timeoutWarn = timeLeft <= 10 && timeLeft > 0
     ? `<span style="color:#ef4444;font-weight:bold;animation:blink 0.5s infinite">⚠️ ${timeLeft.toFixed(0)}초 후 HP 피해!</span>`
@@ -2747,7 +2754,7 @@ function renderCombatOverlay(cs: CombatState): void {
       { g: 'S', t: 10, gold: 5, color: '#ffd700' },
       { g: 'A', t: 20, gold: 3, color: '#43e97b' },
       { g: 'B', t: 35, gold: 2, color: '#42a5f5' },
-      { g: 'F', t: 120, gold: 0, color: '#ef4444', penalty: '❤️-5' },
+      { g: 'F', t: 60, gold: 0, color: '#ef4444', penalty: '❤️-5' },
     ]
     : [
       { g: 'S', t: 10, gold: 4, color: '#ffd700' },
@@ -3197,17 +3204,18 @@ function onCombatComplete(result: CombatResult): void {
     log(`💀 패배! 킬:${result.kills} -${result.damage}HP 골드+${totalGold}${gradeLabel}`, 'red');
   }
 
-  // 등급 표시 플래시
+  // 등급 표시 스탬프 (대형 애니메이션)
   const gradeBadge = document.createElement('div');
   gradeBadge.style.cssText = `
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    font-size:64px; font-weight:900; color:${gradeColor};
-    text-shadow:0 0 30px ${gradeColor}80, 0 4px 8px rgba(0,0,0,0.5);
-    z-index:9999; pointer-events:none; animation:gradeFlash 1.2s ease-out forwards;
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(5);
+    font-size:120px; font-weight:900; color:${gradeColor};
+    text-shadow:0 0 60px ${gradeColor}, 0 0 120px ${gradeColor}80, 0 8px 16px rgba(0,0,0,0.7);
+    z-index:9999; pointer-events:none; animation:gradeStamp 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    font-family:'neodgm', monospace; letter-spacing:8px;
   `;
   gradeBadge.textContent = result.grade;
   document.body.appendChild(gradeBadge);
-  setTimeout(() => gradeBadge.remove(), 1300);
+  setTimeout(() => gradeBadge.remove(), 2600);
 
   // 보스 S등급: 무료 리롤 2회 추가
   if (isBossRound(state.round) && result.grade === 'S') {
@@ -3299,57 +3307,65 @@ function onCombatComplete(result: CombatResult): void {
 }
 
 function afterCombatCleanup(p: typeof state.players[0]): void {
-  // ── 전투 후 자동 합성 (보드 1 + 벤치 2 = 2성 등) ──
+  // 전투 후 자동 합성
   autoMergeAll(p);
 
-  // 카운트다운 시작 — 전투 버튼 비활성화
-  inCountdown = true;
+  // 다음 라운드 진행
+  cmd.execute(state, { type: 'END_ROUND' });
 
   // 렌더 (골드 변경 반영, 상점 조작 가능)
   render();
   refreshUnlockPanel();
 
-  // 3초 카운트다운 후 다음 라운드 (이자 판단 시간)
-  let countdown = 3;
-  const countdownEl = document.createElement('div');
-  countdownEl.id = 'round-countdown';
-  countdownEl.style.cssText = `
-    position:fixed; bottom:120px; left:50%; transform:translateX(-50%);
-    background:linear-gradient(135deg, #1a1a2e, #16213e);
-    border:2px solid #e94560; border-radius:12px;
-    padding:12px 24px; color:#fff; font-size:16px; font-weight:bold;
-    z-index:999; text-align:center; box-shadow:0 4px 20px rgba(233,69,96,0.3);
-    animation: fadeIn 0.2s ease;
-  `;
-  countdownEl.innerHTML = `⏱️ 다음 라운드까지 <span style="color:#e94560;font-size:20px">${countdown}</span>초`;
-  document.body.appendChild(countdownEl);
+  // 새 스테이지 시작(n-1) 처리
+  const newStage = getStage(state.round);
+  const sr = getStageRound(state.round);
+  if (sr.endsWith('-1') && newStage >= 2) {
+    player().freeRerolls += 1;
+    log(`🔄 S${newStage} 시작! 무료 리롤 +1`, 'gold');
+  }
+  if (newStage >= 3 && sr.endsWith('-1')) {
+    showAugmentPick(state.round);
+  }
 
-  const timer = setInterval(() => {
-    countdown--;
-    if (countdown <= 0) {
-      clearInterval(timer);
-      countdownEl.remove();
-      inCountdown = false;
-      // 다음 라운드
-      cmd.execute(state, { type: 'END_ROUND' });
-      render();
-      refreshUnlockPanel();
+  // ── 30초 준비 타이머 바 ──
+  const PREP_TIME = 30;
+  const mapWrapper = document.getElementById('map-wrapper');
+  let timerBar = document.getElementById('prep-timer-bar');
+  if (!timerBar && mapWrapper) {
+    timerBar = document.createElement('div');
+    timerBar.id = 'prep-timer-bar';
+    mapWrapper.appendChild(timerBar);
+  }
+  if (timerBar) {
+    timerBar.style.width = '100%';
+    timerBar.style.display = 'block';
+    timerBar.classList.remove('emergency');
+  }
 
-      // 새 스테이지 시작(n-1) + stage 3 이상이면 증강 3택 표시
-      const newStage = getStage(state.round);
-      const sr = getStageRound(state.round);
-      // 스테이지 시작 시 무료 리롤 1회
-      if (sr.endsWith('-1') && newStage >= 2) {
-        player().freeRerolls += 1;
-        log(`🔄 S${newStage} 시작! 무료 리롤 +1`, 'gold');
+  const prepStart = performance.now();
+  const prepInterval = setInterval(() => {
+    const elapsed = (performance.now() - prepStart) / 1000;
+    const remaining = Math.max(0, PREP_TIME - elapsed);
+    const pct = (remaining / PREP_TIME) * 100;
+
+    if (timerBar) {
+      timerBar.style.width = `${pct}%`;
+      if (remaining <= 5) {
+        timerBar.classList.add('emergency');
       }
-      if (newStage >= 3 && sr.endsWith('-1')) {
-        showAugmentPick(state.round);
-      }
-    } else {
-      countdownEl.innerHTML = `⏱️ 다음 라운드까지 <span style="color:#e94560;font-size:20px">${countdown}</span>초`;
     }
-  }, 1000);
+
+    if (remaining <= 0) {
+      clearInterval(prepInterval);
+      if (timerBar) timerBar.style.display = 'none';
+      if (!inCombat) startCombat();
+    }
+  }, 100);
+
+  // 수동 전투 시작 시 타이머 정리용 글로벌
+  (window as any).__prepInterval = prepInterval;
+  (window as any).__prepTimerBar = timerBar;
 }
 
 // ─── 게임 오버 화면 ──────────────────────────────────────────
