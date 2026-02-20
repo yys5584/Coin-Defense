@@ -3214,19 +3214,16 @@ function onCombatComplete(result: CombatResult): void {
   // 결과 반영
   cmd.getEconomy().processStreaks(p, result.won);
 
-  // 수입 정산 (라운드 기본 수입)
-  const roundGold = cmd.getEconomy().processIncome(state, p);
-
   // 등급별 보너스 골드
   const combatGold = result.goldEarned;
   const gradeGold = result.bonusGold;
   const totalGold = combatGold + gradeGold;
 
-  // 전 라운드 수입 기록
-  const nextRound = state.round;
-  const isWarmup = getStage(nextRound) === 1;
-  const base = getBaseIncome(nextRound);
-  const interest = isWarmup ? 0 : getInterest(p.gold);
+  // 전 라운드 수입 기록 (processIncome은 END_ROUND에서 호출됨)
+  const curRound = state.round;
+  const isWarmup = getStage(curRound) === 1;
+  const baseGold = getBaseIncome(curRound);
+  const interestGold = isWarmup ? 0 : getInterest(p.gold);
 
   // 토템 골드
   let totemG = 0;
@@ -3239,13 +3236,13 @@ function onCombatComplete(result: CombatResult): void {
   }
 
   lastRoundIncome = {
-    stageGold: base,
+    stageGold: baseGold,
     gradeGold,
     grade: result.grade,
-    interestGold: interest,
+    interestGold,
     combatGold,
     totemGold: totemG,
-    total: roundGold + totalGold + totemG,
+    total: baseGold + interestGold + totalGold + totemG,
   };
 
   const gradeColors: Record<string, string> = { S: '#fbbf24', A: '#4ade80', B: '#60a5fa', F: '#f87171' };
@@ -3254,11 +3251,11 @@ function onCombatComplete(result: CombatResult): void {
 
   if (result.won) {
     p.gold += totalGold;
-    log(`✅ 승리! 킬:${result.kills} 골드+${totalGold + roundGold}${gradeLabel} (${result.elapsedTime.toFixed(1)}s)`, 'green');
+    log(`✅ 승리! 킬:${result.kills} 골드+${totalGold}${gradeLabel} (${result.elapsedTime.toFixed(1)}s)`, 'green');
   } else {
     cmd.getEconomy().applyDamage(p, result.damage);
     p.gold += totalGold;
-    log(`💀 패배! 킬:${result.kills} -${result.damage}HP 골드+${totalGold + roundGold}${gradeLabel}`, 'red');
+    log(`💀 패배! 킬:${result.kills} -${result.damage}HP 골드+${totalGold}${gradeLabel}`, 'red');
   }
 
   // 등급 표시 스탬프 (대형 애니메이션)
