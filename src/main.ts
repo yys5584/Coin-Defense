@@ -2733,7 +2733,7 @@ function renderCombatOverlay(cs: CombatState): void {
   }
 
   // 타임아웃 경고
-  const timeLimit = isBossRd ? 120 : 60;
+  const timeLimit = isBossRd ? 120 : 40;
   const timeLeft = Math.max(0, timeLimit - t);
   const timeoutWarn = timeLeft <= 10 && timeLeft > 0
     ? `<span style="color:#ef4444;font-weight:bold;animation:blink 0.5s infinite">⚠️ ${timeLeft.toFixed(0)}초 후 HP 피해!</span>`
@@ -2753,7 +2753,7 @@ function renderCombatOverlay(cs: CombatState): void {
       { g: 'S', t: 10, gold: 4, color: '#ffd700' },
       { g: 'A', t: 20, gold: 2, color: '#43e97b' },
       { g: 'B', t: 30, gold: 1, color: '#42a5f5' },
-      { g: 'F', t: 60, gold: 0, color: '#ef4444', penalty: '❤️-1' },
+      { g: 'F', t: 40, gold: 0, color: '#ef4444', penalty: '❤️-1' },
     ];
   const gradeBar = grades.map((g: any) => {
     const active = t <= g.t;

@@ -433,11 +433,11 @@ export class CombatSystem {
                     }
                 }
             } else {
-                // 일반: 60초 돌파 시 HP-1, 이후 5초마다 HP-1
-                if (this.combat.elapsedTime >= 60) {
-                    const overtime = this.combat.elapsedTime - 60;
+                // 일반: 40초 돌파 시 HP-1, 이후 5초마다 HP-1
+                if (this.combat.elapsedTime >= 40) {
+                    const overtime = this.combat.elapsedTime - 40;
                     const prevOvertime = overtime - dt;
-                    // 60초 돌파 순간: HP -1
+                    // 40초 돌파 순간: HP -1
                     if (prevOvertime < 0) {
                         this.combat.leakedDamage += 1;
                     }
