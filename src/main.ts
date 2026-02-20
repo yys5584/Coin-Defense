@@ -1424,7 +1424,7 @@ function renderShop(): void {
 
       slot.innerHTML = `
         ${mergeHint}
-        <div class="unit-sprite-icon" style="background-image:url('${getUnitSpriteInfo(unitId, def.origin, def.cost).url}');background-size:${getUnitSpriteInfo(unitId, def.origin, def.cost).bgSize};background-position:${getUnitSpriteInfo(unitId, def.origin, def.cost).bgPos}"></div>
+        <span class="unit-emoji">${def.emoji}</span>
         <div class="shop-slot-info">
           <span class="unit-name">${def.name}</span>
           <span class="unit-origin">${toCrypto(def.origin)}</span>
@@ -1987,9 +1987,8 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
     const ss = getUnitSpriteSheet(unit.unitId, def.origin, def.cost);
     card.innerHTML = `<div class="unit-sprite-icon board-icon" data-cols="${ss.cols}" style="background-image:url('${spriteInfo.url}');background-size:${spriteInfo.bgSize}"></div>`;
   } else {
-    // 벤치: .unit-sprite-icon + 이름
-    const spriteInfo = getUnitSpriteInfo(unit.unitId, def.origin, def.cost);
-    card.innerHTML = `<div class="unit-sprite-icon" style="background-image:url('${spriteInfo.url}');background-size:${spriteInfo.bgSize};background-position:${spriteInfo.bgPos}"></div><span class="name">${def.name}</span><span class="star">${stars}</span><span class="cost-badge">${def.cost}</span>`;
+    // 벤치: 이모지 + 이름
+    card.innerHTML = `<span class="unit-emoji">${def.emoji}</span><span class="name">${def.name}</span><span class="star">${stars}</span><span class="cost-badge">${def.cost}</span>`;
   }
 
   // Drag support
