@@ -9,6 +9,7 @@ import { CommandProcessor } from './core/systems/CommandProcessor';
 import { CombatSystem, getPositionOnPath, CombatResult } from './core/systems/CombatSystem';
 import { SynergySystem } from './core/systems/SynergySystem';
 import { UNIT_MAP, SYNERGIES, STAR_MULTIPLIER, LEVELS, getBaseIncome, getInterest, getStreakBonus, getStageRound, getStage, isBossRound, BOX_DROP_TABLES, BOX_UNLOCK_CHANCE, UNLOCK_CONDITIONS, AUGMENTS, STAGE_HINTS, STAGE_DEFENSE } from './core/config';
+import { UNIT_DICTIONARY } from './core/unitDictionary';
 import { GameState, PlayerState, UnitInstance, CombatState, ActiveSynergy } from './core/types';
 import { createUnitVisual, preloadAllSprites, COST_GLOW, COST_GLOW_SHADOW, hasSpriteFor, hasUnitSprite, getUnitSprite, drawUnitSprite, drawMonsterSprite, getUnitSpriteInfo, getUnitSpriteSheet } from './client/sprites';
 
@@ -3441,6 +3442,30 @@ function showTooltip(e: MouseEvent, unit: UnitInstance): void {
     </div>
     ${manaHtml}
     ${skillHtml}
+    ${(() => {
+      const dict = UNIT_DICTIONARY[unit.unitId];
+      if (!dict) return '';
+      let html = `<div class="tt-dict">`;
+      html += `<div class="tt-role">${dict.role}</div>`;
+      html += `<div class="tt-flavor">${dict.flavorText}</div>`;
+      const showStars = dict.skillDesc.star2 !== '-';
+      html += `<div class="tt-star-descs">`;
+      if (showStars) {
+        const descs = [
+          { label: '★', text: dict.skillDesc.star1, star: 1 },
+          { label: '★★', text: dict.skillDesc.star2, star: 2 },
+          { label: '★★★', text: dict.skillDesc.star3, star: 3 },
+        ];
+        for (const sd of descs) {
+          const cls = sd.star === unit.star ? 'tt-star-desc active' : 'tt-star-desc';
+          html += `<div class="${cls}"><span class="tt-star-label">${sd.label}</span> ${sd.text}</div>`;
+        }
+      } else {
+        html += `<div class="tt-star-desc active"><span class="tt-star-label">🌟</span> ${dict.skillDesc.star1}</div>`;
+      }
+      html += `</div></div>`;
+      return html;
+    })()}
     ${def.uniqueEffect ? `<div class="tt-effect">${def.uniqueEffect}</div>` : ''}
     ${buffSummary}
   `;
