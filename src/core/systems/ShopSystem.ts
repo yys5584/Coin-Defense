@@ -148,8 +148,10 @@ export class ShopSystem {
 
         // 판매 골드: ★1=cost, ★2=cost*3, ★3=cost*9
         const sellMultiplier = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
-        // 증강: 환매왕 — 판매 시 코스트 +1 추가 골드
+        // 증강: 콜드 월렛 — 판매 시 100% 환불
+        const coldWallet = player.augments.includes('aug_cold_wallet');
         const sellBonus = player.augments.includes('aug_sell_profit') ? 1 : 0;
+        // 콜드 월렛: 단순히 cost * multiplier 전액 환불 (패널티 없음)
         player.gold += unitDef.cost * sellMultiplier + sellBonus;
 
         // 풀에 반환 (★2=3개, ★3=9개)
@@ -188,6 +190,15 @@ export class ShopSystem {
 
         this.generateShop(state, player);
         this.events.emit('shop:rerolled', {});
+
+        // 🔄 DEX 스왓 봇: 리롤 시 전아군 마나 10 회복
+        if (player.augments.includes('aug_dex_swap')) {
+            for (const unit of player.board) {
+                if (UNIT_MAP[unit.unitId]?.skill?.type === 'active') {
+                    unit.currentMana = (unit.currentMana ?? 0) + 10;
+                }
+            }
+        }
 
         return true;
     }

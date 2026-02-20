@@ -79,6 +79,7 @@ export class CombatSystem {
     private _gameSpeed = 1;
     private _augments: Set<string> = new Set();
     private _adaptiveDmg = false;
+    private _bailoutUsed = false;
 
     /** 게임 속도 (1x, 2x, 3x) */
     get gameSpeed(): number { return this._gameSpeed; }
@@ -274,6 +275,26 @@ export class CombatSystem {
                 unit.currentMana = udef.startingMana ?? 0;
             }
         }
+
+        // 🪂 기습 에어드랍: 무작위 3명 마나 100% 충전
+        if (augs.has('aug_airdrop')) {
+            const activeUnits = player.board.filter(u => {
+                const ud = UNIT_MAP[u.unitId];
+                return ud?.skill?.type === 'active' && u.position;
+            });
+            // 셔플 후 3명 선택
+            for (let i = activeUnits.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [activeUnits[i], activeUnits[j]] = [activeUnits[j], activeUnits[i]];
+            }
+            for (let i = 0; i < Math.min(3, activeUnits.length); i++) {
+                const ud = UNIT_MAP[activeUnits[i].unitId];
+                activeUnits[i].currentMana = ud?.maxMana ?? 100;
+            }
+        }
+
+        // 🚑 구제 금융 플래그 초기화
+        this._bailoutUsed = this._bailoutUsed ?? false;
 
         this.events.emit('combat:start', { round });
 
@@ -1556,6 +1577,79 @@ export class CombatSystem {
             if (p.rangeBonus && p.buffDuration) {
                 // 랜덤 아군 사거리 버프 (간단 구현: 즉시 보너스 반영 안 함, 패시브 오라로 처리)
             }
+
+            // ═══════════════════════════════════════════════
+            // 증강 후처리: 스킬 발동 후 적용되는 증강 효과들
+            // ═══════════════════════════════════════════════
+
+            // 👁️ ZK 증명: 스킬 데미지에 크리 적용
+            if (augSet.has('aug_zk_proof')) {
+                const critChance = this.buffs?.critChance ?? 0.10;
+                if (Math.random() < critChance) {
+                    const critMult = (this.buffs?.critDmgMultiplier ?? 1.5);
+                    // 가장 앞 적에게 크리 보너스 딜
+                    if (frontTarget.alive) {
+                        frontTarget.hp -= baseDmg * (critMult - 1);
+                    }
+                }
+            }
+
+            // 🩸 연쇄 청산: 스킬로 적 처치 시 시체 폭발 + 마나 50%
+            if (augSet.has('aug_chain_liquidation')) {
+                const nowDead = alive.filter(m => m.hp <= 0 && m.alive);
+                for (const corpse of nowDead) {
+                    // 시체 폭발: 주변 적에게 200 딜
+                    const cPos = getPositionOnPath(corpse.pathProgress);
+                    for (const m of alive) {
+                        if (m === corpse || m.hp <= 0) continue;
+                        const dist = Math.abs(m.pathProgress - corpse.pathProgress);
+                        if (dist < 0.15) { // 반경 내
+                            m.hp -= 200;
+                        }
+                    }
+                }
+                if (nowDead.length > 0) {
+                    // 마나 50% 회복
+                    unit.currentMana = (unit.currentMana ?? 0) + maxMana * 0.50;
+                }
+            }
+
+            // 📈 숏 스퀴즈: 체력 30% 이하 보스에게 스킬 즉사
+            if (augSet.has('aug_short_squeeze')) {
+                for (const m of alive) {
+                    if (m.isBoss && m.hp > 0 && (m.hp / m.maxHp) <= 0.30) {
+                        m.hp = 0; // 보스 즉사!
+                    }
+                }
+            }
+
+            // 🌩️ 라이트닝 네트워크: 체인이 있었다면 추가 단일 집중 딜
+            if (augSet.has('aug_lightning_network') && (p.chainTargets || p.ampChainTargets)) {
+                const focusCount = p.chainTargets ?? p.ampChainTargets ?? 3;
+                const focusDmg = baseDmg * 0.5 * focusCount; // 튕길 횟수 × 50%를 단일 집중
+                frontTarget.hp -= focusDmg;
+            }
+
+            // 🔱 하드 포크: 단일 타겟 스킬 → 추가 2명에게 70% 딜
+            if (augSet.has('aug_hard_fork')) {
+                // 단일 타겟 스킬인지 판별 (splash/chain/pierce가 아닌 스킬)
+                const isSingleTarget = !p.splashTargets && !p.chainTargets && !p.pierceTargets && !p.ampChainTargets && !p.freezeTargets && !p.stunTargets;
+                if (isSingleTarget) {
+                    const others = alive.filter(m => m !== frontTarget && m.alive).slice(0, 2);
+                    for (const m of others) {
+                        m.hp -= baseDmg * 0.70;
+                    }
+                }
+            }
+
+            // 🐈 데드캣 바운스: 관통 스킬에 반사 보너스 딜
+            if (augSet.has('aug_dead_cat') && p.pierceTargets) {
+                // 관통 스킬의 타겟들에게 50% 추가 반사 딜
+                const reflectTargets = alive.slice(0, p.pierceTargets);
+                for (const m of reflectTargets) {
+                    m.hp -= baseDmg * 0.50;
+                }
+            }
         }
     }
 
@@ -1954,10 +2048,20 @@ export class CombatSystem {
                 const attackTargetPos = getPositionOnPath(target.pathProgress);
                 unit.lastTargetX = attackTargetPos.px;
 
-                // 💧 평타 마나 회복 +10 (+DeFi 시너지 보너스)
+                // 💧 평타 마나 회복 (+DeFi 시너지 보너스 + 증강 효과)
                 if (UNIT_MAP[unit.unitId]?.skill?.type === 'active') {
+                    const unitDef = UNIT_MAP[unit.unitId]!;
+                    const unitMaxMana = unitDef.maxMana ?? 100;
                     const manaBonus = this.buffs?.manaRegenBonus ?? 0;
-                    unit.currentMana = (unit.currentMana ?? 0) + 10 + manaBonus;
+                    const augs = this._augments;
+                    // ⛏️ 작업 증명: 평타 마나 = 최대마나의 15%
+                    let hitMana = augs?.has('aug_pow') ? unitMaxMana * 0.15 : 10;
+                    hitMana += manaBonus;
+                    // ❄️ 크립토 윈터: CC 걸린 적 타격 시 마나 2배
+                    if (augs?.has('aug_crypto_winter') && target.debuffs?.some(d => d.type === 'stun' || d.type === 'freeze' || d.type === 'slow')) {
+                        hitMana *= 2;
+                    }
+                    unit.currentMana = (unit.currentMana ?? 0) + hitMana;
                 }
 
                 // 투사체 + 피격 이펙트
