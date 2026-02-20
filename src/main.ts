@@ -77,15 +77,8 @@ setOnStartGame(async (stageId: number) => {
 
 // 결과→로비 복귀 (최신 메인 로비로)
 function returnToLobby() {
-  resultViewEl?.classList.add('hidden');
-  appEl?.classList.add('hidden');
   document.querySelector('.rug-pull-overlay')?.remove();
-  // PRO 로비는 game-screen 안에 있음 → game-screen 표시 + lobby-pro 복원
-  showScreen('game-screen');
-  if (lobbyProEl) {
-    lobbyProEl.classList.remove('hidden');
-    renderLobby(lobbyProEl);
-  }
+  location.reload();
 }
 
 initProLobby();
