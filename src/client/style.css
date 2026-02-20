@@ -2648,6 +2648,49 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SELL ZONE (Drag to Sell)
+   ═══════════════════════════════════════════════════════════ */
+
+.sell-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 2px dashed rgba(239, 68, 68, 0.4);
+    border-radius: 8px;
+    color: #f87171;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    animation: sellZoneFadeIn 0.15s ease;
+}
+
+.sell-zone.hidden {
+    display: none;
+}
+
+@keyframes sellZoneFadeIn {
+    from {
+        opacity: 0;
+        transform: scaleY(0.5);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
+
+.sell-zone-hover,
+.sell-zone:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.8) !important;
+    color: #ef4444;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.3), inset 0 0 20px rgba(239, 68, 68, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════
    UNIT INFO PANEL (Right-Click)
    ═══════════════════════════════════════════════════════════ */
 
@@ -2874,6 +2917,14 @@ body {
 .uip-star-label {
     font-weight: 700;
     margin-right: 2px;
+}
+
+.uip-sell-hint {
+    font-size: 10px;
+    color: #64748b;
+    text-align: center;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 /* ═══════════════════════════════════════════════════════════

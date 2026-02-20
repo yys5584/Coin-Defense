@@ -1056,6 +1056,12 @@ function touchDragStart(e: TouchEvent, unit: UnitInstance, location: 'board' | '
 
   draggedUnit = { instanceId: unit.instanceId, from: location };
   hideTooltip();
+  // 터치 판매존 표시
+  const defTouch = UNIT_MAP[unit.unitId];
+  if (defTouch) {
+    const sellMult = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
+    showSellZone(defTouch.cost * sellMult);
+  }
 }
 
 function touchDragMove(e: TouchEvent): void {
@@ -1081,6 +1087,31 @@ function touchDragEnd(e: TouchEvent): void {
   const touch = e.changedTouches[0];
   const el = document.elementFromPoint(touch.clientX, touch.clientY);
   const p = player();
+
+  // 판매존에 드롭
+  const sellTarget = el?.closest('#sell-zone');
+  if (sellTarget) {
+    const unit = [...p.board, ...p.bench].find(u => u.instanceId === draggedUnit!.instanceId);
+    if (unit) {
+      const def = UNIT_MAP[unit.unitId];
+      if (def) {
+        const isOnBoard = p.board.some(u => u.instanceId === unit.instanceId);
+        if (!(inCombat && isOnBoard)) {
+          const sellMult = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
+          const sellPrice = def.cost * sellMult;
+          cmd.execute(state, {
+            type: 'SELL_UNIT', playerId: p.id, instanceId: unit.instanceId,
+          });
+          log(`판매: ${def.emoji} ${def.name} ★${unit.star} (+${sellPrice}G)`, 'green');
+          selectedUnit = null;
+          hideSellZone();
+          touchCleanup();
+          render();
+          return;
+        }
+      }
+    }
+  }
 
   // 보드 셀에 드롭
   const boardCell = el?.closest('.board-cell') as HTMLElement | null;
@@ -1109,6 +1140,7 @@ function touchDragEnd(e: TouchEvent): void {
     }
   }
 
+  hideSellZone();
   touchCleanup();
 }
 
@@ -2059,6 +2091,9 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
     }
     draggedUnit = { instanceId: unit.instanceId, from: location };
     hideTooltip();
+    // 판매존 표시
+    const sellMult = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
+    showSellZone(def.cost * sellMult);
 
     // 커스텀 드래그 이미지 (잔영 방지)
     const ghost = document.createElement('div');
@@ -2081,10 +2116,11 @@ function createUnitCard(unit: UnitInstance, location: 'board' | 'bench'): HTMLEl
     card.classList.remove('dragging');
     draggedUnit = null;
     document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    hideSellZone();
   });
 
-  card.addEventListener('mouseenter', (e) => showTooltip(e as MouseEvent, unit));
-  card.addEventListener('mouseleave', hideTooltip);
+  card.addEventListener('mouseenter', (e) => { hoveredUnit = unit; showTooltip(e as MouseEvent, unit); });
+  card.addEventListener('mouseleave', () => { hoveredUnit = null; hideTooltip(); });
 
   card.addEventListener('contextmenu', (e) => {
     e.preventDefault();
@@ -3618,8 +3654,8 @@ function showUnitInfoPanel(unit: UnitInstance): void {
     ${detailHtml}
     <div class="uip-actions">
       <button class="uip-btn uip-btn-detail" data-uid="${unit.instanceId}">📖 상세보기</button>
-      <button class="uip-btn uip-btn-sell" data-uid="${unit.instanceId}" data-price="${sellPrice}" ${inCombat && isOnBoard ? 'disabled' : ''}>🗑️ 판매 (${sellPrice}G)</button>
     </div>
+    <div class="uip-sell-hint">🗑️ 판매: E키 또는 드래그 → 판매존 (${sellPrice}G)</div>
   `;
 
   // 상세보기 토글
@@ -3632,20 +3668,6 @@ function showUnitInfoPanel(unit: UnitInstance): void {
       const btn = unitInfoPanel?.querySelector('.uip-btn-detail') as HTMLElement;
       if (btn) btn.textContent = unitInfoDetailOpen ? '📖 접기' : '📖 상세보기';
     }
-  });
-
-  // 판매 버튼
-  unitInfoPanel.querySelector('.uip-btn-sell')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isBoardUnit = player().board.some(u => u.instanceId === unit.instanceId);
-    if (inCombat && isBoardUnit) return;
-    cmd.execute(state, {
-      type: 'SELL_UNIT', playerId: player().id, instanceId: unit.instanceId,
-    });
-    log(`판매: ${def.emoji} ${def.name} ★${unit.star} (+${sellPrice}G)`, 'green');
-    selectedUnit = null;
-    hideUnitInfoPanel();
-    render();
   });
 
   // 패널 클릭 시 이벤트 전파 방지
@@ -3672,6 +3694,90 @@ document.addEventListener('contextmenu', (e) => {
   if (unitInfoPanel && !target.closest('.unit-card') && !target.closest('.unit-info-panel')) {
     e.preventDefault();
     hideUnitInfoPanel();
+  }
+});
+
+// ─── 판매존 (드래그 판매) ────────────────────────────────────
+let hoveredUnit: UnitInstance | null = null;
+
+function showSellZone(price: number): void {
+  const zone = $('sell-zone');
+  zone.classList.remove('hidden');
+  $('sell-zone-price').textContent = String(price);
+}
+
+function hideSellZone(): void {
+  const zone = $('sell-zone');
+  zone.classList.add('hidden');
+  zone.classList.remove('sell-zone-hover');
+}
+
+// 판매존 드래그 핸들러
+const sellZone = $('sell-zone');
+sellZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  sellZone.classList.add('sell-zone-hover');
+});
+sellZone.addEventListener('dragleave', () => {
+  sellZone.classList.remove('sell-zone-hover');
+});
+sellZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  sellZone.classList.remove('sell-zone-hover');
+  if (!draggedUnit) return;
+  const p = player();
+  const unit = [...p.board, ...p.bench].find(u => u.instanceId === draggedUnit!.instanceId);
+  if (!unit) return;
+  const def = UNIT_MAP[unit.unitId];
+  if (!def) return;
+  // 전투 중 보드 유닛 판매 불가
+  const isOnBoard = p.board.some(u => u.instanceId === unit.instanceId);
+  if (inCombat && isOnBoard) return;
+  const sellMult = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
+  const sellPrice = def.cost * sellMult;
+  cmd.execute(state, {
+    type: 'SELL_UNIT', playerId: p.id, instanceId: unit.instanceId,
+  });
+  log(`판매: ${def.emoji} ${def.name} ★${unit.star} (+${sellPrice}G)`, 'green');
+  draggedUnit = null;
+  selectedUnit = null;
+  hideSellZone();
+  render();
+});
+
+// 터치 드래그 판매존 지원
+function checkTouchSellZone(touch: Touch): boolean {
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  const zone = el?.closest('#sell-zone');
+  if (zone) {
+    sellZone.classList.add('sell-zone-hover');
+    return true;
+  }
+  sellZone.classList.remove('sell-zone-hover');
+  return false;
+}
+
+// E키 판매 (롤토체스 방식)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'e' || e.key === 'E') {
+    if (!hoveredUnit) return;
+    const p = player();
+    const unit = hoveredUnit;
+    const def = UNIT_MAP[unit.unitId];
+    if (!def) return;
+    const isOnBoard = p.board.some(u => u.instanceId === unit.instanceId);
+    if (inCombat && isOnBoard) return;
+    const sellMult = unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1;
+    const sellPrice = def.cost * sellMult;
+    cmd.execute(state, {
+      type: 'SELL_UNIT', playerId: p.id, instanceId: unit.instanceId,
+    });
+    log(`판매: ${def.emoji} ${def.name} ★${unit.star} (+${sellPrice}G)`, 'green');
+    selectedUnit = null;
+    hoveredUnit = null;
+    hideTooltip();
+    hideUnitInfoPanel();
+    render();
   }
 });
 
