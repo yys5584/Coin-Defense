@@ -2335,8 +2335,10 @@ function renderCombatOverlay(cs: CombatState): void {
     if (progress >= 1) continue;
 
     const el = document.createElement('div');
-    const fxX = gridOffsetX + (fx.x + 0.5) * cellW;
-    const fxY = gridOffsetY + (fx.y + 0.5) * cellH;
+    // 좌표계 분기: 스킬 이펙트는 경로 좌표(0~8, 0~5), 기존 이펙트는 보드 좌표(0~6, 0~3)
+    const isSkillFx = fx.type.startsWith('skill_') || fx.type === 'freeze';
+    const fxX = isSkillFx ? toPixelX(fx.x) : gridOffsetX + (fx.x + 0.5) * cellW;
+    const fxY = isSkillFx ? toPixelY(fx.y) : gridOffsetY + (fx.y + 0.5) * cellH;
 
     if (fx.type === 'damage' || fx.type === 'crit') {
       // 데미지 숫자 — 위로 떠오르며 사라짐
